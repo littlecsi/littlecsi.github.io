@@ -4,7 +4,7 @@ title: Essay
 slug: essay
 menu: true
 submenu: false
-order: 4
+order: 1
 description: >
-  평소 생각과 쓰고싶은 글을 씁니다.
+  제가 관심있는 것에 대해 글을 씁니다.
 ---

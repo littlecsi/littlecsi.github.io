@@ -1,7 +1,7 @@
 ---
 layout: tag-blog
-title: Essay
-slug: essay
+title: Virtual Reality
+slug: vr
 category: essay
 menu: false
 order: 1
