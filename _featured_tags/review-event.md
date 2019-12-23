@@ -4,5 +4,5 @@ title: Event
 slug: event
 category: review
 menu: false
-order: 1
+order: 2
 ---
