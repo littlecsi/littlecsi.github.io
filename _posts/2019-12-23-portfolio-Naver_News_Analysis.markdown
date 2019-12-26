@@ -6,7 +6,7 @@ categories: portfolio
 tags: bigdata
 comments: true
 ---
-![Naver x RStudio](/assets/img/portfolio/portfolio-naver_news_analysis_01.png)
+![Naver x RStudio](/assets/img/portfolio/portfolio-naver_news_analysis_01.png =500x200)
 
 R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예측해 보겠습니다. 그러기에 필요한 문제를 파악하고 분석방법 및 예측 모델을 기획한 다음 분석을 시작하겠습니다. 마지막으로, 도출해낸 결과를 시각화함과 동시에 광고 효율을 올리는 것에 대한 제안을 하겠습니다.
 
@@ -17,6 +17,7 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
 - [Data Requirement](#data-requirement)
 - [Development](#development)
   - [1 Crawling](#1-crawling)
+- [Sources](#sources)
 
 # Analysis
 
@@ -28,7 +29,7 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
 
 # Data Requirement
 
-Data source : https://news.naver.com/
+Data source : [https://news.naver.com](https://news.naver.com)
 
 | Column | Data Type | Description | Variable Name |
 |:---:|:---:|:---:|:---:|
@@ -60,6 +61,23 @@ Data source : https://news.naver.com/
 
 > Data Requirement에 있는 데이터 웹크롤링하기
 
-우선 크롤링을 하기 위해 `rvest` 패키지를 사용했습니다.
+우선 크롤링을 하기 위해 `rvest` 와 `RSelenium` 패키지를 사용했습니다. Selenium을 사용함으로써 `rvest`로 GET 하거나 POST 하여 가져올 수 없는 웹페이지를 크롤링할 떄 편리합니다. 예를 들어 클릭해서 로그인 후 내용을 크롤링 한다든지, 검색어를 입력해서 크롤링 하는 경우, 웹표준을 지키지 않아서 크롤링이 어려운 경우 등에 사용하면 편리합니다.
+
+RSelenium 을 사용하기 위해서 3개의 드라이버를 다운 받았습니다:
+
+- [Selenium Standalone Server](http://selenium-release.storage.googleapis.com/index.html)
+
+자바 jar 파일입니다. Selenium 서버를 실행하기 위한 툴입니다.
+
+- [Gecko Driver](https://github.com/mozilla/geckodriver/releases/tag/v0.17.0)
+
+W3C WebDriver 프로토콜을 사용하여 Selenium 과 통신합니다. W3C 는 보편적으로 정의된 표준입니다. 즉, Selenium 개발자들이 각 브라우저 버전별로 Selenium 버전을 계속 개발하지 않아도 된다는 뜻입니다.
+
+- [Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/)
+
+이 또한 W3C WebDriver standard를 시행한 독립 서버입니다.
 
 ![News Website Analysis 01](/assets/img/portfolio/portfolio-naver_news_analysis_02.jpg)
+
+# Sources
+[R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
