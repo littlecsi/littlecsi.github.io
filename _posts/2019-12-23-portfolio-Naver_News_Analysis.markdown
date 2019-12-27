@@ -174,11 +174,11 @@ for(y in year) {
 
 먼저 for 문을 도는 변수가 크롤링 시작날짜 *startDate* 변수와 일치할 때까지 다음 반복문으로 넘어가고, 크롤링 마치는날짜 *stopDate* 변수와 일치할 경우 그 반복문을 마지막으로 실행하고 반복문을 탈출 할 수 있게 설계하였습니다.
 
-*day* 변수를 반복처리 하면서 이런경우 다음 반복문으로 넘어가도록 설계했습니다:
+*day* 변수를 반복처리 하면서 이런경우 다음 반복문으로 넘어가도록 설계했습니다 :
 - 31일이 없는 월일 경우 (4월, 6월, 9월, 11월)
 - 2월 30일 또는 31일인 경우
 
-이 모든 예외처릴 거치고도 *day* 변수 반복문에 있다는 것은 3개의 반복문이 startDate와 일치하다는 뜻으로 크롤링이 시작할 준비가 되었다는 뜻입니다. 그러므로 이때 *startFlag* 변수를 True 으로 바꾸어 줍니다.
+이 모든 예외처릴 거치고도 *day* 변수 반복문에 있다는 것은 3개의 반복문이 *startDate* 와 일치하다는 뜻으로 크롤링이 시작할 준비가 되었다는 뜻입니다. 그러므로 이때 *startFlag* 변수를 True 으로 바꾸어 줍니다.
 그리고, *dat* 변수에 *url* 변수 속 date를 지정할 때 넣을 값 (8자리 숫자배열) 을 저장합니다.
 
 마지막으로, *dat* 변수가 *stopDate* 와 일치할 경우 *finFlag* 를 True 값으로 바꾸어줍니다.
@@ -195,6 +195,24 @@ for(y in year) {
 먼저 `rvest` 패키지를 활용한 크롤링입니다. 접근하고 싶은 URL 을 가지고 **read_html()** 함수를 사용하였습니다.
 
 ```R
+chkURL <- function(url) {
+    out <- tryCatch(
+        {
+            html <- read_html(url)
+            return(html)
+        },
+        error=function(cond) {
+            return(F)
+        },
+        warning=function(cond) {
+            return(F)
+        },
+        finally={
+            cat('chkURL function called\n')
+        }
+    )
+}
+
 html <- chkURL(url)
             
 # Checks URL
@@ -215,7 +233,20 @@ if(len == 0) { next } # If nothing is crawled, skip
 if(length(view) == 0) { view <- rep(NA, len) }
 ```
 
-처음으로 *url* 변수를 chkURL() 함수의 매개변수로 사용하여 *html* 변수에 넣습니다.
+처음으로 *url* 변수를 **chkURL()** 함수의 매개변수로 사용하여 *html* 변수에 넣습니다. **chkURL()** 함수는 커스텀 함수이며, **tryCatch()** 함수를 사용합니다. 이 함수는 **read_html()** 를 시도하는 중 error 나 warning 이 뜨면 False 값을 리턴하는 함수입니다. 만약에 성공적이었으면 그대로 파싱한 웹사이트를 list 데이터 타입으로 리턴합니다.
+
+그 이후에 만약에 *html* 변수가 list 타입이 아니라면 파싱이 잘못된 것이므로 list 타입일 때까지 while 문을 돌려서 파싱을 시도합니다.
+
+찾고싶어하는 정보들이 모두 ol 태그내에 있는 div 태그내에 있어서 *list* 변수에 `ranking_text` 클래스를 가지고 있는 태그들을 모두 불러 저장하였습니다.
+
+그리고 필요한 데이터들을 다음과 같이 태그를 따라가서 각각의 변수에 저장하였습니다 :
+- 기사 제목 : ranking_text > ranking_headline > a 태그. 텍스트를 불러와 *title* 에 저장
+- 기사 부제 : ranking_text > ranking_lede. 텍스트를 불러와 *subti* 에 저장
+- 언론사 : ranking_text > ranking_office. 텍스트를 불러와 *source* 에 저장
+- 조회수 : ranking_text > ranking_view. 숫자를 불러와 *view* 에 저장
+- *댓글수 : ranking_text > count_cmt. 숫자를 불러와 *cmt* 에 저장
+
+
 
 # Sources
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
