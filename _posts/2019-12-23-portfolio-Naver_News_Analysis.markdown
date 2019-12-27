@@ -188,7 +188,34 @@ for(y in year) {
 
 ### 1.4 Rvest Crawling
 
+특별한 반응이 필요없는 일반적인 크롤링은 `rvest` 패키지 함수를 사용했다. 일반적인 파싱으로 기사의 제목, 부제, 언론사, 그리고 조회수 및 댓글수를 크롤링하였습니다.
 
+기사 댓글에 대한 세부적인 정보들은 `rvest` 패키지로 접근이 불가능하여 이런 상황을 위해 만들어진 `RSelenium` 패키지를 사용하였습니다. `RSelenium` 을 사용한 크롤링은 다음에 설명 하겠습니다.
+
+먼저 `rvest` 패키지를 활용한 크롤링입니다. 접근하고 싶은 URL 을 가지고 **read_html()** 함수를 사용하였습니다.
+
+```R
+html <- chkURL(url)
+            
+# Checks URL
+while(is.list(html) == F) {
+    html <- chkURL(url)
+}
+
+list <- html %>% html_nodes('.ranking_list') %>% html_nodes('.ranking_text')
+
+title <- list %>% html_nodes('.ranking_headline') %>% html_nodes('a') %>% html_text()
+subti <- list %>% html_nodes('.ranking_lede') %>% html_text()
+source <- list %>% html_nodes('.ranking_office') %>% html_text()
+view <- list %>% html_nodes('.ranking_view') %>% html_text()
+
+len <- length(title) # number of articles in this page
+
+if(len == 0) { next } # If nothing is crawled, skip
+if(length(view) == 0) { view <- rep(NA, len) }
+```
+
+처음으로 *url* 변수를 chkURL() 함수의 매개변수로 사용하여 *html* 변수에 넣습니다.
 
 # Sources
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
