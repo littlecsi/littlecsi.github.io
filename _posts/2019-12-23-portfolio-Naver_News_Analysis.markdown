@@ -495,5 +495,9 @@ write.xlsx(df, file, sheetName=sheName, col.names=T, row.names=F, append=T, pass
 
 ## 2 Database - MySQL
 
+엑셀 파일에서 데이터를 불러오는 시간이 생각보다 매우 오려걸려 MySQL 데이터베이스를 사용하여 관리하기로 하였습니다. 이를 위해 MySQL 을 설치 후 R 에서 `RMySQL` 과 `DBI` 패키지를 사용해 데이터를 불러왔습니다.
+
+
+
 # Sources
-[R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
+[R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)p
