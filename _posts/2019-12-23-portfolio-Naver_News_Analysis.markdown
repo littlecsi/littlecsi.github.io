@@ -25,6 +25,7 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
       - [1.5.1 Most Viewed Page](#151-most-viewed-page)
       - [1.5.1 Most Commeneted Page](#151-most-commeneted-page)
   - [2 Database - MySQL](#2-database---mysql)
+    - [2.1 Initialisation](#21-initialisation)
 - [Sources](#sources)
 
 # Analysis
@@ -497,7 +498,33 @@ write.xlsx(df, file, sheetName=sheName, col.names=T, row.names=F, append=T, pass
 
 엑셀 파일에서 데이터를 불러오는 시간이 생각보다 매우 오려걸려 MySQL 데이터베이스를 사용하여 관리하기로 하였습니다. 이를 위해 MySQL 을 설치 후 R 에서 `RMySQL` 과 `DBI` 패키지를 사용해 데이터를 불러왔습니다.
 
+```R
+conn <- dbConnect(MySQL(), user="naver", password="Naver1q2w3e4r!", dbname="naverdb",host="localhost")
+```
+
+`DBI` 패키지의 **dbConnect()** 함수를 사용해 올바른 매개변수를 넣어 실행시키면 아무 에러 없이 *conn* 객체가 생성됩니다.
+
+이제 엑세에서 데이터를 불러와서 database 에 집어 넣기만 하면 됩니다.
+
+### 2.1 Initialisation
+
+db 에 접근하기 앞서, 변수 초기화를 해보겠습니다.
+
+```R
+ext <- '.xlsx'
+path <- 'resources/'
+types <- c('E','I','L','P','S','W')
+sections <- c('econ','IT','life_cult','politics','soc','world')
+tables <- c('NEWS_ECON', 'NEWS_IT', 'NEWS_LIFE_CULT', 'NEWS_POLITICS', 'NEWS_SOC', 'NEWS_WORLD')
+```
+
+- ext : 파일 불러 올때의 확장명
+- path : 엑셀파일이 들어가있는 파일 이름
+- types : NEWSID 라는 Primary Key 를 생성할 때 필요한 변수
+- sections : 파일 불러 올때 필요한 뉴스 분야 이름을 저장한 변수
+- tables : DB 에 저장되어있는 테이블 이름들을 저장한 변수
+
 
 
 # Sources
-[R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)p
+[R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
