@@ -26,6 +26,11 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
       - [1.5.1 Most Commeneted Page](#151-most-commeneted-page)
   - [2 Database - MySQL](#2-database---mysql)
     - [2.1 Initialisation](#21-initialisation)
+    - [2.2 Functions](#22-functions)
+      - [2.2.1 dbsend()](#221-dbsend)
+      - [2.2.2 cleanData()](#222-cleandata)
+      - [2.2.3 dbDisconnectAll()](#223-dbdisconnectall)
+    - [2.3 Data Insertion](#23-data-insertion)
 - [Sources](#sources)
 
 # Analysis
@@ -469,7 +474,7 @@ write.xlsx(df, file, sheetName=sheName, col.names=T, row.names=F, append=T, pass
 
 #### 1.5.1 Most Commeneted Page
 
-'댓글 수 많은' 페이지를 크롤링하는 방법은 그 전과 매우 비슷합니다. 하지만, 이번에는 oid 와 aid 를 사용하지 않아도 됩니다. 뉴스 댓글에 관한 정보 페이지로 가는 URL 주소를 바로 불러 올 수 있기 떄문입니다. 이 작업은 `rvest` 패키지를 사용합니다.
+'댓글 많은' 페이지를 크롤링하는 방법은 그 전과 매우 비슷합니다. 하지만, 이번에는 oid 와 aid 를 사용하지 않아도 됩니다. 뉴스 댓글에 관한 정보 페이지로 가는 URL 주소를 바로 불러 올 수 있기 떄문입니다. 이 작업은 `rvest` 패키지를 사용합니다.
 
 ```R
 urls <- list %>% html_nodes('.count_cmt') %>% html_attr('href')
@@ -523,6 +528,197 @@ tables <- c('NEWS_ECON', 'NEWS_IT', 'NEWS_LIFE_CULT', 'NEWS_POLITICS', 'NEWS_SOC
 - types : NEWSID 라는 Primary Key 를 생성할 때 필요한 변수
 - sections : 파일 불러 올때 필요한 뉴스 분야 이름을 저장한 변수
 - tables : DB 에 저장되어있는 테이블 이름들을 저장한 변수
+
+DB 에 6개의 테이블을 생성하였습니다. 6개의 테이블은 각 뉴스 분류 별로 생성한 것 입니다. 다음은 테이블 생성할 때 사용한 SQL 코드 입니다.
+
+```SQL
+USE naverdb;
+
+
+CREATE TABLE NEWS_POLITICS(
+    NEWSID varchar(16) PRIMARY KEY,
+    NEWSRANK INT,   
+    TITLE varchar(512),
+    SUBTITLE varchar(512),
+    SRC varchar(32),
+    NEWSDATE varchar(16),
+    NVIEW INT,
+    NCOMMENT INT,
+    CURR_CMT INT,
+    DELETED INT,
+    BROKEN INT,
+    MALER INT,
+    FEMALER INT,
+    X10 INT,
+    X20 INT,
+    X30 INT,
+    X40 INT,
+    X50 INT,
+    X60 INT
+);
+```
+
+보시다시피 19개의 컬럼을 사용하였습니다. 각 컬럼은 다음을 나타냅니다 : 
+- NEWSID : 뉴스 기사 고유 아이디 (이것은 네이버에서 제공된 것이 아닌 저희가 정한 커스텀 아이디입니다)
+- NEWSRANK : 뉴스 랭킹
+- TITLE : 뉴스 기사 제목
+- SUBTITLE : 뉴스 기사 부제
+- SRC : 언론사
+- NEWSDATE : 작성된 날짜
+- NVIEW : 조회 수
+- NCOMMENT : 전체 댓글 수
+- CURR_CMT : 현재 댓글 수
+- DELETED : 삭제된 댓글 수
+- BROKEN : 규정 미준수 댓글 수
+- MALER : 남자 댓글 수 비율
+- FEMALER : 여자 댓글 수 비율
+- X10 : 10대 댓글 수 비율
+- X20 : 20대 댓글 수 비율
+- X30 : 30대 댓글 수 비율
+- X40 : 40대 댓글 수 비율
+- X50 : 50대 댓글 수 비율
+- X60 : 60대 댓글 수 비율
+
+### 2.2 Functions
+
+DB 에 데이터를 전송하기 위해 3개의 함수를 사용했습니다.
+
+#### 2.2.1 dbsend()
+
+이 함수에는 4개의 매개변수가 들어갑니다.
+- df : DB 에 삽입할 데이터가 들어있는 데이터 프레임
+- type : 뉴스 기사 분류 코드
+- tab : 데이터를 삽입할 DB 속 테이블 이름
+
+NEWSID, NEWSDATE 외의 컬럼은 데이터 가공이 필요하지 않고 데이터프레임에서 바로 테이블로 삽입이 가능함으로 다른 설명이 굳이 필요가 없습니다.
+
+```R
+len <- nrow(df)
+
+for(l in c(1:len)) {
+    DATE <- paste(str_sub(date[l], 1, 4), '/', str_sub(date[l], 5, 6), '/', str_sub(date[l], 7, 8), sep='')
+    NEWSDATE <- c(NEWSDATE, DATE)
+}
+```
+
+NEWSDATE 컬럼 데이터 가공 코드입니다. 연, 월, 일 사이에 '/' 를 넣어주고 NEWSDATE 벡터에 저장합니다.
+
+```R
+NEWSID <- c()
+if(is.null(NVIEW)) {
+    NVIEW <- rep(0, len)
+    for(l in c(1:len)) {
+        ID <- paste(type, 'C', date[l], NEWSRANK[l], sep='')
+        NEWSID <- c(NEWSID, ID)
+    }
+}
+else {
+NCOMMENT <- rep(0, len)
+    for(l in c(1:len)) {
+        ID <- paste(type, 'V', date[l], NEWSRANK[l], sep='')
+        NEWSID <- c(NEWSID, ID)
+    }
+}
+```
+
+저는 DB 에 조회 수 많은 기사 데이터 및 댓글 많은 기사 데이터를 모두 각 기사 분류에 따라 삽입하므로 NVIEW 컬럼과 NCOMMENT 컬럼중 하나는 무조건 NULL 값이 들어갑니다. 따라서, 먼저 NVIEW 가 NULL 인지 확인합니다. 만약에 NULL 이면, 0을 *len* 변수 값 만큼 넣습니다. 먼약 NCOMMENT 가 NULL 일 경우 반대로 시행합니다.
+
+NEWSID 는 뉴스 분류 코드, 'V' 또는 'C', 날짜, 랭킹을 합친 것을 뉴스 아이디로 사용하며 DB 에서의 Primary Key 로 사용하고 있습니다. '조회 수 많은' 페이지의 데이터면 'V'를, '댓글 많은' 페이지의 데이터면 'C'를 사용합니다.
+
+```R
+for(i in c(1:len)) {
+    if(is.na(X10[i])) {
+        MALER[i] <- 0
+        FEMALER[i] <- 0
+        X10[i] <- 0
+        X20[i] <- 0
+        X30[i] <- 0
+        X40[i] <- 0
+        X50[i] <- 0
+        X60[i] <- 0
+    }
+}
+```
+
+또 다른 예외 처리로 '10대 댓글 비율'이 NA 값인 경우 비율 데이터에 아무것도 안 들어왔다는 의미로 0으로 대치하여 삽입하였습니다.
+
+```R
+for(i in c(1:len)) {
+    if(is.na(CURR_CMT[i])) {
+        CURR_CMT[i] <- 0
+        DELETED[i] <- 0
+        BROKEN[i] <- 0
+    }
+}
+```
+
+현재 댓글 수가 NA 값인 경우 '현재 댓글 수', '삭제된 댓글 수', '규정 미준수 댓글 수' 모두 아무것도 파싱 되지 않았다는 뜻임으로, 0으로 대치하여 삽입하였습니다.
+
+```R
+for(l in c(1:len)) {
+    query <- paste("INSERT INTO ", tab, " VALUES(\'", 
+        NEWSID[l], '\', ', 
+        NEWSRANK[l], ', \'', 
+        TITLE[l], '\',\'', 
+        SUBTITLE[l], '\',\'',  
+        SRC[l], '\',\'', 
+        NEWSDATE[l], '\', ', 
+        NVIEW[l], ', ', 
+        NCOMMENT[l], ', ', 
+        CURR_CMT[l], ', ', 
+        DELETED[l], ', ', 
+        BROKEN[l], ', ', 
+        MALER[l], ', ', 
+        FEMALER[l], ', ', 
+        X10[l], ', ', 
+        X20[l], ', ', 
+        X30[l], ', ', 
+        X40[l], ', ', 
+        X50[l], ', ', 
+        X60[l], ")", 
+        sep='')
+    dbSendQuery(conn, query)
+}
+```
+
+위는 query 문을 `DBI` 패키지의 **dbSendQuery()** 함수를 사용하여 각 행의 데이터를 for 문을 사용해 DB 에 집어넣는 코드입니다.
+
+#### 2.2.2 cleanData()
+
+**cleanData()** 함수는 뉴스 기사의 제목과 부제에서 `"`, `,`, `'`, 그리고 tab 을 없애주는 함수입니다.
+
+```R
+cleanData <- function(df) {
+  df$title <- str_replace_all(df$title, '\"', ' ')
+  df$title <- str_replace_all(df$title, ',', ' ')
+  df$title <- str_replace_all(df$title, '\'', ' ')
+  df$title <- str_replace_all(df$title, '\t', '')
+  
+  df$subti <- str_replace_all(df$subti, '\"', ' ')
+  df$subti <- str_replace_all(df$subti, ',', ' ')
+  df$subti <- str_replace_all(df$subti, '\'', ' ')
+  df$subti <- str_replace_all(df$subti, '\t', '')
+  return(df)
+}
+```
+
+`stringr` 패키지의 **str_replace_all()** 함수를 사용해 불필요한 문자들을 공백으로 바꾸어서 없애줍니다.
+
+#### 2.2.3 dbDisconnectAll()
+
+현재 conn 객체를 통해 만들어진 DB 와의 연결을 모두 끊어주는 함수입니다.
+
+```R
+dbDisconnectAll <- function(){
+  ile <- length(dbListConnections(MySQL()))
+  lapply( dbListConnections(MySQL()), function(x) dbDisconnect(x) )
+  cat(sprintf("%s connection(s) closed.\n", ile))
+}
+```
+
+`DBI` 패키지의 **dbListConnections()** 함수를 사용합니다. 리턴된 리스트의 요소 갯수를 *ile* 변수에 저장하고 **lapply()** 함수를 사용해 리턴된 connection 들에 **dbDisconnect()** 함수를 사용해 모두 접속을 끊어줍니다.
+
+### 2.3 Data Insertion
 
 
 
