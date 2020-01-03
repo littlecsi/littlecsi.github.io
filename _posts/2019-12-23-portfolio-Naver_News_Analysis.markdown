@@ -16,21 +16,35 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
 - [Analysis](#analysis)
 - [Data Requirement](#data-requirement)
 - [Development](#development)
-  - [1 Crawling](#1-crawling)
+  - [0 Crawling](#0-crawling)
+    - [0.1 Initialisation](#01-initialisation)
+    - [0.2 URL analysis](#02-url-analysis)
+    - [0.3 Exceptions](#03-exceptions)
+    - [0.4 rvest Crawling](#04-rvest-crawling)
+    - [0.5 RSelenium Crawling](#05-rselenium-crawling)
+      - [0.5.1 Most Viewed Page](#051-most-viewed-page)
+      - [0.5.2 Most Commeneted Page](#052-most-commeneted-page)
+  - [1 Database - MySQL](#1-database---mysql)
     - [1.1 Initialisation](#11-initialisation)
-    - [1.2 URL analysis](#12-url-analysis)
-    - [1.3 Exceptions](#13-exceptions)
-    - [1.4 rvest Crawling](#14-rvest-crawling)
-    - [1.5 RSelenium Crawling](#15-rselenium-crawling)
-      - [1.5.1 Most Viewed Page](#151-most-viewed-page)
-      - [1.5.1 Most Commeneted Page](#151-most-commeneted-page)
-  - [2 Database - MySQL](#2-database---mysql)
-    - [2.1 Initialisation](#21-initialisation)
-    - [2.2 Functions](#22-functions)
-      - [2.2.1 dbsend()](#221-dbsend)
-      - [2.2.2 cleanData()](#222-cleandata)
-      - [2.2.3 dbDisconnectAll()](#223-dbdisconnectall)
-    - [2.3 Data Insertion](#23-data-insertion)
+    - [1.2 Functions](#12-functions)
+      - [1.2.1 dbsend()](#121-dbsend)
+      - [1.2.2 cleanData()](#122-cleandata)
+      - [1.2.3 dbDisconnectAll()](#123-dbdisconnectall)
+    - [1.3 Data Insertion](#13-data-insertion)
+    - [1.4 Data Select](#14-data-select)
+  - [2 Chi-Squared Test](#2-chi-squared-test)
+    - [2.1 Monthly View Data](#21-monthly-view-data)
+      - [2.1.1 Data Pre-processing](#211-data-pre-processing)
+      - [2.1.2 Visualisation](#212-visualisation)
+      - [2.1.3 Test](#213-test)
+      - [2.1.4 Result](#214-result)
+    - [2.2 Monthly Comment Data](#22-monthly-comment-data)
+      - [2.2.1 Data Pre-processing](#221-data-pre-processing)
+      - [2.2.2 Visualisation](#222-visualisation)
+      - [2.2.3 Test](#223-test)
+      - [2.2.4 Result](#224-result)
+    - [2.3 Conclusion](#23-conclusion)
+  - [3 F-Test](#3-f-test)
 - [Sources](#sources)
 
 # Analysis
@@ -71,9 +85,9 @@ Data source : [https://news.naver.com](https://news.naver.com)
 
 # Development
 
-## 1 Crawling
+## 0 Crawling
 
-### 1.1 Initialisation
+### 0.1 Initialisation
 
 > Data Requirement에 있는 데이터 웹크롤링하기
 
@@ -118,7 +132,7 @@ remDr$open()
 
 성곡적으로 실행시킨 경우, 새로운 Chrome 창이 떴습니다.
 
-### 1.2 URL analysis
+### 0.2 URL analysis
 
 크롤링할 사이트 url 을 분석 후 baseurl 을 *url* 변수에 저장하였습니다.
 
@@ -129,26 +143,11 @@ url <- 'https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_d
 - sectionId 는 뉴스 분야를 나타내는 고유값이다. 100부터 105까지 총 6개의 section(정치, 경제, 사회, 생활/문화, 세계, IT/과학) 입니다.
 - date 는 날짜를 나타내므로, 형식은 20181101 처럼 8자리 숫자를 입력합니다.
 
-### 1.3 Exceptions
+### 0.3 Exceptions
 
 'Data Requirement' 에서 말했듯이 Training 데이터는 1년치 데이터이고, Testing 데이터는 1개월 데이터입니다. 먼저 for 문을 돌리기 위한 변수들을 만들었습니다.
 
-```R
-year <- as.character(c(2018:2019))
-month <- c('01','02','03','04','05','06','07','08','09','10','11','12')
-day <- c(c('01','02','03','04','05','06','07','08','09'), 10:31)
-month_eng <- c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
-```
-
 더 나아가, 크롤링 시작하는 날짜와 끝나는 날짜도 변수에 하고 크롤링 시작 및 탈출을 하기 위한 flag 논리 변수도 생성하였습니다.
-
-```R
-startDate <- '20191101'
-stopDate <-  '20191130'
-
-startFlag = F
-finFlag = F
-```
 
 이제 for 문 속 예외 처리를 확인해 보겠습니다.
 
@@ -198,7 +197,7 @@ for(y in year) {
 *mcnt* 변수는 마지막에 모은 크롤링 데이터를 가지고 엑셀 파일에 저장할 때 필요한 index 변수입니다.
 이는 나중에 데이터 저장을 다루는 챕터에서 다루겠습니다.
 
-### 1.4 rvest Crawling
+### 0.4 rvest Crawling
 
 특별한 반응이 필요없는 일반적인 크롤링은 `rvest` 패키지 함수를 사용했다. 일반적인 파싱으로 기사의 제목, 부제, 언론사, 그리고 조회 수 및 댓글 수를 크롤링하였습니다.
 
@@ -207,24 +206,6 @@ for(y in year) {
 먼저 `rvest` 패키지를 활용한 크롤링입니다. 접근하고 싶은 URL 을 가지고 **read_html()** 함수를 사용하였습니다.
 
 ```R
-chkURL <- function(url) {
-    out <- tryCatch(
-        {
-            html <- read_html(url)
-            return(html)
-        },
-        error=function(cond) {
-            return(F)
-        },
-        warning=function(cond) {
-            return(F)
-        },
-        finally={
-            cat('chkURL function called\n')
-        }
-    )
-}
-
 html <- chkURL(url)
             
 # Checks URL
@@ -264,20 +245,17 @@ if(length(view) == 0) { view <- rep(NA, len) }
 
 또한, *view* 변수에 아무것도 파싱 되지 않는 경우에 NA 값을 *len* 변수의 숫자만큼 넣었습니다. 댓글 수 관련 크롤링때 같은 일이 일어난다면 *cmt* 변수에 NA 값을 *len* 변수의 숫자만큼 넣었습니다.
 
-### 1.5 RSelenium Crawling
+### 0.5 RSelenium Crawling
 
 `RSelenium` 을 사용하여 크롤링을 할 때 '많이 본 뉴스' 페이지와 '댓글 많은' 패이지를 따로 크롤링하였습니다. 
 
-#### 1.5.1 Most Viewed Page
+#### 0.5.1 Most Viewed Page
 
 크롤링을 시작하기 전의 변수 초기화 작업을 했습니다.
 
 ```R
 urls <- list %>% html_nodes('.ranking_headline') %>% html_nodes('a') %>% html_attr('href')
 iter <- c(1:length(title))
-
-currCmt <- c(); deleted <- c(); brokenPolicy <- c(); maleRatio <- c(); femaleRatio <- c();
-X10 <- c(); X20 <- c(); X30 <- c(); X40 <- c(); X50 <- c(); X60 <- c();
 ```
 
 먼저 기사들의 URL 주소들을 벡터 타입의 *urls* 변수에 저장하였습니다. 요소 접근 방법은 `rvest` 패키지을 사용해 위와 동일합니다.
@@ -340,13 +318,6 @@ HTML 요소를 찾을 떄 remoteDriver 의 **findElements()** 함수를 사용�
 만약에 0.25 초를 기다리고도 로딩이 되지 않은 페이지에서 요소를 접근하려고 할 시에 *elm* 변수에는 아무것도 파싱되지 않습니다. 따라서, *elm* 변수는 길이가 0 이 됩니다. 그럴 경우 while 문을 돌려서 *sleepT* 변수의 값을 기하급수적으로 늘립니다. 그렇게 '새로고침'을 한 다음 또 다시 *sleepT* 의 값 만큼 대기합니다. 이렇게 *elm* 변수의 길이가 0 이 아닐 떄 까지 '새로고침'을 시도합니다.
 
 ```R
-cleanc <- function(x) { # Function to remove commas in view
-    x <- gsub(',', '', x)
-    return(x)
-}
-
-...
-
 currCmt <- cleanc(c(currCmt, as.character(elm[[1]]$getElementText())))
 
 if(is.na(as.integer(currCmt[i]))) { # If current comment is not crawled, change to NA
@@ -357,11 +328,7 @@ if(is.na(as.integer(currCmt[i]))) { # If current comment is not crawled, change 
     femaleRatio <- c(femaleRatio, NA)
     X10 <- c(X10, NA)
     X20 <- c(X20, NA)
-    X30 <- c(X30, NA)
-    X40 <- c(X40, NA)
-    X50 <- c(X50, NA)
-    X60 <- c(X60, NA)
-    print("No Data - appended NA values")
+    ...
     next()
 }
 ```
@@ -381,11 +348,7 @@ if(as.integer(currCmt[i]) < 100) { # If current comment count is less than 100, 
     femaleRatio <- c(femaleRatio, NA)
     X10 <- c(X10, NA)
     X20 <- c(X20, NA)
-    X30 <- c(X30, NA)
-    X40 <- c(X40, NA)
-    X50 <- c(X50, NA)
-    X60 <- c(X60, NA)
-    print("No Data - appended NA values")
+    ...
     next()
 }
 ```
@@ -411,10 +374,7 @@ maleRatio <- c(maleRatio, as.character(elm[[1]]$getElementText()))
 femaleRatio <- c(femaleRatio, as.character(elm[[2]]$getElementText()))
 X10 <- c(X10, as.character(elm[[3]]$getElementText()))
 X20 <- c(X20, as.character(elm[[4]]$getElementText()))
-X30 <- c(X30, as.character(elm[[5]]$getElementText()))
-X40 <- c(X40, as.character(elm[[6]]$getElementText()))
-X50 <- c(X50, as.character(elm[[7]]$getElementText()))
-X60 <- c(X60, as.character(elm[[8]]$getElementText()))
+...ㄴ
 ```
 
 마지막으로 'u_cbox_chart_per' 을 class 로 가진 요소들을 찾아 *elm* 변수에 저장했습니다. 만약 아무것도 파싱이 되지 않았으면 페이지가 로딩 되기 전에 파싱을 시도 했다는 뜻으로, while 문을 돌리며 페이지를 계속 '새로고침' 하였습니다.
@@ -422,17 +382,6 @@ X60 <- c(X60, as.character(elm[[8]]$getElementText()))
 파싱이 끝나면 다시 **getElementText()** 함수를 사용해 남자 댓글 비율, 여자 댓글 비율, 10대 댓글 비율, 20대 댓글 비율, 등 나머지 데이터를 파싱하여 각각의 벡터 타입 변수에 저장하였습니다.
 
 ```R
-clean <- function(x) { # Function to remove new lines, tabs, etc...
-    x <- gsub("\t", "", x)
-    x <- gsub("\r", "", x)
-    x <- gsub("\n", "", x)
-    x <- str_trim(x)
-    
-    return(x)
-}
-
-...
-
 infoDF <- data.frame(currCmt=currCmt, deleted=deleted, brokenPolicy=brokenPolicy, maleRatio=maleRatio, femaleRatio=femaleRatio, X10=X10, X20=X20, X30=X30, X40=X40, X50=X50, X60=X60)
             
 # pre-processing
@@ -472,7 +421,7 @@ write.xlsx(df, file, sheetName=sheName, col.names=T, row.names=F, append=T, pass
 - password : 파일에 비밀번호를 넣습니다
 - showNA : NA 값을 보여줄지 안 보여줄지 정합니다
 
-#### 1.5.1 Most Commeneted Page
+#### 0.5.2 Most Commeneted Page
 
 '댓글 많은' 페이지를 크롤링하는 방법은 그 전과 매우 비슷합니다. 하지만, 이번에는 oid 와 aid 를 사용하지 않아도 됩니다. 뉴스 댓글에 관한 정보 페이지로 가는 URL 주소를 바로 불러 올 수 있기 떄문입니다. 이 작업은 `rvest` 패키지를 사용합니다.
 
@@ -499,7 +448,7 @@ write.xlsx(df, file, sheetName=sheName, col.names=T, row.names=F, append=T, pass
 
 파일을 저장할 때는 위와 같이 'view_data' 대신 'comment_data' 라고 파일명을 짓습니다.
 
-## 2 Database - MySQL
+## 1 Database - MySQL
 
 엑셀 파일에서 데이터를 불러오는 시간이 생각보다 매우 오려걸려 MySQL 데이터베이스를 사용하여 관리하기로 하였습니다. 이를 위해 MySQL 을 설치 후 R 에서 `RMySQL` 과 `DBI` 패키지를 사용해 데이터를 불러왔습니다.
 
@@ -511,7 +460,7 @@ conn <- dbConnect(MySQL(), user="naver", password="Naver1q2w3e4r!", dbname="nave
 
 이제 엑세에서 데이터를 불러와서 database 에 집어 넣기만 하면 됩니다.
 
-### 2.1 Initialisation
+### 1.1 Initialisation
 
 db 에 접근하기 앞서, 변수 초기화를 해보겠습니다.
 
@@ -579,11 +528,11 @@ CREATE TABLE NEWS_POLITICS(
 - X50 : 50대 댓글 수 비율
 - X60 : 60대 댓글 수 비율
 
-### 2.2 Functions
+### 1.2 Functions
 
 DB 에 데이터를 전송하기 위해 3개의 함수를 사용했습니다.
 
-#### 2.2.1 dbsend()
+#### 1.2.1 dbsend()
 
 이 함수에는 4개의 매개변수가 들어갑니다.
 - df : DB 에 삽입할 데이터가 들어있는 데이터 프레임
@@ -683,7 +632,7 @@ for(l in c(1:len)) {
 
 위는 query 문을 `DBI` 패키지의 **dbSendQuery()** 함수를 사용하여 각 행의 데이터를 for 문을 사용해 DB 에 집어넣는 코드입니다.
 
-#### 2.2.2 cleanData()
+#### 1.2.2 cleanData()
 
 **cleanData()** 함수는 뉴스 기사의 제목과 부제에서 `"`, `,`, `'`, 그리고 tab 을 없애주는 함수입니다.
 
@@ -693,18 +642,14 @@ cleanData <- function(df) {
   df$title <- str_replace_all(df$title, ',', ' ')
   df$title <- str_replace_all(df$title, '\'', ' ')
   df$title <- str_replace_all(df$title, '\t', '')
-  
-  df$subti <- str_replace_all(df$subti, '\"', ' ')
-  df$subti <- str_replace_all(df$subti, ',', ' ')
-  df$subti <- str_replace_all(df$subti, '\'', ' ')
-  df$subti <- str_replace_all(df$subti, '\t', '')
+  ...
   return(df)
 }
 ```
 
 `stringr` 패키지의 **str_replace_all()** 함수를 사용해 불필요한 문자들을 공백으로 바꾸어서 없애줍니다.
 
-#### 2.2.3 dbDisconnectAll()
+#### 1.2.3 dbDisconnectAll()
 
 현재 conn 객체를 통해 만들어진 DB 와의 연결을 모두 끊어주는 함수입니다.
 
@@ -718,9 +663,247 @@ dbDisconnectAll <- function(){
 
 `DBI` 패키지의 **dbListConnections()** 함수를 사용합니다. 리턴된 리스트의 요소 갯수를 *ile* 변수에 저장하고 **lapply()** 함수를 사용해 리턴된 connection 들에 **dbDisconnect()** 함수를 사용해 모두 접속을 끊어줍니다.
 
-### 2.3 Data Insertion
+### 1.3 Data Insertion
 
+이제 여기까지의 함수들을 가지고 엑셀 파일을 불러와 데이터를 집어 넣어 보도록 하겠습니다.
 
+```R
+for(i in c(1:6)) {
+  type <- types[i]
+  section <- sections[i]
+  tab <- tables[i]
+  
+  fpath <- paste(path, section, '/2018_view_data_', section, ext, sep='')
+  for(i in c(1:2)) {
+    df <- read.xlsx(fpath, sheet=i, colNames=T, rowNames=F)
+    df <- cleanData(df)
+    dbsend(df, type, section, tab)
+    cat('-', i, '-\n')
+  }
+  ...
+}
+
+dbDisconnectAll()
+```
+
+뉴스 기사 분류가 6개이기 떄문에 첫 for 문을 6번 돌립니다. 2018년 데이터는 11월, 12월 총 2개월이 있으니까 for 문을 2번씩 돌립니다. 마지막으로 2019년 데이터는 1월부터 10월 까지 총 10개월이 있으니까 for 문을 10번씩 돌립니다.
+
+그리고 마지막으로 **dbDisconnectAll()** 함수를 사용해 conn 객체들을 모두 닫아줍니다.
+
+### 1.4 Data Select
+
+DB 에 올라간 데이터를 받아오는 함수를 모아둔 스크립트를 base 파일에 저장해 두었습니다. 데이터를 삽입했을 때와 같이 *conn* 객체를 다시 생성합니다.
+
+```R
+getSectionData <- function(section, type) {
+    query01 <- paste('select * from news_',section,' where newsid like "%',type,'%"',
+                     'and newsid not like "%1911%"', sep = '')
+    dfOne <- dbGetQuery(conn, query01)
+    return(dfOne)
+}
+```
+
+위 코드는 **getSectionData()** 함수입니다. 다음은 매개변수의 설명입니다 :
+- section : 원하는 뉴스 기사 분류의 이름을 집어넣습니다
+- type : 'C' 는 '댓글 많은' 데이터를, 'V' 는 '조회 수 많은' 데이터를 불러옵니다
+
+2019년 11월 데이터는 테스트 데이터이므로 `NOT LIKE` 를 사용해 SELECT 문에서 불러오지 않게 합니다.
+
+## 2 Chi-Squared Test
+
+네이버 뉴스의 각 분류의 월별 댓글 및 조회 수가 일 년 평균의 댓글 및 조회 수와 차이가 있는지를 검정했다.
+
+### 2.1 Monthly View Data
+
+> 귀무 가설 : 각 분류의 조회 수는 일 년 평균의 조회 수와 차이가 없다.
+
+데이터는 각 분류의 월별 view 합계를 사용했으며, 각 행은 1월부터 12월까지 입니다.
+
+#### 2.1.1 Data Pre-processing
+
+먼저 **getSectionData()** 함수를 사용해서 데이터를 불러옵니다.
+
+```R
+sections <- c("econ", "IT", "life_cult", "politics", "soc", "world")
+
+...
+
+type <- 'V'
+Edf <- getSectionData(sections[1], type)
+Idf <- getSectionData(sections[2], type)
+...
+```
+
+데이터 가공을 하기 위해 **getMonthlyView()** 함수를 만들었습니다. 
+
+```R
+getMonthlyView <- function(df) {
+    len <- nrow(df)
+    
+    x1 <- c()
+    x2 <- c()
+    ...
+    
+    # get NView(7th col)
+    for(l in c(1:len)) {
+        month <- df[l,6] %>% str_sub(6, 7)
+        
+        if(month == "01") { x1 <- c(x1, df[l,7]) }
+        if(month == "02") { x2 <- c(x2, df[l,7]) }
+        ...
+    }
+    
+    x1 <- sum(as.numeric(x1))
+    x2 <- sum(as.numeric(x2))
+    ...
+
+    mViewTotal <- c(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12)
+    
+    return(mViewTotal)
+}
+```
+
+그리고 리턴된 값들을 각 변수에 저장합니다.
+
+```R
+EmViewTotal <- getMonthlyView(Edf)
+ImViewTotal <- getMonthlyView(Idf)
+...
+```
+
+그리고 6개의 벡터를 데이터프레임으로 모와줍니다.
+
+```R
+ViewTotaldf <- data.frame(
+    Economy=EmViewTotal,
+    IT=ImViewTotal,
+    Life_Cult=LmViewTotal,
+    Politics=PmViewTotal,
+    Society=SmViewTotal,
+    World=WmViewTotal
+)
+ViewTotaldf$Month <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+```
+
+그렇게 되면 아래와 같은 데이터프레임이 완성됩니다.
+
+|Month|Economy|IT|Life_Cult|Politics|Society|World|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|Jan|100360767|24318368|66185551|94377073|224854699|56742533|
+|Feb|82605339|26571839|60148342|81224742|195040992|52918607|
+|Mar|92725836|22961125|81840238|102367831|274495875|69620547|
+|Apr|64376011|26225649|29612244|90189555|171676720|45618439|
+|May|58151423|17556183|30631936|79373214|143327966|49052918|
+|Jun|47012168|15552585|36170789|69076368|148542046|54264870|
+|Jul|74764867|20546391|47437879|80397013|155554583|66601541|
+|Aug|81484980|31272142|64107155|99438941|149975828|86008202|
+|Sep|59604523|28324852|58441438|113892992|152266161|63514743|
+|Oct|56800322|27399146|53852995|90718911|163767600|67452310|
+|Nov|184035809|36879388|80367084|178246245|383292716|66053212|
+|Dec|106837908|26320105|88204415|45959082|242464417|74342050|
+
+#### 2.1.2 Visualisation
+
+시각화를 위해 `reshape2` 패키지의 **melt()** 함수를 사용합니다.
+
+```R
+ViewPlotData1 <- melt(ViewTotaldf, id.vars="Month")
+```
+
+하지만, 이대로 그래프를 그리게 되면 x 축의 레이블이 저희가 원하는 순서대로 나오지 않게 됩니다. 그래서 Month 컬럼을 factor 로 바꿔서 저희가 원하는 순서로 정해줍니다.
+
+```R
+xorder <- c("Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct")
+ViewPlotData1$Month <- factor(ViewPlotData1$Month, levels=xorder, labels=xorder)
+```
+
+이렇게 한 결과, 아래와 같은 그래프를 뽑을 수 있었습니다.
+
+![Total Number of Views per Month](/assets/img/portfolio/portfolio-naver_news_analysis_02.png)
+
+```R
+options("scipen" = 100)
+ViewPlot1 <- ggplot(ViewPlotData1, aes(Month, value, col=variable)) +
+    geom_point() + 
+    geom_line(aes(color=variable, group=variable)) + 
+    labs(title="Total Number of Views per Month (2018.11 ~ 2019.10)")
+ViewPlot1
+```
+
+위 그래프를 보면 일 년간의 조회 수의 추이를 볼 수 있습니다.
+
+- IT 를 제외하면 대체로 변동폭이 큰것으로 보입니다
+- 사회 기사 조회 수가 일년동안 1위를 차지하고 있습니다
+- 반면, IT 기사는 조회 수가 꼴지를 기록하고 있으며, 사람들의 관심이 가장 낮은 것으로 보입니다
+
+#### 2.1.3 Test
+
+그래프로 확인 할 수 있는 부분을 카이 제곱 분석을 통해 확인해 보겠습니다. 6가지 분류를 한번에 검정하기 위해 반복문을 사용하였습니다.
+
+```R
+for(i in c(1:6)) {
+    testing <- cbind(chi_df[,i]/1000000, rep(sum(chi_df[,i]) / 12, 12)/1000000)
+    res_df[i] <- chisq.test(testing, correct = F)$p.value
+}
+```
+
+조회 수의 수의 크기가 크기 때문에 100만으로 나누어 정규화하였습니다. 카이 제곱 검정을 수행한 결과의 p-value 는 다음 표로 정리하였습니다.
+
+|Economy|IT|Life_Cult|Politics|Society|World|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|0.0000|0.7604|0.0000|0.0000|0.0000|0.4039|
+
+#### 2.1.4 Result
+
+- 월간 총 조회수 검정 결과, IT(0.76)와 세계(0.40)는 p-value 가 0.05 이상으로 귀무 가설이 채택되없습니다. 따라서 IT와 세계 섹션은 일 년 평균의 조회수와 각 월의 조회수가 차이가 없는 것으로 나타났습니다.
+- 그리고 경제(0), 문화(0), 정치(0), 사회(0) 섹션은 p-value 가 0.05 이하로 귀무 가설이 기각 됨으로 인해 일 년 평균 조회수와 각 월의 조회수가 차이가 있는 것으로 나타났습니다.
+
+### 2.2 Monthly Comment Data
+
+> 귀무 가설 : 각 분류의 댓글 수는 일 년 평균의 댓글 수와 차이가 없다.
+
+데이터는 각 분류의 월별 comment 합계를 사용했으며, 각 행은 1월부터 12월까지 입니다.
+
+#### 2.2.1 Data Pre-processing
+
+데이터 전처리는 조회 수 데이터와 같습니다.
+
+#### 2.2.2 Visualisation
+
+![Total Number of Comments per Month](/assets/img/portfolio/portfolio-naver_news_analysis_03.png)
+
+위 그래프를 보면 일 년간의 댓글 수의 추이를 볼 수 있습니다.
+
+- 정치와 사회 섹션은 대체로 비슷한 모양을 보이며 변동폭이 크다는 것을 볼 수 있으며, 경제와 세계 섹션은 정치, 사회에 비해 적은 변동폭을 볼 수 있지만 IT와 문화섹션은 변동이 비교적 적은 것을 볼 수 있습니다
+- 정치 뉴스에 대한 댓글 수가 일년동안 1위를 차지한 것을 확인할 수 있으며, 또다시 IT 뉴스에 관한 댓글 수가 꼴찌를 차지한 것을 볼 수 있습니다
+
+#### 2.2.3 Test
+
+그래프로 확인 할 수 있는 부분을 카이 제곱 분석을 통해 확인해 보겠습니다. 6가지 분류를 한번에 검정하기 위해 반복문을 사용하였습니다.
+
+```R
+for(i in c(1:6)) {
+    testing <- cbind(chi_df[,i]/10000, rep(sum(chi_df[,i]) / 12, 12)/10000)
+    res_df[i] <- chisq.test(testing, correct = F)$p.value
+}
+```
+
+댓글 수의 크기가 크기 때문에 1만으로 나누어 정규화하였습니다. 카이 제곱 검정을 수행한 결과의 p-value 는 다음 표로 정리하였습니다.
+
+|Economy|IT|Life_Cult|Politics|Society|World|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|0.1171|0.9994|0.8414|0.0000|0.0000|0.0747|
+
+#### 2.2.4 Result
+
+- 월간 총 댓글수는 IT(0.99)와 문화(0.84), 경제(0.11), 세계(0.07) 섹션에서 p-value가 0.05 이상으로 일 년 평균의 댓글 수와 각 월의 댓글 수가 서로 차이가 없는 것으로 나타났습니다
+- 정치(0), 사회(0)는 p-value가 0.05 이하로 귀무 가설이 기각되었습니다. 이는 정치와 사회 카테고리의 댓글 수는 월별 평균과 차이가 있음으로 결론지을 수 있습니다.
+
+### 2.3 Conclusion
+
+네이버 뉴스 기사에서 IT, 세계 섹션은 일 년 내내 평이한 조회 수와 댓글 수가 달리며, 정치와 사회 섹션은 일 년간 조회 수와 댓글 수의 변동이 크다는 것을 알 수 있습니다. 급격하게 조회수 및 댓글 수가 올라가는 시점의 기사 제목과 내용을 분석해보면 의미 있는 결과가 나올 것으로 추정됩니다.
+
+## 3 F-Test
 
 # Sources
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
