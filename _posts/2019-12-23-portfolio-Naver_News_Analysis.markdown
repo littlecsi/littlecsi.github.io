@@ -53,6 +53,22 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
       - [3.2.2 Result](#322-result)
     - [3.3 Conclusion](#33-conclusion)
   - [4 Decision Tree](#4-decision-tree)
+    - [4.1 Planning](#41-planning)
+    - [4.2 Dataset Production](#42-dataset-production)
+    - [4.3 Algorithm Selection](#43-algorithm-selection)
+      - [4.3.1 tree Package](#431-tree-package)
+      - [4.3.2 party Package](#432-party-package)
+      - [4.3.3 rpart Package](#433-rpart-package)
+    - [4.4 Visualisation](#44-visualisation)
+    - [4.5 Decision Tree Prediction](#45-decision-tree-prediction)
+    - [4.6 Conclusion](#46-conclusion)
+  - [5 Artificial Neural Network](#5-artificial-neural-network)
+    - [5.1 Dataset](#51-dataset)
+    - [5.2 one-hot encoding](#52-one-hot-encoding)
+    - [5.3 Training &amp; Test Data Selection](#53-training-amp-test-data-selection)
+    - [5.4 Model Creation](#54-model-creation)
+    - [5.5 Model Prediction](#55-model-prediction)
+    - [5.6 Conclusion](#56-conclusion)
 - [Sources](#sources)
 
 # Analysis
@@ -990,6 +1006,312 @@ resultDf 를 살펴보면 다음과 같습니다 :
 조회수 랭킹 기사는 전체 15가지의 경우의 수 중에 6가지의 경우가 채택되었습니다. 교차표를 살펴보면 IT 와 사회 섹션의 경우 다른 섹션과 비슷한 성질의 분포 모양을 가지지 않는다는 것을 알 수 있습니다. 따라서 IT와 사회를 제외한 섹션들은 대체로 비슷한 경향을 가지지만, IT와 사회 섹션은 다른 분야의 뉴스 조회수와 무관한 경향을 가집니다.
 
 ## 4 Decision Tree
+
+의사 결정 트리를 통해 댓글 작성자의 성별과 연령대 데이터를 통해 뉴스 분류를 예측하는 방법을 알아보겠습니다. 
+
+### 4.1 Planning
+
+1. 종속 변수는 카테고리, 독립 변수는 성별과 연령을 두어 성별과 연령대를 전체 댓글 수에 비례하도록 나눕니다.
+3. 특정 연령, 성별을 넣었을 때, 뉴스 분류가 결정되도록 합니다.
+
+### 4.2 Dataset Production
+
+저희가 지금 가지고 있는 데이터는 댓글 성별 비율 및 연령대 비율입니다. 이 비율을 전체 댓글 수에 곱해서 raw data 를 도출하였습니다.
+
+```R
+for(i in c(1:nrow(tree_df))) {
+    for(j in c(5:12)) {
+        tree_df[i,j] <- round(tree_df[i,1] * tree_df[i,j] / 100, 2)
+    }
+}
+```
+
+그 결과, 다음과 같은 데이터셋이 도출 되었습니다 :
+
+| MALER | FEMALER | X10 | X20 | X30 | X40 | X50 | X60 | cat |
+|:-------:|:-------:|:----:|:------:|:------:|:------:|:--------:|:--------:|:-----:|
+| 2021.04 | 384.96 | 0 | 168.42 | 721.8 | 890.22 | 457.14 | 168.42 | E |
+| 644.91 | 132.09 | 7.77 | 108.78 | 225.33 | 256.41 | 132.09 | 46.62 | E |
+| 463.55 | 171.45 | 6.35 | 25.4 | 165.1 | 247.65 | 133.35 | 57.15 | E |
+| 489.01 | 129.99 | 6.19 | 105.23 | 191.89 | 167.13 | 105.23 | 43.33 | E |
+| 505.8 | 56.2 | 0 | 16.86 | 118.02 | 213.56 | 157.36 | 56.2 | E |
+
+Training 데이터와 Test 데이터를 샘플링하기 위해 `caret` 패키지의 **createDataPartition()** 함수를 사용하였습니다. 이 때, Training 데이터의 비율은 80% 로 하였습니다.
+
+```R
+idx <- createDataPartition(y=treeData$cat, p=0.8, list=F)
+train <- treeData[idx,]
+test <- treeData[-idx,]
+```
+
+### 4.3 Algorithm Selection
+
+의사 결정 트리를 생성하는데에는 여러 알고리즘이 있습니다. 뉴스 댓글 작성자 데이터를 넣고 적절한 결과를 도출하는 알고리즘을 선택하였습니다.
+
+#### 4.3.1 tree Package
+
+```R
+treeMod <- tree(cat ~ ., data=train)
+plot(treeMod)
+```
+
+`tree` 패키지의 **tree()** 함수를 사용해 실행한 결과, 다음과 같은 에러가 발생했습니다.
+
+```
+Error in plot.tree(treeMod) : cannot plot singlenode tree
+```
+
+싱글 노드 tree 가 생성되어 그래프로 시각화를 하지 못하는 결과를 에러가 발생했습니다. 따라서, tree 알고리즘은 좋지 않은 선택이라고 결정하였습니다.
+
+#### 4.3.2 party Package
+
+```R
+ctreeMod <- ctree(cat ~ ., data=train)
+plot(treeMod)
+```
+
+`party` 패키지의 **ctree()** 함수를 사용해 실행한 결과, tree 알고리즘과 동일한 에러가 발생했습니다.
+
+#### 4.3.3 rpart Package
+
+```R
+rpartMod <- rpart(cat ~ ., data=train, method="class")
+```
+
+`rpart` 패키지의 **rpart()** 함수를 이용해 실행한 결과, 오류가 발생하지 않고 분기 지점을 잘 도출해낸 것을 확인할 수 있었습니다.
+
+*rpartMod* 변수를 출력해 보면 다음과 같습니다 :
+
+```
+ n= 52506 
+
+ node), split, n, loss, yval, (yprob)
+     * denotes terminal node
+
+ 1) root 52506 43755 E (0.17 0.17 0.17 0.17 0.17 0.17)  
+ 2) X40< 184.12 30066 21582 I (0.19 0.28 0.26 0.0079 0.019 0.24)  
+     4) X50< 22.545 15771  8623 I (0.036 0.45 0.34 0 0.0013 0.17)  
+     8) FEMALER< 25.195 13420  6573 I (0.021 0.51 0.3 0 0.00015 0.17) *
+     9) FEMALER>=25.195 2351  1005 L (0.12 0.13 0.57 0 0.0077 0.18) *
+     5) X50>=22.545 14295  9172 E (0.36 0.093 0.18 0.017 0.039 0.31)  
+     10) FEMALER< 108.6 12379  7669 E (0.38 0.1 0.15 0.013 0.012 0.34)  
+         20) X10< 0.315 4928  2395 E (0.51 0.07 0.14 0.012 0.012 0.25) *
+         21) X10>=0.315 7451  4481 W (0.29 0.13 0.16 0.014 0.012 0.4) *
+     11) FEMALER>=108.6 1916  1224 L (0.22 0.027 0.36 0.039 0.22 0.14) *
+ 3) X40>=184.12 22440 13928 P (0.14 0.012 0.039 0.38 0.36 0.069)  
+     6) X60< 117.45 10789  5734 S (0.22 0.022 0.067 0.11 0.47 0.12) *
+     7) X60>=117.45 11651  4297 P (0.062 0.0023 0.013 0.63 0.27 0.025) *
+```
+
+의사 결정 트리를 보면 train 데이터가 가진 속성으로 적절하게 나누어 최종노드(*으로 표시되어있다)까지 잘 분기되는 모습을 볼 수 있습니다.
+
+### 4.4 Visualisation
+
+![rpart Tree Diagram](/assets/img/portfolio/portfolio-naver_news_analysis_04.png)
+
+시각화된 의사 결정 트리를 통해 최종 노드까지 분기되는 과정을 짚어보면, 최상단 분기 지점(1)에서 40대 댓글수를 통해 분기하며, 다음 레벨의 분기 지점에서는 각각 50대(2), 60대(3) 댓글수를 통해 나뉩니다. 다음 레벨의 분기 지점(4, 5)에서 여성의 댓글수를 통해 나뉘고, 마지막 분기 지점에서 10대(10)의 댓글 수를 통해 분기 됩니다.
+
+모든 train 데이터의 각 노드별 분기 기대값은 각각 1/6 확률(16%) 이였지만 IT 노드로 간 데이터는 전체의 25%, 생활은 4%(9)와 4%(11) 총 8%, 경제는 10%, 세계는 15%, 사회 21% 그리고 정치는 22% 비율로 도달했습니다.
+
+각 분야로 분기되는 과정을 알아보겠습니다 :
+- IT : 40대 댓글이 184개 미만이고, 50대 댓글이 21개 미만이며, 여자 댓글 수가 25개 미만인 경우
+- Life/Culture : 
+  - 40대 댓글이 184개 미만이고, 50대 댓글이 21개 미만이며, 여자 댓글 수가 25개 이상인 경우
+  - 40대 댓글이 184개 미만이고, 50대 딧글이 21개 이상이며, 여자 댓글 수가 109개 이상인 경우
+- Economy : 40대 댓글이 184개 미만이고, 50대 댓글이 21개 이상이며, 여자 댓글 수가 109개 미만이고, 10대 댓글이 없을 경우
+- World : 40대 댓글이 184개 미만이고, 50대 댓글이 21개 이상이며, 여자 댓글 수가 109개 미만이고, 10대 댓글이 있을 경우
+- Society : 40대 댓글이 184개 이상이고, 60대 댓글이 121개 미만인 경우
+- Politics : 40대 댓글이 184개 이상이고, 60대 댓글이 121개 이상인 경우
+
+### 4.5 Decision Tree Prediction
+
+**predict()** 함수를 통해 의사 결정 트리의 모델을 이용하여 test 데이터를 넣고 정확도를 계산하였습니다. 정확도를 계산하기 위해 `caret` 패키지의 **confusionMatrix()** 함수를 사용했습니다.
+
+```R
+confusionMatrix(factor(test$cat), predict(rpartMod, test, type = "class"))
+```
+
+그 결과 :
+
+```
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    E    I    L    P    S    W
+         E 2460  456    0 1570  661  322
+         I  529 4091    0  153  200  496
+         L  664 2241    0  503 1726  335
+         P  523   55    0 4483  262  146
+         S  861   19    0 1743 2561  285
+         W 1373 1495    0 1169  734  698
+
+Overall Statistics
+                                         
+               Accuracy : 0.4356 
+```
+
+위 결과를 보면 예측 데이터에 생활 데이터가 없다고 나타났습니다. 또한, 전체 정확도는 43.56% 가 나왔습니다.
+
+### 4.6 Conclusion
+
+네이버 뉴스 댓글의 속성으로 의사 결정 트리 알고리즘을 선정하기 위해 3가지 알고리즘을 시도해보았습니다. 그 중 `tree` 와 `party` 패키지의 알고리즘은 에러가 발생하여 `rpart` 패키지 알고리즘을 이용하여 의사 결정 트리를 생성했습니다.
+
+생성된 의사 결정 트리를 이용하여 test 데이터를 예측해본 결과 정확도가 43.56%가 나왔습니다. 따라서, 의사 결정 트리는 네이버 뉴스 댓글 속성으로 뉴스 분류를 예측하기에 적합하지 않은 알고리즘으로 판단하였습니다.
+
+## 5 Artificial Neural Network
+
+인공 신경망 알고리즘이 구현된 `nnet` 과 `neuralnet` 패키지를 이용하여 네이버 댓글의 속서으로 뉴스 카테고리 예측을 해보겠습니다.
+
+### 5.1 Dataset
+
+예측할 데이터의 독립 변수를 늘리기 위해 이때까지 사용한 성별과 연령대 컬럼 외에 추가적으로 총 댓글 수, 삭제된 댓글 수, 규정 미준수 댓글 수까지 합쳐서 사용하였습니다.
+
+`nnet` 패키지의 **nnet()** 함수를 사용하기위해 독립 변수에 one-hot encoding 이 필요합니다.
+
+### 5.2 one-hot encoding
+
+section 컬럼을 one-hot encoding 하기 위해 `nnet` 패키지의 **class.ind()** 함수를 사용하였습니다.
+
+```R
+section.ind <- class.ind(NewsData$section)
+NewsDataE <- cbind(NewsData, section.ind)
+```
+
+그 결과, *NewsDataE* 데이터 프레임은 다음과 같이 변하였습니다 :
+
+| ... | section | Economy | IT | Life_Cult | Politics | Society | World |
+|:---:|:---------:|:-------:|:--:|:---------:|:--------:|:-------:|:-----:|
+| ... | Life_Cult | 0 | 0 | 1 | 0 | 0 | 0 |
+| ... | IT | 0 | 1 | 0 | 0 | 0 | 0 |
+| ... | Economy | 1 | 0 | 0 | 0 | 0 | 0 |
+| ... | World | 0 | 0 | 0 | 0 | 0 | 1 |
+| ... | Life_Cult | 0 | 0 | 1 | 0 | 0 | 0 |
+| ... | World | 0 | 0 | 0 | 0 | 0 | 1 |
+
+### 5.3 Training & Test Data Selection
+
+One-hot encoding 된 데이터들의 80%를 trian 데이터로 정하고, 나머지 20%를 test 데이터로 정하였습니다. 이 때, 원본 데이터의 각 행을 구별하기 위해 다음과 같이 전처리를 하였습니다.
+
+```R
+Elen <- nrow(subset(NewsDataE, section == "Economy"))
+Ilen <- nrow(subset(NewsDataE, section == "IT"))
+...
+
+Ei <- sample(c(1:Elen), 0.8*Elen)
+Ii <- sample(c(1:Ilen), 0.8*Ilen)
+...
+
+idx <- c(
+    Ei,
+    Ii + Elen,
+    Li + Elen + Ilen,
+    Pi + Elen + Ilen + Llen,
+    Si + Elen + Ilen + Llen + Plen,
+    Wi + Elen + Ilen + Llen + Plen + Slen
+)
+
+trData <- NewsDataE[idx,]
+teData <- NewsDataE[-idx,]
+```
+
+각 행의 길이를 구하고 시작점을 찾기 위해 다음 column 으로 갈 떄 이전 column 의 길이를 더한 index 값을 설정하여 train 과 test 데이터를 만들었습니다. 
+
+이렇게 한 이유는 모든 섹션 데이터의 80%를 얻기 위해서 입니다. 그냥 전체 데이터에서 80%를 뽑으면 한 섹션에 대한 학습이 덜 될 수 있으므로, 동등한 데이터 양에서 학습하여 학습 최대치를 얻기 위해 이렇게 하였습니다.
+
+### 5.4 Model Creation
+
+**nnet()** 함수의 매개변수는 여러가지가 있지만 그 중에 x, y, softmax, size 만 사용하여 모델을 생성하였습니다. nnet 모델을 생성하기 위해 x 에 1열부터 11열까지(댓글 속성), y 에 13열부터 18열까지(one-hot encoding 된 카테고리)를 넣었으며, softmax 에 True 값을 넣어 각 값들 사이가 보간(interpolate)되도록 했습니다. 
+
+```R
+trX <- trData[,c(1:11)]
+trY <- trData[,c(13:18)]
+teX <- teData[,c(1:11)]
+
+nnModel <- nnet(x=trX, y=trY, size=15, softmax=T)
+```
+
+**nnet()** 함수가 시행되면서 다음과 같이 출력창에 값이 모이는 것을 확인할 수 있습니다.
+
+```
+# weights:  276
+initial  value 109595.533387 
+iter  10 value 88784.254272
+iter  20 value 83903.432492
+iter  30 value 76683.557201
+iter  40 value 72820.532824
+iter  50 value 71768.875055
+iter  60 value 71330.444224
+iter  70 value 70551.945893
+iter  80 value 69642.710653
+iter  90 value 68783.966017
+iter 100 value 67949.304016
+final  value 67949.304016 
+stopped after 100 iterations
+```
+
+만들어진 *nnModel* 을 시각화 해보았습니다. 시각화를 하기 위해 nnet plot 함수를 별도로 다운로드 받았습니다.
+
+```R
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
+plot.nnet(nnModel)
+```
+
+![nnet model](/assets/img/portfolio/portfolio-naver_news_analysis_05.png)
+
+시각화된 nnet 모델을 보면 hidden 계층이 하나 있고, 독립 변수 11개, 종속 변수 6개와 bias 값이 있는 것을 확인할 수 있습니다.
+
+### 5.5 Model Prediction
+
+nnet 의 결과인 모델을 이용하여 test 데이터로 예측을 수행합니다. 예측을 위해 **predict()** 함수를 사용했습니다. 예측 결과를 테이블로 만들어 정확도를 계산했습니다.
+
+```R
+nnPrediction <- predict(nnModel, teX, type="class")
+predTable <- table(nnPrediction, teData$section)
+```
+
+|  | Economy | IT | Life_Cult | Politics | Society | World |
+|:---------:|:-------:|:----:|:---------:|:--------:|:-------:|:-----:|
+| Economy | 765 | 216 | 183 | 11 | 24 | 407 |
+| IT | 93 | 1423 | 557 | 0 | 6 | 342 |
+| Life_Cult | 243 | 353 | 956 | 9 | 54 | 663 |
+| Politics | 160 | 10 | 59 | 1694 | 586 | 87 |
+| Society | 795 | 154 | 338 | 441 | 1493 | 449 |
+| World | 132 | 32 | 95 | 33 | 25 | 240 |
+
+교차표로 결과값을 비교한 결과를 바탕으로 정확도를 계산하였습니다.
+
+```R
+calcAcc <- function(compTable) {
+    len <- nrow(compTable)
+    total <- 0
+    for(l in c(1:len)) { total <- total + compTable[l,l] }
+    accuracy <- round((total / sum(compTable)) * 100, 2)
+    return(accuracy)
+}
+predAccuracy <- cat(calcAcc(predTable), "%\n")
+# 50.05 %
+```
+
+모델 예측 정확도는 50.05%가 나왔습니다. 평균 예측 정확도를 얻기 위해 4번 더 반복하여 시각화하고 평균치를 구했습니다.
+
+```R
+df=data.frame(x=c(1:5), y=c(50.05, 50.53, 44.24, 56.92, 50.68))
+ggplot(data=df, mapping=aes(x=x, y=y, col=x, fill=x)) +
+  geom_col(position="identity", show.legend=F) +
+  geom_text(label=paste(df$y, "%"), nudge_y=2, color="black") +
+  geom_hline(aes(yintercept=mean(df$y))) +
+  geom_text(x=3, y=51, label=paste("mean :", mean(df$y)), check_overlap=T, color="Red") +
+  labs(title="nnet result", x="Tries", y="Percentage")
+```
+
+![nnet prediction result graph](/assets/img/portfolio/portfolio-naver_news_analysis_06.png)
+
+평균값은 50.484%가 나왔으며 기대한 것보다 매우 낮다는 것을 확인할 수 있습니다.
+
+### 5.6 Conclusion
+
+인공신경망 알고리즘을 구현한 `nnet` 패키지를 이용하여 네이버 뉴스 댓글의 속성으로 카테고리 예측을 해보았습니다. 5번 수행한 결과 평균 50.484%의 예측 정확도를 도출하였고, 이는 곧 데이터 분석에 적합하지 않다는 결론을 내릴 수 있었습니다.
 
 # Sources
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
