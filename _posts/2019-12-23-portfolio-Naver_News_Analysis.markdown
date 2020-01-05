@@ -69,6 +69,14 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
     - [5.4 Model Creation](#54-model-creation)
     - [5.5 Model Prediction](#55-model-prediction)
     - [5.6 Conclusion](#56-conclusion)
+  - [6 Cluster Analysis](#6-cluster-analysis)
+    - [6.1 Dataset](#61-dataset)
+    - [6.2 Distance Calculation](#62-distance-calculation)
+    - [6.3 Analysis](#63-analysis)
+    - [6.4 Dividing Group](#64-dividing-group)
+    - [6.5 Summary Statistical Analysis](#65-summary-statistical-analysis)
+    - [6.6 Conclusion](#66-conclusion)
+  - [7 KNN](#7-knn)
 - [Sources](#sources)
 
 # Analysis
@@ -1312,6 +1320,196 @@ ggplot(data=df, mapping=aes(x=x, y=y, col=x, fill=x)) +
 ### 5.6 Conclusion
 
 인공신경망 알고리즘을 구현한 `nnet` 패키지를 이용하여 네이버 뉴스 댓글의 속성으로 카테고리 예측을 해보았습니다. 5번 수행한 결과 평균 50.484%의 예측 정확도를 도출하였고, 이는 곧 데이터 분석에 적합하지 않다는 결론을 내릴 수 있었습니다.
+
+## 6 Cluster Analysis
+
+네이버 댓글 작성자의 속정을 독립 변수로 하여 댓글 작성자 속성별 군집 분류를 하고, 이를 분석해 보겠습니다.
+
+### 6.1 Dataset
+
+의사 결정 트리에서 사용한 데이터셋을 사용합니다. 네이버 정책에 따른 뉴스의 총 댓글 수가 100개 미만인 경우, 성별과 연령대 댓글 비율 정보를 제공하지 않기 때문에, 백프로 제공되는 30대의 댓글 비율이 0이아닌 경우만을 적합한 데이터로 선정하였습니다.
+
+```R
+df <- subset(df, df$X30 != 0)
+df <- changeNum(df)
+```
+
+**changeNum()** 함수는 비율 데이터를 수치화하는 커스텀 함수입니다.
+
+군집화를 할 때, Vector 메모리 부족과 덴드로그램을 그릴 때 session abort 가 떠서 적정 수치로 샘플링을 하였습니다. 이 프로젝트에서는 5%(3281개)의 샘플 데이터를 이용하였습니다.
+
+```R
+idx <- sample(1:nrow(df), 0.05 * nrow(df))
+df <- df[idx, ]
+```
+
+군집 분석에 필요한 데이터는 텍스트 데이터가 아닌 정수형 데이터를 넣어야 하기 때문에 뉴스 카테고리를 정수로 표현하였습니다 :
+
+- 경제(1), IT(2), 생활/문화(3), 정치(4), 사회(5), 세계(6)
+
+```R
+df$type <- ifelse(df$cate == 'E', 1,
+            ifelse(df$cate == 'I', 2,
+            ifelse(df$cate == 'L', 3,
+            ifelse(df$cate == 'P', 4,
+            ifelse(df$cate == 'S', 5, 6)))))
+```
+
+### 6.2 Distance Calculation
+
+각 행(데이터)의 거리를 측정하기 위해 유클리디언 거리 측정법으로 계산하였습니다. 기존 dataset 의 2열부터 9열까지의 속성(성별, 연령대)를 독립 변수로 지정하고 유클리디언 거리를 측정하였습니다. 
+
+```R
+target <- sampling[,4:11]
+gender_type_dist <- dist(target, 'euclidean')
+```
+
+*gender_type_dist* 변수를 출력해보면 다음과 같이 나옵니다 :
+
+|  | 4881 | 32733 | 44421 | 10192 | 50251 | 29771 |
+|:-----:|:---------:|:---------:|:---------:|:-----:|:-----:|:-----:|
+| 32733 | 29.782545 |  |  |  |  |  |
+| 44421 | 28.195744 | 12.961481 |  |  |  |  |
+| 10192 | 21.400935 | 19.467922 | 11.874342 |  |  |  |
+| ... | ... | ... | ... | ... | ... | ... |
+
+### 6.3 Analysis
+
+측정된 데이터간 거리를 바탕으로 평균 연결 방법(ave)을 통해 **hclust()** 함수를 사용하여 군집화를 수행했습니다.
+
+```R
+gender_type_res <- hclust(gender_type_dist , method="ave")
+```
+
+```
+Call:
+hclust(d = gender_type_dist, method = "ave")
+
+Cluster method   : average 
+Distance         : euclidean 
+Number of objects: 260
+```
+
+그 결과 260개의 object 가 생성된 것을 확인할 수 있습니다.
+
+그리고 군집화된 데이터를 시각화 해보았습니다.
+
+![Gender and Category Cluster Dendrogram](/assets/img/portfolio/portfolio-naver_news_analysis_07.png)
+
+남성과 여성, 그리고 20대, 30/40대, 50대, 10/60대로 군집된 것을 볼 수 있습니다. 
+
+최적의 k 값을 도출하기 위해 k 를 1부터 10까지 변화시키며, witness 값이 급격하게 변하는 Elbow point 를 구했습니다.
+
+```R
+maxlen <- 10
+for(i in 1:maxlen){
+    wss[i] <- sum(kmeans(target, centers = i)$withinss)
+} 
+wss # witness
+```
+
+변화하는 witness 의 값을 시각화하면 다음과 같습니다 :
+
+```R
+plot(1:10, wss, type="b",xlab = "Number of Clusters", ylab = "Within group sum of squares")
+```
+
+![Elbow Point](/assets/img/portfolio/portfolio-naver_news_analysis_08.png)
+
+그래프를 확인해보면 완만해지는 부분(Elbow point)가 4로 추정됩니다. 따라서 Elbow point 를 4로 설정하였습니다. 설정된 값을 이용해 k-means 군집을 하고 시각화 해보았습니다.
+
+```R
+kms <- kmeans(target , elbow)
+plot(target , col = kms$cluster)
+```
+
+```
+K-means clustering with 4 clusters of sizes 26, 371, 136, 5
+
+Cluster means:
+     MALER    FEMALER        X10        X20       X30       X40
+1 3640.483 1188.40192  40.665769  486.08385 1182.2319 1520.3785
+2  338.936   97.85968   4.491024   46.23863  114.9720  143.0425
+3 1335.988  458.10794  12.677647  160.39625  439.5718  589.7121
+4 7813.844 3909.55600 126.162000 1285.68800 3004.7820 3785.5340
+         X50       X60
+1 1085.32385 500.55192
+2   89.27108  38.91423
+3  407.20007 181.85154
+4 2564.49000 969.41200
+```
+
+![k-means result](/assets/img/portfolio/portfolio-naver_news_analysis_09.png)
+
+k-means 군집이 된 위 그래프를 보면, 대체로 선ㅂ명하게 4가지로 분류된 것을 볼 수 있습니다. 하지만 10대와 교차되는 데이터들은 다른 분류와 다르게 섞여있는 것을 확인할 수 있습니다. 이 는, 10대 데이터의 가짓수가 다른 컬럼에 비해 비교적으로 많이 적어서 생기는 문제로 확인됩니다.
+
+### 6.4 Dividing Group
+
+군집 분석 결과를 앞서 도출된 Elbow point 인 4개의 대상의 군집수를 지정하기 위해 **cutree()** 함수를 사용합니다. 관측치를 대상으로 4개의 군집수를 지정하여 군집을 의미하는 숫자(1~4)가 출력 됩니다.
+
+```R
+ghc <- cutree(gender_type_res, k = K)
+```
+
+군집수(ghc)를 기존 데이터셋의 컬럼에 추가하고, 군집수의 빈도를 구하였습니다. 그리고 각 그룹의 요약을 출력하고 그 그룹의 평균을 table 로 표현하였습니다. 
+
+```R
+sampling$ghc <- ghc
+table(sampling$ghc)
+
+for(i in c(1:4)) {
+    g1 <- subset(sampling, ghc == i)
+    print(summary(g1[2:9]))
+}
+```
+
+- 그룹별 빈도
+
+
+| 1그룹 | 2그룹 | 3그룹 | 4그룹 |
+|:-----:|:-----:|:-----:|:-----:|
+| 210 | 1 | 2 | 37 |
+
+- 그룹별 요인 평균
+
+| 요인 | 1그룹 | 2그룹 | 3그룹 | 4그룹 |
+|:----:|:-----:|:-----:|:-----:|:-----:|
+| 남성 | 450 | 9112 | 6152 | 2027 |
+| 여성 | 148 | 2570 | 2366 | 707 |
+| 10대 | 6 | 116 | 0 | 16 |
+| 20대 | 62 | 700 | 381 | 221 |
+| 30대 | 157 | 2103 | 1412 | 629 |
+| 40대 | 195 | 3972 | 2560 | 918 |
+| 50대 | 123 | 3388 | 2641 | 654 |
+| 60대 | 54 | 1402 | 1439 | 294 |
+
+### 6.5 Summary Statistical Analysis
+
+위 테이블을 보면 2그룹과 3그룹의 댓글 수는 많지만 빈도 수가 적어(1, 2개의 댓글에 불과) 정확한 판단이 어렵다는 것을 확인할 수 있습니다. 따라서 1그룹과 4그룹을 살펴보았습니다.
+
+그룹별 요인 평균을 보면 1그룹의 경우 빈도는 210으로 가장 많지만, 전체 댓글의 경우 600개 밖에 되지 않습니다. 그러므로 대중의 관심도 측면에서 데이터의 가치가 저하된다고 볼 수 있습니다.
+
+4그룹의 빈도 수는 37개이지만, 평균 댓글 수가 2700개에 달합니다. 따라서 빈도도 많으며 댓글 수도 높은 4그룹이 사람들의 관심도가 높은 기사 댓글군이라고 판단 하였습니다. 
+
+4그룹의 뉴스 섹션 분포를 도출하여 다음과 같은 결과를 얻었습니다 :
+
+| 경제 | IT | 생활/문화 | 정치 | 사회 | 세계 |
+|:----:|:--:|:---------:|:----:|:----:|:----:|
+| 4 | 3 | 10 | 2 | 23 | 3 |
+
+4그룹의 구성요소는 문화와 사회 섹션이 다수로 판단되며, 문화와 사회 섹션의 제목의 경향을 알아보기 위하여 출력하였습니다.
+
+![News Title](/assets/img/portfolio/portfolio-naver_news_analysis_10.png)
+
+위 기사 제목을 살펴보면 대체로 자극적인 단어와 부정적인 어휘를 사용하는 것을 확인할 수 있습니다. 따라서 뉴스를 보는 사람들은 자극적인 제목에 관심을 많이 보이며, 의사표현을 많이 한다는 것을 알 수 있었습니다.
+
+### 6.6 Conclusion
+
+군집 분석을 통해 댓글 통계를 가진 기사들은 비슷한 경향을 가진 그룹으로 분류될 수 있음을 보여주었습니다. 또한 각 유사한 특징을 가진 그룹들을 분석해본 결과 네이버 댓글수는 자극적인 제목에 반응이 더 크다는 것을 보여주며, 특히 문화와 사회 섹션의 기사에 많은 댓글이 달린다는 것을 알 수 있었습니다.
+
+## 7 KNN
+
+
 
 # Sources
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
