@@ -77,7 +77,15 @@ R을 사용하여서 네이버 뉴스를 분석, 그리고 뉴스 분야를 예�
     - [6.5 Summary Statistical Analysis](#65-summary-statistical-analysis)
     - [6.6 Conclusion](#66-conclusion)
   - [7 KNN](#7-knn)
+    - [7.1 Data Pre-processing](#71-data-pre-processing)
+    - [7.2 Data Separation](#72-data-separation)
+    - [7.3 Applying KNN algorithm](#73-applying-knn-algorithm)
+    - [7.4 Best k value](#74-best-k-value)
+    - [Applying KNN algorithm with the best k-value](#applying-knn-algorithm-with-the-best-k-value)
+    - [Final Accuracy Calculation](#final-accuracy-calculation)
+- [Final Conclusion](#final-conclusion)
 - [Sources](#sources)
+- [Collaborator](#collaborator)
 
 # Analysis
 
@@ -1509,7 +1517,219 @@ for(i in c(1:4)) {
 
 ## 7 KNN
 
+네이버 댓글 작성자의 성별과 연령대 데이터를 이용하여 뉴스 카테고리를 분류하는 지도 학습 알고리즘을 수행했습니다. 또한 학습된 모델을 통해 테스트 데이터를 통해 새로운 댓글 작성자의 데이터가 들어오면 알맞은 뉴스 섹션으로 분류 해보겠습니다.
 
+### 7.1 Data Pre-processing 
+
+KNN 알고리즘을 적용하는데 사용할 데이터는 사회와 생활 섹션을 사용하였습니다. 두 섹션의 댓글수, 성별 비율, 연령대 비율과 섹션 컬럼을 가져오기 위해 다음과 같은 전처리 과정을 거쳤습니다. 또한 네이버 댓글 정책으로 인해 통계가 없는 데이터를 삭제하는 과정을 거쳤습니다.
+
+```R
+S_training$cate <- substr(S_training$NEWSID, 1, 1)
+S_training <- S_training[,c(-1,-7)]
+
+C_training$cate <- substr(C_training$NEWSID, 1, 1)
+C_training <- C_training[,c(-1,-7)]
+
+tot_training <- rbind(S_training, C_training)
+training <- tot_training[, c(6, 10:18)]
+training <- training[,c(-1)]
+```
+
+| NCOMMENT | MALER | FEMALER | X10 | X20 | X30 | X40 | X50 | X60 | cate |
+|:--------:|:-----:|:-------:|:---:|:---:|:---:|:---:|:---:|:---:|:----:|
+| 5897 | 73 | 27 | 2 | 11 | 24 | 34 | 22 | 8 | S |
+| 2251 | 59 | 41 | 1 | 12 | 37 | 35 | 12 | 2 | S |
+| 2066 | 73 | 27 | 0 | 10 | 34 | 36 | 15 | 5 | S |
+| 2010 | 72 | 28 | 1 | 18 | 36 | 30 | 11 | 4 | S |
+| 1464 | 52 | 48 | 3 | 21 | 35 | 29 | 9 | 3 | S |
+| ... | ... | ... | ... | ... | ... | ... | ... | ... | ... |
+
+### 7.2 Data Separation
+
+Train, Test, Valid 데이터를 3:1:1 의 비율로 갖추고 입력(독립 변수)과 출력(종속 변수) 데이터로 분리하는 과정을 거쳤습니다.
+
+```R
+idx <- sample(x = c("train", "valid", "test"), size = nrow(training), replace = TRUE, prob = c(3, 1, 1))
+
+train <- training[idx == "train", ]
+valid <- training[idx == "valid", ]
+test <- training[idx == "test", ]
+
+train_x <- train[, -9]
+valid_x <- valid[, -9]
+test_x <- test[, -9]
+
+train_y <- train[, 9]
+valid_y <- valid[, 9]
+test_y <- test[, 9]
+```
+
+### 7.3 Applying KNN algorithm
+
+전처리된 데이터셋을 KNN 알고리즘을 통해 학습 모델을 만들어 보겠습니다. train 파라미터에 train 데이터의 독립 변수를 넣으며, test 파라미터에 확인데이터(valid)의 독립 변수를 넣고, cl(class 변수)에 train 의 종속 변수를 넣었습니다. 또 k값은 1을 넣어 모델을 생성하여 정확도를 계산해 보았습니다.
+
+```R
+knn_1 <- knn(train = train_x, test = valid_x, cl = train_y, k = 1, use.all = F)
+table(knn_21, valid_y)
+accuracy_21 <- sum(knn_21 == valid_y) / length(valid_y)
+```
+
+- 생성된 모델 
+
+```
+[1] L L S S S S S S S S S S S L S S S S S S S S L S S S
+[27] L S S S S S S S S S S S S S S S S L S S S S S S S S
+[53] S L S S S L S S S S S S S S S S S S L S S S S S S S
+[79] S L S S S S S L S L S S S S S S S S S S L S S S S S
+```
+
+- 분류된 결과의 Cross Table
+
+| knn_21 |  | valid_y |
+|:------:|:----:|:-------:|
+|  | L | S |
+| L | 1125 | 233 |
+| S | 216 | 1946 |
+
+k 가 1일 때, 뉴스 섹션 분류 정확도는 87.24% 가량 나왔습니다.
+
+### 7.4 Best k value
+
+k 가 1부터 train 데이터의 행 개수 만큼 변화할 때 분류 정확도를 구하려 했습니다. 반복문을 이용하여 k 가 1부터 train 행 개수만큼 변화할 때, 분류 정확도가 몇 %가 되는지 그래프를 그려보고 최적의 k 값을 확인하였습니다.
+
+- 분류 정확도를 사전 할당해 줍니다.
+
+```R
+accuracy_k <- NULL
+```
+
+- k 가 1부터 train 데이터의 행 개수까지 반복합니다.
+
+```R
+pb <- progress_bar$new(format="[:bar] :current/:total (:percent)", total=cnt)
+cnt <- nrow(train)
+for(idx in c(1:cnt)){
+  # k가 idx일 때 knn 적용
+  knn_k <- knn(train = train_x, test = valid_x, cl = train_y, k = idx)
+  # 분류 정확도 계산
+  accuracy_k <- c(accuracy_k, sum(knn_k == valid_y) / length(valid_y))
+  pb$tick(0)
+  pb$tick(1)
+}
+```
+
+- 이 때, 12% 에서 에러가 발생했습니다.
+
+```
+[=========>----------------------------------------------------] 499/4188 ( 12%)
+Error in knn(train = train_x, test = valid_x, cl = train_y, k = idx) : 
+  too many ties in knn
+```
+
+- k 에 따른 분류 정확도 데이터를 생성하고 시각화를 해보았습니다.
+
+```R
+valid_k <- data.frame(k = c(1:cnt), accuracy = accuracy_k)
+plot(formula = accuracy ~ k, data = valid_k, type = "o", pch = 20, main = "validation - optimal k")
+```
+
+![validation - optimal k value](/assets/img/portfolio/portfolio-naver_news_analysis_11.png)
+
+- 분류 정확도가 가장 높으면서, 가장 작은 k 값을 도출합니다.
+
+```R
+sort(valid_k$accuracy, decreasing = T)
+maxdata <- max(valid_k$accuracy)
+
+min_position <- min(which(valid_k$accuracy == maxdata))
+```
+
+*min_position* 의 값과 그래프를 확인해보면 적정 k 값을 알 수 있습니다. 최적의 *min_position* 은 21이 나왔으며, 이 때 *maxdata* (최대의 분류 정확도)는 91.96%가 나왔습니다. k 가 1일때와 비교해보면 4% 가량 정확도가 높아진 것을 확인할 수 있습니다. 
+
+### Applying KNN algorithm with the best k-value
+
+최적의 k 값인 21을 이용하여 test 데이터에 적용한 모델을 생성했습니다.
+
+```R
+knn_optimization <- knn(train = train_x, test = test_x, cl = train_y, k = min_position)
+```
+
+생성된 모델은 test 데이터와 비교하기 위해 Confusion Matrix 를 구성합니다.
+
+```R
+result <- matrix(NA, nrow = 2, ncol = 2)
+rownames(result) <- paste0("real_", c('S', 'L'))
+colnames(result) <- paste0("clsf_", c('S', 'L'))
+
+result[1, 1] <- sum(ifelse(test_y == "S" & knn_optimization == "S", 1, 0))
+result[2, 1] <- sum(ifelse(test_y == "L" & knn_optimization == "L", 1, 0))
+result[1, 2] <- sum(ifelse(test_y == "S" & knn_optimization == "L", 1, 0))
+result[2, 2] <- sum(ifelse(test_y == "L" & knn_optimization == "S", 1, 0))
+```
+
+최종 결과는 다음과 같은 Confusion Matrix 로 나타났습니다.
+
+|  | clsf_S | clsf_L |
+|:------:|:------:|:------:|
+| real_S | 2226 | 43 |
+| real_L | 1099 | 261 |
+
+### Final Accuracy Calculation
+
+최적 k 값을 이용한 KNN 모델에 test 데이터를 넣어 분류하고, 그 정확도를 table 로 정리하였습니다. 
+
+```R
+table(prediction=knn_optimization, answer=test_y)
+
+accuracy <- sum(knn_optimization == test_y) / sum(result)
+accuracy
+```
+
+|  | 생활 | 사회 |
+|:----:|:----:|:----:|
+| 생활 | 1099 | 43 |
+| 사회 | 261 | 2226 |
+
+k 가 21일 때 뉴스 섹션 분류 정확도는 최적의 k 값을 구했을 때 나왔던 91.96% 보다 조금 낮은 91.62%가 나왔습니다. 이는 최적 k 값을 사용하지 않은(k=1) 경우에 비해 4% 높은 결과가 나왔고, 이때까지 사용한 모든 알고리즘의 정확도보다 비교적으로 매우 높은 수치로 확인 되었습니다.
+
+따라서 90% 이상의 정확도를 가진 분류 알고리즘으로 성공적인 예측을 할 수 있다는 결과를 도출하였습니다.
+
+# Final Conclusion
+
+네이버 뉴스의 각 세션 별 댓글 및 조회 수 분석을 통해 비슷한 경향(동질성)의 뉴스 카테고리를 분류해보았습니다. 그리고 댓글 작성자 유형에 따른 섹션 예측 모델들을 의사 결정 트리, KNN, 인공 신경망으로 생성하고 예측 정확도를 도출했습니다. 그 결과 KNN 을 제외하면 절반 가량의 정확도를 보이며 예측이 불가능하다는 판단을 내렸으며, KNN 의 경우 k 가 21일때 카테고리 분류 정확도는 최고치인 91.62%가 나왔습니다. 이로 인해 KNN 알고리즘을 통한 네이버 댓글 작성자의 유형에 따라 어떤 카테고리에 관심도가 높은지 알 수 있으며, 타겟을 예측한 마케팅이 가능할 것으로 판단됩니다. 
+
+또한 분석 목표와 부합되는 의사 결정 트리와 군집 분석의 도출된 결과를 활용하여, 일명 ‘효율 지수’를 측정하였습니다. 이는 의사 결정 트리의 결정 수치(말단 노드의 채택 비율)와 군집 분석의 그룹별 관심도(빈도 / 전체 댓글 수)를 곱한 것을 칭하였습니다. 그 결과는 다음 표로 나타납니다.
+
+| 분류 | IT | 생활/문화 | 경제 | 세계 | 사회 | 정치 |
+|:--------:|:------:|:---------:|:------:|:------:|:------:|:------:|
+| 의사결정 | 0.25 | 0.08 | 0.1 | 0.15 | 0.21 | 0.22 |
+| 군집분석 | 0.07 | 0.22 | 0.09 | 0.07 | 0.51 | 0.04 |
+| 효율지수 | 0.0167 | 0.0178 | 0.0089 | 0.0100 | 0.1073 | 0.0098 |
+
+의사 결정 트리 및 군집 분석을 같이 고려한 결과,
+1. 사회 분야가 상당히 높다는 것을 확인 할 수 있습니다.
+2. 생활/문화와 IT 가 사회 분야에 비해 1/6 수준이라는 것을 확인할 수 있습니다.
+3. 나머지 분야는 사회 분야에 비해 1/10 수준이라는 것을 확인할 수 있습니다.
+
+> 댓글 작성자 성배율은 3:1 (남자:여자) 이며, 소비지수*는 87.8, 92.1 (남자, 여자) 입니다.
+
+* 소비지수는 소비자 특성별 소비 지출 전망(2019년 전반기)를 참고하였습니다.
+
+![소비자 특성별 소비 지출 전망](/assets/img/portfolio/portfolio-naver_news_analysis_12.png)
+
+따라서, 네이버 뉴스에 광고를 추진한다면 관심도가 제일 높은 사회 뉴스를 활용하고,
+사회 뉴스에서 강세를 보이는 40대 남성을 대상으로 한 상품이 다른 상품 대비 효율적일 것으로 판단됩니다.
+소비 지출 지수(’19년 전반기 기준)에서 40대 남성과 여성이 모두 높은 수치를 보였던 주거와 교육 분야의 상품이 적절하다고 판단됩니다.
+2,30대 남성을 대상으로 한 상품은 IT 뉴스 활용 및 광고 시 효율적일 것으로 판단되며,
+특히, 소비 지출 지수에서 높은 수치를 보였던 주거 분야와 교통/통신 분야의 상품이 적절하다고 판단됩니다.
 
 # Sources
+[Source Code - 소스 코드](https://github.com/littlecsi/tjproject)
+
 [R을 이용한 Selenium 실행 (Windows 10 기준)](https://hmtb.tistory.com/5)
+
+[Progress bar in your R terminal](https://github.com/r-lib/progress)
+
+# Collaborator
+
+- [rap0d](https://github.com/rap0d)
