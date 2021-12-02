@@ -2,7 +2,7 @@
 #  User configuration
 # -----------------------------------------------------------------------------
 
-title:               littlecsi
+title:               Jahad
 
 # The unique resource location of your page.
 # Set to `https://<username>.github.io` when hosting on GitHub Pages
@@ -14,9 +14,7 @@ baseurl:             ""
 
 # A very short description of your page
 tagline:             
-  Road to Success...
-  
-  Carpe Diem!
+  Are you really trying?
 
 # A short description of the page, used in the sidebar and as fallback for the meta description tag.
 # Markdown enabled, but don't use more than one paragraph (enforced by `>`)
