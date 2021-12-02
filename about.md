@@ -15,13 +15,11 @@ I believe that the future of Virtual Reality will provide us with a new life and
 
 Starting with self-teaching python, I learned how to code in Java as well as C# in Unity.
 
-I like to design sometimes, although I don't have much experience.
-
-My dream is to develop Virtual Reality in either Microsoft or Oculus.
+My dream is to develop algorithms for AutoTrading or devote myself in NFT.
 
 ## History
 
-<!-- - United Kingdom, Imperial College London (Current) -->
+- United Kingdom, Imperial College London (2020 ~ present)
 
 - United Kingdom, City of London Freemen's School (2015 ~ 2019)
 
