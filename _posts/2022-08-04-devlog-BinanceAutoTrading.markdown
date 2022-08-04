@@ -7,7 +7,7 @@ tags: binance
 comments: true
 ---
 
-![Binance x Python]()
+![Binance x Python](/assets/img/devlog/Avis-Binance.jpeg)
 
 # Table of Contents
 
