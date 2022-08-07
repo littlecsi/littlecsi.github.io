@@ -1,7 +1,7 @@
 ---
 layout: post
-title: '[Binance Auto Trading] Research and Analysis'
-subtitle: 'Analysing what problems I will be facing'
+title: 'Binance Auto Trading'
+subtitle: ''
 categories: devlog
 tags: binance
 comments: true
@@ -20,6 +20,7 @@ comments: true
   - [Step 2: Calculate Target Price](#step-2-calculate-target-price)
   - [Step 3: Updating Variables](#step-3-updating-variables)
   - [Step 4: Trade Crypto](#step-4-trade-crypto)
+  - [Step 5: Integration to AWS server](#step-5-integration-to-aws-server)
 
 
 # Introduction
@@ -219,3 +220,36 @@ def main():
 ```
 
 첫 if문 조건이 <현재시간이 다음날 자정과 자정 + 10초 사이>인 이유는 AWS 서버의 일처리 속도 때문이다. 매 while문이 얼마동안 돌아갈지 모르기 때문에 적당한 간격의 10초를 정하고 그 사이를 "자정"이라 부르는 것이다. 마지막에 `time.sleep(1)`를 통해 이 while문은 iteration 당 1초가 조금 넘는 시간이 걸릴 것이다. 
+
+## Step 5: Integration to AWS server
+
+코드도 완료가 되었으니 이제 서버에 코드를 올리고 돌려야한다. 알아서 git을 통해 github repository를 클론하자.
+
+이제 nohup을 이용해 프로젝트를 백그라운드에서 실행되도록 한다. 
+
+```
+$ nohup python3 binance/main.py > output.log &
+```
+
+하지만 무언가 되지 않았다... 그 이유는 내가 매수를 하면서 구매하는 코인의 갯수 계산을 잘못했기 때문이다. 현재 내 코드는 코인의 가격이 내 잔고보다 높으면 0개를 구매하려 한다. 이를 수정하기 위해서 나는 **get_precision()** 함수를 생성했다. 코인 구매 갯수를 계산하면서 소수점이 엄청 많이 생긴다. 
+
+```python
+def get_precision(client: Spot, asset: str="BTCUSDT") -> int:
+    """
+    Returns the asset precision of an asset.
+    """
+    assert isinstance(client, Spot)
+    assert isinstance(asset, str)
+
+    if len(asset) <= 4: asset += "USDT"
+
+    return int(client.exchange_info(asset)["symbols"][0]["baseAssetPrecision"])
+```
+
+이 함수를 통해 해당 asset이 가지는 소수점 자리를 구하고 다음과 같이 **round()** 함수를 써서 quantity를 구한다. 
+
+```python
+quantity = round((balance / price), get_precision(client, asset))
+```
+
+이렇게 고치고 나면 코드가 정상적으로 돌아간다.
