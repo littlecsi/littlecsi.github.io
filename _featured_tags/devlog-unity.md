@@ -1,7 +1,7 @@
 ---
 layout: tag-blog
-title: Unity
-slug: unity
+title: Crypto
+slug: crypto
 category: devlog
 menu: false
 order: 1
