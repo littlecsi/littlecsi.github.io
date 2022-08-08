@@ -3,7 +3,7 @@ layout: post
 title: 'Binance Auto Trading'
 subtitle: '바이낸스 자동 매매 구현하기'
 categories: devlog
-tags: binance
+tags: crypto
 comments: true
 ---
 
