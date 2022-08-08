@@ -231,25 +231,8 @@ def main():
 $ nohup python3 binance/main.py > output.log &
 ```
 
-하지만 무언가 되지 않았다... 그 이유는 내가 매수를 하면서 구매하는 코인의 갯수 계산을 잘못했기 때문이다. 현재 내 코드는 코인의 가격이 내 잔고보다 높으면 0개를 구매하려 한다. 이를 수정하기 위해서 나는 **get_precision()** 함수를 생성했다. 코인 구매 갯수를 계산하면서 소수점이 엄청 많이 생긴다. 
+하지만 무언가 되지 않았다... 그 이유는 내가 매수를 하면서 구매하는 코인의 갯수 계산을 잘못했기 때문이다. 현재 내 코드는 코인의 가격이 내 잔고보다 높으면 0개를 구매하려 한다. 이를 수정하기 위해서 나는 간단하게 **round()** 함수를 사용했다. 소수점을 3자리수까지만 허용을 하게되면 코드는 쉽게 돌아간다. 
 
 ```python
-def get_precision(client: Spot, asset: str="BTCUSDT") -> int:
-    """
-    Returns the asset precision of an asset.
-    """
-    assert isinstance(client, Spot)
-    assert isinstance(asset, str)
-
-    if len(asset) <= 4: asset += "USDT"
-
-    return int(client.exchange_info(asset)["symbols"][0]["baseAssetPrecision"])
+quantity = round((balance / price), 3)
 ```
-
-이 함수를 통해 해당 asset이 가지는 소수점 자리를 구하고 다음과 같이 **round()** 함수를 써서 quantity를 구한다. 
-
-```python
-quantity = round((balance / price), get_precision(client, asset))
-```
-
-이렇게 고치고 나면 코드가 정상적으로 돌아간다.
