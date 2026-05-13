@@ -19,7 +19,9 @@ My dream is to develop algorithms for AutoTrading or devote myself in NFT.
 
 ## History
 
-- United Kingdom, Imperial College London (2020 ~ present)
+- South Korea, Mandatory Army Service (2024 ~ 2026)
+
+- United Kingdom, Imperial College London (2020 ~ 2024)
 
 - United Kingdom, City of London Freemen's School (2015 ~ 2019)
 
