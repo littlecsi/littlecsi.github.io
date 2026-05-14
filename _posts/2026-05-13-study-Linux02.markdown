@@ -1,0 +1,329 @@
+---
+layout: post
+title: '[Linux] Linux Terminal, File System, and Package Management'
+subtitle: 'Linux Terminal, File System, and Package Management'
+categories: study
+tags: Linux
+comments: true
+---
+
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
+## Table of Content
+
+- [🎯 Objectives](#-objectives)
+  - [📸 Snapshot: The "Save Game" of VMs](#-snapshot-the-save-game-of-vms)
+  - [🖥️ Terminal vs. Shell vs. Command](#️-terminal-vs-shell-vs-command)
+  - [🐚 Different Types of Shells](#-different-types-of-shells)
+  - [🛠️ Structure of a Command](#️-structure-of-a-command)
+  - [📚 Getting Help: Documentation Tools](#-getting-help-documentation-tools)
+  - [🆘 How to Help Yourself When Stuck](#-how-to-help-yourself-when-stuck)
+  - [🚀 8 Essential Navigation Commands](#-8-essential-navigation-commands)
+  - [📂 Linux File Hierarchy Standard (FHS)](#-linux-file-hierarchy-standard-fhs)
+    - [FHS Minimap](#fhs-minimap)
+    - [Absolute Path vs. Relative Path](#absolute-path-vs-relative-path)
+    - [The Versatility of `cd`](#the-versatility-of-cd)
+    - [Windows vs. Linux FHS](#windows-vs-linux-fhs)
+    - [The FHS Metaphor](#the-fhs-metaphor)
+    - [Mapping: Windows vs. Linux](#mapping-windows-vs-linux)
+  - [⚙️ Configuration \& Variables](#️-configuration--variables)
+    - [Main Files in `/etc`](#main-files-in-etc)
+    - [6 Main Directories Comparison](#6-main-directories-comparison)
+  - [🔍 Exploration Toolkit (4 Tools)](#-exploration-toolkit-4-tools)
+  - [🧬 Variables \& Shell Customization](#-variables--shell-customization)
+    - [Environment Variables](#environment-variables)
+    - [Environment vs. Local vs. Alias](#environment-vs-local-vs-alias)
+    - [The `$PATH` Logic](#the-path-logic)
+    - [Persistence: Temporary vs. Permanent](#persistence-temporary-vs-permanent)
+    - [Configuration Files](#configuration-files)
+  - [📦 Package Management (APT)](#-package-management-apt)
+    - [8 Essential APT Commands](#8-essential-apt-commands)
+    - [Update vs. Upgrade (Common Misunderstanding)](#update-vs-upgrade-common-misunderstanding)
+    - [Search \& Show](#search--show)
+    - [Install vs. Remove vs. Purge](#install-vs-remove-vs-purge)
+    - [3 Main Package Tools Comparison](#3-main-package-tools-comparison)
+    - [🛡️ APT Safety Checklist](#️-apt-safety-checklist)
+  - [4. Virtualization \& Infrastructure](#4-virtualization--infrastructure)
+    - [🏗️ VM vs. Container](#️-vm-vs-container)
+    - [🌐 Client-Server Structure](#-client-server-structure)
+  - [5. Remote Environment Setup](#5-remote-environment-setup)
+    - [🚪 Port Forwarding](#-port-forwarding)
+    - [🔑 SSH Remote Connection Guide](#-ssh-remote-connection-guide)
+
+---
+
+# 🎯 Objectives
+
+- Master the core concepts of the Linux terminal and shell.
+- Understand the Linux File Hierarchy Standard (FHS) and how to navigate it.
+- Learn how to manage system variables and environment settings.
+- Build skills for managing software packages with APT.
+
+---
+
+## 📸 Snapshot: The "Save Game" of VMs
+
+A **snapshot** is a recorded state of a virtual machine at a specific point in time. It includes the state of the disk, RAM, and configuration.
+
+- **How to use it:**
+    1. **Take a Snapshot:** Before a risky task (like editing a core config file), save the current state.
+    2. **Restore/Revert:** If the system breaks, roll back to the saved "healthy" state.
+    3. **Delete:** After confirming the changes are stable, delete the snapshot to save disk space.
+
+---
+
+## 🖥️ Terminal vs. Shell vs. Command
+
+- **Terminal:** The graphical window or interface that provides a text-based environment (e.g., GNOME Terminal, iTerm2).
+- **Shell:** The interpreter (e.g., Bash, Zsh). It takes your input, translates it for the kernel, and returns the result.
+- **Command:** The specific instruction or program you tell the shell to run (e.g., `ls`, `cd`).
+
+---
+
+## 🐚 Different Types of Shells
+
+- **sh (Bourne Shell):** The original Unix shell. It is simple, but it lacks modern features.
+- **bash (Bourne Again Shell):** The standard shell for many Linux distros (including Ubuntu).
+- **zsh (Z Shell):** Highly customizable and popular for its "Oh My Zsh" plugin framework.
+- **fish (Friendly Interactive Shell):** Known for excellent auto-suggestions and a user-friendly experience out of the box.
+
+---
+
+## 🛠️ Structure of a Command
+
+A typical command follows this pattern:
+`ls -al /etc`
+
+1. **Command (`ls`):** The program to execute.
+2. **Options/Flags (`al`):** Modifies how the command behaves (e.g., show all files in a long list).
+3. **Arguments (`/etc`):** The target the command acts on.
+
+---
+
+## 📚 Getting Help: Documentation Tools
+
+- **`-help`**: A quick summary of options built into the command.
+- **`man` (Manual)**: The official, detailed manual for a command.
+- **`tldr`**: A community-driven tool that provides practical examples of common use cases.
+
+---
+
+## 🆘 How to Help Yourself When Stuck
+
+1. **Read the Error Message:** Many Linux errors tell you exactly what is wrong (e.g., "Permission denied").
+2. **Use Tab Completion:** Avoid typos by letting the shell complete file and command names.
+3. **History:** Use the `up` arrow to find previous successful commands.
+4. **The Internet is Your Friend:** Search the error message on StackOverflow or in official documentation.
+
+---
+
+## 🚀 8 Essential Navigation Commands
+
+1. **`pwd`**: Print Working Directory (Where am I?).
+2. **`ls`**: List files in the current folder.
+3. **`cd`**: Change Directory to move between folders.
+4. **`mkdir`**: Create a new directory.
+5. **`touch`**: Create a new empty file.
+6. **`cp`**: Copy files or directories.
+7. **`mv`**: Move or rename files/directories.
+8. **`rm`**: Remove (delete) files or directories.
+
+---
+
+## 📂 Linux File Hierarchy Standard (FHS)
+
+### FHS Minimap
+
+- `/`: The root. Everything starts here.
+- `/bin` & `/usr/bin`: Basic user commands.
+- `/etc`: System-wide configuration files.
+- `/home`: Personal folders for users.
+- `/root`: The home folder for the superuser.
+- `/var`: Variable data, such as logs and databases.
+
+### Absolute Path vs. Relative Path
+
+- **Absolute Path:** Always starts from the root (`/`). (e.g., `/home/ubuntu/docs/test.txt`).
+- **Relative Path:** Starts from your current location (e.g., `docs/test.txt` or `../test.txt`).
+
+### The Versatility of `cd`
+
+- `cd ~`: Go to your home directory.
+- `cd ..`: Move up one level.
+- `cd -`: Return to the previous directory.
+- `cd /`: Go to the very start (root).
+
+### Windows vs. Linux FHS
+
+| Feature | Windows | Linux |
+| --- | --- | --- |
+| **Drive Logic** | C:, D:, E: (Physical partitions) | **Single Tree (Root `/`)** |
+| **Path Separator** | Backslash (`\\`) | **Forward slash (`/`)** |
+| **Case Sensitivity** | Mostly Case-Insensitive | **Strictly Case-Sensitive** |
+
+### The FHS Metaphor
+
+Think of the Linux FHS like a **large library**:
+
+- The **root (`/`)** is the building itself.
+- **`/etc`** is the administrative office (rules and settings).
+- **`/bin`** is the tool shed (items everyone uses).
+- **`/home`** is the private study rooms (individual spaces).
+
+### Mapping: Windows vs. Linux
+
+- `C:\\Users` ↔ `/home`
+- `C:\\Windows` ↔ `/usr` or `/boot`
+- `C:\\Program Files` ↔ `/usr/bin` or `/opt`
+- `Control Panel` ↔ `/etc`
+
+---
+
+## ⚙️ Configuration & Variables
+
+### Main Files in `/etc`
+
+- `/etc/passwd`: User account information.
+- `/etc/shadow`: Secure encrypted passwords.
+- `/etc/hostname`: The computer name.
+- `/etc/hosts`: Local IP-to-hostname mapping.
+
+### 6 Main Directories Comparison
+
+| Directory | Full Name | Purpose |
+| --- | --- | --- |
+| `/bin` | Binaries | Essential command binaries for all users. |
+| `/etc` | Etcetera | System-wide configuration files. |
+| `/home` | Home | User home directories (personal data). |
+| `/root` | Root | Home directory for the root user. |
+| `/tmp` | Temporary | Temporary files (often cleared on reboot). |
+| `/usr` | User System Resources | Secondary hierarchy for user read-only data. |
+
+---
+
+## 🔍 Exploration Toolkit (4 Tools)
+
+1. **`find`**: Search for files by name, size, or time.
+2. **`grep`**: Search for specific text patterns *inside* files.
+3. **`which`**: Show the full path of the command you are running.
+4. **`locate`**: Quickly find files using a pre-built database.
+
+---
+
+## 🧬 Variables & Shell Customization
+
+### Environment Variables
+
+These variables define system behavior and are available to child processes. Examples include `USER`, `HOME`, and `PATH`.
+
+### Environment vs. Local vs. Alias
+
+- **Environment Variable:** Global. Available to the whole session and apps (e.g., `export VAR=1`).
+- **Local Variable:** Exists only within the current shell instance.
+- **Alias:** A custom shortcut for a longer command (e.g., `alias ll='ls -al'`).
+
+### The `$PATH` Logic
+
+When you type a command (like `python`), the shell searches the directories listed in **`$PATH`** from left to right. It runs the first match it finds. If nothing is found, you get "Command not found."
+
+### Persistence: Temporary vs. Permanent
+
+- **Temporary:** Typing `export VAR=val` in the terminal lasts only until you close that window.
+- **Permanent:** Add the command to a configuration file so it loads every time you log in.
+
+### Configuration Files
+
+- **`.bashrc`**: Personal settings for non-login shells (your daily terminal).
+- **`.profile`**: Personal settings for login shells.
+- **`/etc/profile`**: System-wide settings for all users.
+
+---
+
+## 📦 Package Management (APT)
+
+### 8 Essential APT Commands
+
+1. `sudo apt update`: Refresh the list of available software.
+2. `sudo apt upgrade`: Install the latest versions of currently installed packages.
+3. `sudo apt install`: Download and install a new program.
+4. `sudo apt remove`: Uninstall a program.
+5. `sudo apt purge`: Uninstall a program and delete its config files.
+6. `sudo apt autoremove`: Remove unused dependencies.
+7. `apt search`: Look for a program in the online repository.
+8. `apt show`: View detailed info about a specific package.
+
+### Update vs. Upgrade (Common Misunderstanding)
+
+- **`update`**: Updates the list of what is available. It does not install anything.
+- **`upgrade`**: Downloads and installs newer versions based on the updated list.
+
+### Search & Show
+
+- `apt search nginx`: "Is there a package called nginx?"
+- `apt show nginx`: "What version is it, how big is it, and what does it do?"
+
+### Install vs. Remove vs. Purge
+
+- **Install**: Adds the program.
+- **Remove**: Removes the program, but keeps any custom settings and config files.
+- **Purge**: Removes the program and deletes its configuration files.
+
+### 3 Main Package Tools Comparison
+
+| Tool | Level | Description |
+| --- | --- | --- |
+| **dpkg** | Low-level | Installs individual `.deb` files. It does not handle dependencies. |
+| **APT** | High-level | The modern standard. It handles dependencies automatically via the internet. |
+| **Snap/Flatpak** | Containerized | Universal packages that include their own libraries (larger, but works everywhere). |
+
+### 🛡️ APT Safety Checklist
+
+- [ ]  **Always `sudo`**: Package management requires administrator privileges.
+- [ ]  **Update first**: Always run `apt update` before installing something new.
+- [ ]  **Read the prompt**: Check what `apt` is about to delete or install before pressing 'Y'.
+- [ ]  **Avoid mixing**: Try to use only one package manager (like APT) to avoid library conflicts.| **Debian / Ubuntu** | Ubuntu, Mint | **Pros**: User-friendly, huge community. **Cons**: Can be bloated. **Usage**: Beginners, Web Servers. |
+| **Red Hat (RHEL)** | RHEL, Rocky, Alma | **Pros**: Enterprise stability, long support. **Cons**: Paid support (RHEL). **Usage**: Corporate environments. |
+| **Arch Linux** | Arch, Manjaro | **Pros**: Always latest software (Rolling). **Cons**: High difficulty. **Usage**: Power users, enthusiasts. |
+
+---
+
+## 4. Virtualization & Infrastructure
+
+### 🏗️ VM vs. Container
+
+- **Virtual Machine (VM)**:
+    - Virtualizes **Hardware**.
+    - Includes a full **Guest OS** for every instance.
+    - *Heavy resource usage, slow boot, but high isolation.*
+- **Container (Docker)**:
+    - Virtualizes the **Operating System**.
+    - Shares the **Host Kernel**.
+    - *Lightweight, starts in seconds, "write once, run anywhere" efficiency.*
+
+### 🌐 Client-Server Structure
+
+- **Server**: A machine or process that "listens" for requests and provides a service (Web, DB).
+- **Client**: An application (like a Browser or SSH terminal) that requests a service from the server.
+
+---
+
+## 5. Remote Environment Setup
+
+### 🚪 Port Forwarding
+
+- **Concept**: Connecting a port on your physical computer (Host) to a port on your virtual machine (Guest).
+- **Setup**: Map **Host Port 2222** → **Guest Port 22** in VirtualBox settings. This allows you to SSH into the VM from your main desktop.
+
+### 🔑 SSH Remote Connection Guide
+
+SSH (Secure Shell) is the industry standard for secure remote management.
+
+1. **Verify Service**: `systemctl status ssh`
+2. **Standard Connection**: `ssh username@server_ip`
+3. **Connection via Port Forwarding**:
+    
+    ```bash
+    ssh -p 2222 username@127.0.0.1
+    ### OR
+    ssh -p 2222 username@localhost
+    ```
