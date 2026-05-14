@@ -1,7 +1,7 @@
 ---
 layout: post
-title: '[Linux] '
-subtitle: ''
+title: '[Linux] Advanced File Manipulation, Redirection, and Text Stream Processing'
+subtitle: 'Advanced File Manipulation, Redirection, and Text Stream Processing'
 categories: study
 tags: Linux
 comments: true
