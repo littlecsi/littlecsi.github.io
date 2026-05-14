@@ -1,0 +1,128 @@
+---
+layout: post
+title: '[Linux] Linux Foundations & Infrastructure Setup'
+subtitle: 'Linux Foundations & Infrastructure Setup'
+categories: study
+tags: Linux
+comments: true
+---
+
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
+## Table of Content
+
+- [Table of Content](#table-of-content)
+- [1. Operating System Overview](#1-operating-system-overview)
+  - [📊 Windows vs. Linux](#-windows-vs-linux)
+  - [🧠 OS Main Functions](#-os-main-functions)
+- [2. System Architecture](#2-system-architecture)
+  - [🐚 Kernel and Shell Relationship](#-kernel-and-shell-relationship)
+  - [🛡️ Kernel Mode vs. User Mode](#️-kernel-mode-vs-user-mode)
+- [3. Open Source \& Distributions](#3-open-source--distributions)
+  - [🔓 Open Source Overview](#-open-source-overview)
+  - [📦 Linux Distributions](#-linux-distributions)
+- [4. Virtualization \& Infrastructure](#4-virtualization--infrastructure)
+  - [🏗️ VM vs. Container](#️-vm-vs-container)
+  - [🌐 Client-Server Structure](#-client-server-structure)
+- [5. Remote Environment Setup](#5-remote-environment-setup)
+  - [🚪 Port Forwarding](#-port-forwarding)
+  - [🔑 SSH Remote Connection Guide](#-ssh-remote-connection-guide)
+
+---
+
+## 1. Operating System Overview
+
+### 📊 Windows vs. Linux
+
+| Feature | Windows | Linux |
+| --- | --- | --- |
+| **Source Model** | Closed Source (Proprietary) | **Open Source (GPL License)** |
+| **Kernel Type** | Hybrid Kernel | **Monolithic Kernel** |
+| **Interface** | GUI (Graphic User Interface) | **CLI (Command Line Interface)** |
+| **Configuration** | Registry, GUI Settings | **Plain Text Files** |
+| **Stability** | Forced updates / Reboots | **High uptime / Live patching** |
+| **Cost** | Paid License | **Free / Open Source** |
+| **Primary Use** | Desktop, Office, Gaming | **Servers, Cloud, AI, Embedded** |
+
+### 🧠 OS Main Functions
+
+- **Process Management**: Allocation of CPU resources and multitasking control.
+- **Memory Management**: Managing RAM allocation and Virtual Memory (Swap).
+- **File System Management**: Organizing storage, retrieval, and naming of data.
+- **I/O Device Management**: Coordinating hardware communication via device drivers.
+- **Security & Protection**: Managing user permissions and preventing unauthorized access.
+
+---
+
+## 2. System Architecture
+
+### 🐚 Kernel and Shell Relationship
+
+- **Kernel**: The core of the OS. It interacts directly with the hardware (CPU, RAM, Disk).
+- **Shell**: The user interface (Interpreter). It takes your commands and translates them into system calls that the kernel can execute.
+
+### 🛡️ Kernel Mode vs. User Mode
+
+- **User Mode**: Restricted mode where applications run. Prevents apps from crashing the whole system.
+- **Kernel Mode**: Privileged mode for the OS core. Full access to all hardware and CPU instructions.
+- **Transition**: Applications switch from User Mode to Kernel Mode via **System Calls** to perform tasks like "reading a file."
+
+---
+
+## 3. Open Source & Distributions
+
+### 🔓 Open Source Overview
+
+- **Definition**: Software where the source code is public, allowing anyone to view, modify, and distribute it.
+- **Advantages**: High security (many eyes on code), rapid innovation, no vendor lock-in, and lower cost (TCO).
+
+### 📦 Linux Distributions
+
+| Family | Examples | Pros/Cons & Usage |
+| --- | --- | --- |
+| **Debian / Ubuntu** | Ubuntu, Mint | **Pros**: User-friendly, huge community. **Cons**: Can be bloated. **Usage**: Beginners, Web Servers. |
+| **Red Hat (RHEL)** | RHEL, Rocky, Alma | **Pros**: Enterprise stability, long support. **Cons**: Paid support (RHEL). **Usage**: Corporate environments. |
+| **Arch Linux** | Arch, Manjaro | **Pros**: Always latest software (Rolling). **Cons**: High difficulty. **Usage**: Power users, enthusiasts. |
+
+---
+
+## 4. Virtualization & Infrastructure
+
+### 🏗️ VM vs. Container
+
+- **Virtual Machine (VM)**:
+    - Virtualizes **Hardware**.
+    - Includes a full **Guest OS** for every instance.
+    - *Heavy resource usage, slow boot, but high isolation.*
+- **Container (Docker)**:
+    - Virtualizes the **Operating System**.
+    - Shares the **Host Kernel**.
+    - *Lightweight, starts in seconds, "write once, run anywhere" efficiency.*
+
+### 🌐 Client-Server Structure
+
+- **Server**: A machine or process that "listens" for requests and provides a service (Web, DB).
+- **Client**: An application (like a Browser or SSH terminal) that requests a service from the server.
+
+---
+
+## 5. Remote Environment Setup
+
+### 🚪 Port Forwarding
+
+- **Concept**: Connecting a port on your physical computer (Host) to a port on your virtual machine (Guest).
+- **Setup**: Map **Host Port 2222** → **Guest Port 22** in VirtualBox settings. This allows you to SSH into the VM from your main desktop.
+
+### 🔑 SSH Remote Connection Guide
+
+SSH (Secure Shell) is the industry standard for secure remote management.
+
+1. **Verify Service**: `systemctl status ssh`
+2. **Standard Connection**: `ssh username@server_ip`
+3. **Connection via Port Forwarding**:
+    
+    ```bash
+    ssh -p 2222 username@127.0.0.1
+    ### OR
+    ssh -p 2222 username@localhost
+    ```
