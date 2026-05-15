@@ -1,0 +1,743 @@
+---
+layout: post
+title: '[Linux] Linux User, Group, and Permission Management'
+subtitle: 'Linux User, Group, and Permission Management'
+categories: study
+tags: Linux
+comments: true
+---
+
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
+## Table of Content
+
+- [🎯 Learning Objectives](#-learning-objectives)
+- [Linux Account Concept](#linux-account-concept)
+  - [🎫 Concept: What is a Linux Account?](#-concept-what-is-a-linux-account)
+    - [1. Digital Identity (Identity)](#1-digital-identity-identity)
+    - [2. Authentication \& Authorization](#2-authentication--authorization)
+    - [3. Ownership \& Auditing](#3-ownership--auditing)
+- [Linux Account Types Overview](#linux-account-types-overview)
+  - [📋 3 Key Account Types](#-3-key-account-types)
+    - [1. Root (Superuser)](#1-root-superuser)
+    - [2. System Accounts (Service Accounts)](#2-system-accounts-service-accounts)
+    - [3. General Users (Normal Accounts)](#3-general-users-normal-accounts)
+- [Comparison: Root vs. Normal User](#comparison-root-vs-normal-user)
+  - [⚖️ Root vs. Normal User](#️-root-vs-normal-user)
+  - [🔑 Key Differences in Authority](#-key-differences-in-authority)
+    - [1. Security \& Risk](#1-security--risk)
+    - [2. Administrative Commands](#2-administrative-commands)
+    - [3. File Ownership](#3-file-ownership)
+- [Linux System Accounts Summary](#linux-system-accounts-summary)
+  - [⚙️ Core Concept](#️-core-concept)
+  - [📋 Technical Characteristics](#-technical-characteristics)
+- [Linux General User Accounts Summary](#linux-general-user-accounts-summary)
+  - [👤 Core Concept](#-core-concept)
+  - [📋 Technical Characteristics](#-technical-characteristics-1)
+- [The `useradd` Command: Primary Arguments](#the-useradd-command-primary-arguments)
+  - [📋 Command Arguments](#-command-arguments)
+  - [🛠️ Practical Example](#️-practical-example)
+- [Comparison: useradd vs. adduser](#comparison-useradd-vs-adduser)
+      - [💡 Key Takeaway](#-key-takeaway)
+- [The passwd Command: Password Management](#the-passwd-command-password-management)
+  - [📋 Primary Arguments and Options](#-primary-arguments-and-options)
+    - [Password Storage Location](#password-storage-location)
+- [Account Modification and Deletion: usermod \& userdel](#account-modification-and-deletion-usermod--userdel)
+  - [🛠️ usermod: Modify User Accounts](#️-usermod-modify-user-accounts)
+  - [🗑️ userdel: Delete User Accounts](#️-userdel-delete-user-accounts)
+- [Group Management](#group-management)
+  - [📋 Core Concepts](#-core-concepts)
+  - [📁 Related Files](#-related-files)
+  - [🛠️ Management Commands](#️-management-commands)
+  - [⚙️ Primary Command Arguments](#️-primary-command-arguments)
+    - [groupadd](#groupadd)
+    - [groupmod](#groupmod)
+- [Group Member Management: gpasswd](#group-member-management-gpasswd)
+  - [🛠️ Main Arguments for Member Management](#️-main-arguments-for-member-management)
+  - [💡 Practical Tip](#-practical-tip)
+- [System Information and Configuration Files](#system-information-and-configuration-files)
+  - [📄 Core System Files](#-core-system-files)
+  - [📋 File Content Structure (Examples)](#-file-content-structure-examples)
+    - [/etc/passwd](#etcpasswd)
+    - [/etc/group](#etcgroup)
+- [`/etc/passwd` File Structure](#etcpasswd-file-structure)
+  - [📋 Field Definitions](#-field-definitions)
+  - [🔍 Example Entry](#-example-entry)
+- [`/etc/shadow` \& `/etc/group`](#etcshadow--etcgroup)
+  - [🔑 /etc/shadow (Password Security)](#-etcshadow-password-security)
+  - [👥 /etc/group (Group Definitions)](#-etcgroup-group-definitions)
+  - [⚠️ Important Warning: Editing System Files](#️-important-warning-editing-system-files)
+    - [Why use these commands?](#why-use-these-commands)
+- [Switching Users: su vs. su -](#switching-users-su-vs-su--)
+    - [1. `su` (Without the hyphen)](#1-su-without-the-hyphen)
+    - [2. `su -` (With the hyphen)](#2-su---with-the-hyphen)
+    - [⚠️ Practical Note](#️-practical-note)
+- [Authorization Management: `sudo` \& `visudo`](#authorization-management-sudo--visudo)
+  - [🔑 sudo (Substitute User Do)](#-sudo-substitute-user-do)
+  - [🛠️ visudo](#️-visudo)
+  - [⚠️ Important Warning: Editing /etc/sudoers](#️-important-warning-editing-etcsudoers)
+- [Basic Idea of File Permissions](#basic-idea-of-file-permissions)
+  - [👥 Three User Categories](#-three-user-categories)
+  - [🔓 Access Types](#-access-types)
+  - [📝 Permission Notation](#-permission-notation)
+- [File Permission Structure and Numeric Representation](#file-permission-structure-and-numeric-representation)
+  - [🔢 The Numeric (Octal) Logic](#-the-numeric-octal-logic)
+  - [🧮 Calculating Permission Sets](#-calculating-permission-sets)
+  - [📝 Structure Summary](#-structure-summary)
+    - [Example: 754](#example-754)
+- [User, Group, and Others](#user-group-and-others)
+  - [👤 Three Levels of Ownership](#-three-levels-of-ownership)
+    - [1. Owner (User)](#1-owner-user)
+    - [2. Group](#2-group)
+    - [3. Others](#3-others)
+- [Common Permission Modes](#common-permission-modes)
+- [`chmod` (Change Mode)](#chmod-change-mode)
+    - [Core Arguments \& Syntax](#core-arguments--syntax)
+- [`chown` and `chgrp` (Ownership Management)](#chown-and-chgrp-ownership-management)
+    - [chown (Change Owner)](#chown-change-owner)
+    - [chgrp (Change Group)](#chgrp-change-group)
+- [Special Permissions](#special-permissions)
+    - [Special Permissions Table](#special-permissions-table)
+    - [Implementation Examples](#implementation-examples)
+- [`umask` (User File-Creation Mask) 🎭](#umask-user-file-creation-mask-)
+    - [📐 Core Logic](#-core-logic)
+    - [🔢 Common umask Examples](#-common-umask-examples)
+    - [⌨️ Usage \& Arguments](#️-usage--arguments)
+    - [🛡️ Best Practice](#️-best-practice)
+
+
+# 🎯 Learning Objectives
+
+The primary focus of this session is to master the foundational administrative tasks required to manage a multi-user Linux environment securely.
+
+- **Understanding Multi-user Concepts**: Grasp the architecture of Linux as a system designed to handle multiple users and tasks simultaneously.
+- **User & Group Administration**:
+    - Master the creation, modification, and deletion of user accounts.
+    - Understand how to organize users into groups for efficient resource management.
+- **Permission & Ownership Control**:
+    - Learn to define and manage access rights (**Read, Write, Execute**) for files and directories.
+    - Understand the relationship between users, groups, and file ownership.
+- **Security & Access Policy**:
+    - Apply the **Principle of Least Privilege** to minimize system vulnerabilities.
+    - Ensure users have exactly the amount of access required for their specific roles, and no more.
+
+---
+
+# Linux Account Concept
+
+## 🎫 Concept: What is a Linux Account?
+
+In a Linux system, an account is the **core entity** responsible for system security and resource access control. It functions across three primary dimensions:
+
+### 1. Digital Identity (Identity)
+
+- **UID & GID**: Every user is identified by the system through unique numeric identifiers—the **User ID (UID)** and **Group ID (GID)**.
+- **Aliases**: Username (e.g., `student`) is merely a human-readable alias for the underlying numeric ID.
+
+### 2. Authentication & Authorization
+
+- **Authentication**: Users must verify their identity to the system using passwords or security keys.
+- **Authorization**: Once authenticated, the account is granted specific rights, such as permission to execute files or control system processes.
+
+### 3. Ownership & Auditing
+
+- **Ownership**: The account becomes the "Owner" of any files it creates or processes it executes.
+- **Audit Trail**: The account serves as the basic unit for system logging; all actions performed by an account are recorded for auditing purposes.
+
+---
+
+# Linux Account Types Overview
+
+Based on page 5 of the Lecture 4 notes, Linux systems utilize three primary types of accounts, each with distinct roles and numeric identifier (UID) ranges.
+
+## 📋 3 Key Account Types
+
+### 1. Root (Superuser)
+
+- **Role**: The system-wide administrator with unlimited access.
+- **Capabilities**: Can access all files, modify system settings, and manage other users.
+- **Risk**: High. Any mistakes made as root can potentially destroy the entire system.
+- **UID**: `0`
+
+### 2. System Accounts (Service Accounts)
+
+- **Role**: Used to run background services, daemons, or specific applications (e.g., `nginx`, `mysql`).
+- **Security**: These are typically configured with `nologin` or no shell to prevent interactive logins.
+- **UID Range**: `1 ~ 999`
+
+### 3. General Users (Normal Accounts)
+
+- **Role**: Accounts for individual people to perform daily tasks.
+- **Capabilities**: Can log in to the system but are restricted to their own home directory and files they own.
+- **UID Range**: `1000+`
+
+---
+
+# Comparison: Root vs. Normal User
+
+Based on page 6 of the Lecture 4 notes, here is the structural and functional comparison between the Superuser (Root) and General Users.
+
+## ⚖️ Root vs. Normal User
+
+| Feature | Root (Superuser) | Normal User |
+| --- | --- | --- |
+| **System Identity** | Administrator / "God" Mode | General Participant |
+| **Numeric ID (UID)** | **`0`** | **`1000 ~ 60,000+`** |
+| **Shell Prompt** | **`#`** (Hash) | **`$`** (Dollar sign) |
+| **Home Directory** | `/root` | `/home/[username]` |
+| **File Access** | Full access to all system/user files | Restricted to own files and shared data |
+| **Command Scope** | Can execute all system commands | Restricted from administrative commands |
+
+## 🔑 Key Differences in Authority
+
+### 1. Security & Risk
+
+- **Root**: Since it can bypass all permission checks, a single command error can delete the entire filesystem or crash the kernel.
+- **Normal User**: Restricted environment prevents a single user from accidentally damaging the system or accessing other users' private data.
+
+### 2. Administrative Commands
+
+- Certain commands (e.g., `useradd`, `fdisk`, `apt install`) are reserved exclusively for the Root account.
+- Normal users must be granted temporary administrative rights via **`sudo`** to execute these specific tasks.
+
+### 3. File Ownership
+
+- **Root** owns the core system directories (e.g., `/etc`, `/bin`, `/sbin`).
+- **Normal Users** typically only have write permissions within their own sub-directory inside `/home`.
+
+---
+
+# Linux System Accounts Summary
+
+System accounts are administrative entities used to run background services rather than for human interaction.
+
+## ⚙️ Core Concept
+
+- **Purpose**: Designed to run background processes, services, and daemons (e.g., `sshd`, `dbus`).
+- **Security Isolation**: By running services under dedicated accounts, a vulnerability in one service cannot easily compromise the entire system or other services.
+
+## 📋 Technical Characteristics
+
+- **UID Range**: Generally assigned numeric IDs between **1 ~ 999**.
+- **Login Prevention**: Usually assigned a non-interactive shell (e.g., `/sbin/nologin`) to prevent actual users from logging into them.
+- **Home Directory**: Unlike human users, their "home" directories are functional system paths (e.g., `/var/lib/mysql`) used for service data rather than personal storage.
+
+---
+
+# Linux General User Accounts Summary
+
+General user accounts are the primary interface for human interaction with the Linux system, characterized by restricted access and dedicated personal storage.
+
+## 👤 Core Concept
+
+- **Purpose**: Designed for individual people to perform daily tasks (e.g., development, documentation, web browsing).
+- **Security Architecture**: Operates under a "restricted environment" to ensure one user cannot compromise the system or access another user's private data without explicit permission.
+
+## 📋 Technical Characteristics
+
+- **Numeric Identity (UID)**: Typically assigned numeric IDs starting from **1000** and up.
+- **Home Directory**: Each account is allocated a private storage space, usually located at `/home/[username]`. This is the only area where the user has full read/write/execute control by default.
+- **Shell Environment**: Assigned a standard interactive shell (e.g., `/bin/bash` or `/bin/zsh`) to allow command-line interaction.
+- **Privilege Level**: Cannot perform administrative tasks (like installing software or modifying system configs) unless granted temporary authority via the `sudo` command.
+
+---
+
+# The `useradd` Command: Primary Arguments
+
+The `useradd` command uses specific flags to define the properties of a new account. Below are the arguments detailed on page 9 of the lecture notes.
+
+## 📋 Command Arguments
+
+| Argument | Function | Description |
+| --- | --- | --- |
+| **`-u [UID]`** | **User ID** | Manually specifies the numeric User ID. |
+| **`-g [Group]`** | **Primary Group** | Sets the user's main group (the group must already exist). |
+| **`-G [Groups]`** | **Secondary Groups** | Adds the user to additional groups, separated by commas. |
+| **`-d [Path]`** | **Home Directory** | Defines a custom location for the user's home folder. |
+| **`-m`** | **Create Home** | Forces the creation of the home directory (copies files from `/etc/skel`). |
+| **`-s [Shell]`** | **Login Shell** | Specifies the default command-line shell (e.g., `/bin/bash`). |
+| **`-c [Comment]`** | **User Info** | Adds descriptive information, such as the user's full name. |
+| **`-e [Date]`** | **Expiry Date** | Sets an expiration date for the account (YYYY-MM-DD). |
+
+## 🛠️ Practical Example
+
+To create a user named `student` with a custom UID and a specific shell:
+
+```bash
+sudo useradd -u 1100 -s /bin/bash -m student
+```
+
+---
+
+# Comparison: useradd vs. adduser
+
+| Feature | useradd | adduser |
+| --- | --- | --- |
+| **Type** | Native Binary (Low-level) | Perl Script (High-level) |
+| **Interaction** | Non-interactive (Command-line flags only) | Interactive (Prompts for info) |
+| **Home Directory** | Not created by default (Requires `-m`) | Created automatically |
+| **Password Setup** | Manual step required (`passwd`) | Prompts for password during creation |
+| **Default Shell** | Uses system default (often `sh`) | Uses `/etc/adduser.conf` default (usually `bash`) |
+| **Ease of Use** | Difficult for beginners; complex syntax | User-friendly; handles details automatically |
+| **Main Use Case** | System scripts and automation | Manual account creation by administrators |
+
+#### 💡 Key Takeaway
+
+- **`useradd`** is a standard tool found on almost all Linux distributions. It is preferred for automation and shell scripting because it doesn't wait for user input.
+- **`adduser`** is a "wrapper" script (common in Debian/Ubuntu). It is much more convenient for manual use as it guides you through setting the password, home directory, and user information (GECOS) in one go.
+
+---
+
+# The passwd Command: Password Management
+
+The `passwd` command is used to set or change user passwords and manage account security status.
+
+## 📋 Primary Arguments and Options
+
+| **Argument** | **Function** | **Description** |
+| --- | --- | --- |
+| **`-l`** | **Lock** | Locks the account by prefixing the encrypted password with a `!`, preventing the user from logging in. |
+| **`-u`** | **Unlock** | Unlocks a previously locked account, restoring the password's validity. |
+| **`-d`** | **Delete** | Deletes the user's password (makes the account passwordless). |
+| **`-S`** | **Status** | Displays the password status of the account (e.g., locked, set, or expired). |
+
+### Password Storage Location
+
+- The encrypted password hashes are stored in the secure **`/etc/shadow`** file, which is readable only by the root user.
+
+---
+
+# Account Modification and Deletion: usermod & userdel
+
+These utilities are used to update existing account properties or remove them from the system.
+
+## 🛠️ usermod: Modify User Accounts
+
+The `usermod` command adjusts the attributes of an account that has already been created.
+
+| Argument | Function | Description |
+| --- | --- | --- |
+| **`-u [UID]`** | **Change UID** | Assigns a new numeric ID to the user. |
+| **`-g [Group]`** | **Change Primary Group** | Updates the user's primary group. |
+| **`-d [Path]`** | **Change Home Directory** | Sets a new path for the user's home folder. |
+| **`-m`** | **Move Home** | Moves the content of the old home directory to the new path (must be used with `-d`). |
+| **`-s [Shell]`** | **Change Shell** | Changes the default login shell. |
+| **`-l [NewName]`** | **Rename Account** | Changes the account's login name. |
+| **`-L`** | **Lock Account** | Locks the account (disables login). |
+| **`-U`** | **Unlock Account** | Unlocks a previously locked account. |
+
+## 🗑️ userdel: Delete User Accounts
+
+The `userdel` command removes account information from the system files.
+
+| Argument | Function | Description |
+| --- | --- | --- |
+| **`[username]`** | **Basic Delete** | Removes the user entry from system files but leaves the home directory on the disk. |
+| **`-r`** | **Recursive Delete** | Deletes the user account along with their home directory and mail spool. |
+
+---
+
+# Group Management
+
+Linux groups are used to manage sets of users, allowing permissions to be granted to multiple users at once to simplify system administration.
+
+## 📋 Core Concepts
+
+- **Standard Groups**: Pre-defined groups created during system installation for specific services.
+- **User-defined Groups**: Custom groups created by the administrator to manage specific user access.
+- **GID (Group ID)**: A unique numeric identifier for each group.
+    - Typically, **1 ~ 499** or **999** is reserved for system groups.
+    - **1000 and above** are used for general groups.
+
+## 📁 Related Files
+
+- **`/etc/group`**: The main file containing group information.
+- **`/etc/gshadow`**: A secure file that stores group password information.
+
+## 🛠️ Management Commands
+
+| Command | Function | Description |
+| --- | --- | --- |
+| **`groupadd`** | **Create** | Adds a new group to the system. |
+| **`groupmod`** | **Modify** | Changes the configuration (GID or name) of an existing group. |
+| **`groupdel`** | **Delete** | Removes an existing group from the system. |
+| **`groups`** | **Display** | Shows the groups that a specific user belongs to. |
+
+## ⚙️ Primary Command Arguments
+
+### groupadd
+
+- **`g [GID]`**: Manually assigns a specific Group ID.
+
+### groupmod
+
+- **`g [GID]`**: Changes the GID of an existing group.
+- **`n [New_Name]`**: Changes the name of an existing group.
+
+---
+
+# Group Member Management: gpasswd
+
+The `gpasswd` command is a dedicated tool for managing group memberships and group administrators.
+
+## 🛠️ Main Arguments for Member Management
+
+| Argument | Function | Description |
+| --- | --- | --- |
+| **`-a [user]`** | **Add** | Adds a specific user to the group. |
+| **`-d [user]`** | **Delete** | Removes a specific user from the group. |
+| **`-M [users]`** | **Members** | Defines the entire list of group members (overwrites existing members). |
+| **`-A [user]`** | **Administrator** | Assigns a specific user as the group administrator. |
+
+## 💡 Practical Tip
+
+While `gpasswd -a` is used specifically for adding members, the `usermod` command can also be used to manage group memberships:
+
+- **`usermod -G [groups] [user]`**: Sets the user's secondary groups (overwrites existing ones).
+- **`usermod -aG [groups] [user]`**: Appends the user to new groups without removing them from their current ones.
+
+---
+
+# System Information and Configuration Files
+
+Key system files store essential data regarding user accounts, passwords, and group definitions.
+
+## 📄 Core System Files
+
+| File Path | Description |
+| --- | --- |
+| **/etc/passwd** | Contains basic user account information (UID, GID, home directory, shell). |
+| **/etc/shadow** | Stores encrypted user passwords and password expiration settings. |
+| **/etc/group** | Contains group names, GIDs, and the list of users belonging to each group. |
+| **/etc/gshadow** | Stores encrypted group passwords and group administrator information. |
+
+## 📋 File Content Structure (Examples)
+
+### /etc/passwd
+
+`root:x:0:0:root:/root:/bin/bash`
+
+- Includes the username, password placeholder (`x`), UID, GID, comment, home directory, and default shell.
+
+### /etc/group
+
+`devteam:x:2000:student,user1`
+
+- Includes the group name, password placeholder (`x`), GID, and a comma-separated list of members.
+
+---
+
+# `/etc/passwd` File Structure
+
+The `/etc/passwd` file contains essential information for each user account. Each line represents a single user, with seven distinct fields separated by colons (`:`).
+
+## 📋 Field Definitions
+
+| Field | Meaning | Description |
+| --- | --- | --- |
+| **Field 1** | **Username** | The name the user enters to log in. |
+| **Field 2** | **Password** | A placeholder (`x`) indicating the encrypted password is in `/etc/shadow`. |
+| **Field 3** | **User ID (UID)** | A unique numeric ID for the user. |
+| **Field 4** | **Group ID (GID)** | The numeric ID for the user's primary group. |
+| **Field 5** | **Comment** | Descriptive information (e.g., full name or office location). |
+| **Field 6** | **Home Directory** | The absolute path to the user's personal directory. |
+| **Field 7** | **Login Shell** | The command-line shell used by the user after logging in. |
+
+## 🔍 Example Entry
+
+`student:x:1000:1000:Linux Student:/home/student:/bin/bash`
+
+- **Username**: student
+- **Password**: x (encrypted in /etc/shadow)
+- **UID**: 1000
+- **GID**: 1000
+- **Comment**: Linux Student
+- **Home Directory**: /home/student
+- **Shell**: /bin/bash
+
+---
+
+# `/etc/shadow` & `/etc/group`
+
+These files are essential for managing security and organization within a Linux system.
+
+## 🔑 /etc/shadow (Password Security)
+
+The `/etc/shadow` file contains encrypted password data and account aging policies. It is restricted to the root user for security.
+
+| Field | Meaning | Description |
+| --- | --- | --- |
+| **Field 1** | **Login Name** | The user account name. |
+| **Field 2** | **Encrypted Password** | The hashed password string. |
+| **Field 3** | **Last Change** | Days since 1970-01-01 since the last password update. |
+| **Field 4** | **Minimum** | Days required before the password can be changed again. |
+| **Field 5** | **Maximum** | Days the password remains valid before a change is required. |
+| **Field 6** | **Warn** | Days before expiration that the user receives a warning. |
+| **Field 7** | **Inactive** | Days after expiration before the account is disabled. |
+| **Field 8** | **Expire** | The absolute date the account will be disabled. |
+| **Field 9** | **Flag** | Reserved field for future use. |
+
+## 👥 /etc/group (Group Definitions)
+
+The `/etc/group` file defines the groups on the system and lists their members.
+
+| Field | Meaning | Description |
+| --- | --- | --- |
+| **Field 1** | **Group Name** | The name of the group. |
+| **Field 2** | **Password** | Usually an `x`, indicating the group password (if any) is in `/etc/gshadow`. |
+| **Field 3** | **GID** | The unique numeric Group ID. |
+| **Field 4** | **Group List** | A comma-separated list of users who are members of this group. |
+
+## ⚠️ Important Warning: Editing System Files
+
+When modifying critical system files like `/etc/passwd`, `/etc/shadow`, or `/etc/group`, it is **highly recommended** to use specialized editing commands rather than general text editors (like `vi` or `nano`) directly. 🚫📝
+
+- **`vipw`**: Used for safely editing the `/etc/passwd` and `/etc/shadow` files. 🔑
+- **`vigr`**: Used for safely editing the `/etc/group` and `/etc/gshadow` files. 👥
+
+### Why use these commands?
+
+- **File Locking:** They place a lock on the files to prevent other administrative tools or processes from making simultaneous changes, which could lead to **file corruption**. 🔒
+- **Syntax Checking:** They perform basic validation to ensure the file structure remains intact before saving. ✅
+
+---
+
+# Switching Users: su vs. su -
+
+The `su` (substitute user) command allows you to switch to another user account (defaulting to root) during a login session. However, there is a critical functional difference between using it with or without the hyphen.
+
+### 1. `su` (Without the hyphen)
+
+- **Behavior:** Switches the user ID but **remains in the current directory**.
+- **Environment:** It does **not** reset the environment variables. You keep the previous user's environment settings (such as `$PATH` or custom aliases).
+- **Usage:** Often used when you just need quick root privileges for a command in your current working folder.
+
+### 2. `su -` (With the hyphen)
+
+- **Behavior:** Switches the user ID and **moves to the target user's home directory**.
+- **Environment:** It performs a **login shell** transition. This means it initializes a completely fresh environment by loading the target user's configuration files (like `.bash_profile` or `.login`).
+- **Usage:** This is the **recommended** way to switch to root to ensure all paths and system variables are correctly configured for administrative tasks.
+
+### ⚠️ Practical Note
+
+Using `su -` is generally safer for system administration because it ensures you are working within the root user's intended environment, preventing errors caused by inherited paths from a regular user account.
+
+---
+
+# Authorization Management: `sudo` & `visudo`
+
+While both commands are related to elevated privileges, they serve distinct roles in system administration.
+
+## 🔑 sudo (Substitute User Do)
+
+The `sudo` command allows a permitted user to execute a command as the superuser (root) or another user, as defined by the security policy.
+
+- **Function**: It grants temporary administrative power for a specific command.
+- **Authentication**: Usually requires the **user's own password**, not the root password.
+- **Logging**: All successful and failed attempts are logged for security auditing. (`/var/log/auth.log`)
+
+## 🛠️ visudo
+
+The `visudo` command is the dedicated utility used to edit the `/etc/sudoers` file, which contains the authorization rules for who can use `sudo`.
+
+- **Function**: It opens the sudoers file in a safe environment.
+- **Safety**: It locks the file against simultaneous edits and **validates the syntax** before saving to prevent configuration errors.
+
+## ⚠️ Important Warning: Editing /etc/sudoers
+
+It is strongly advised **never** to edit the `/etc/sudoers` file directly with a standard text editor (like `vi` or `nano`). 🚫📝
+
+- **The Risk**: If you make a syntax error or a typo while editing the file directly, you could **break the sudo system entirely**. 💥
+- **The Consequence**: This can leave the system in a state where no one (including the administrator) can gain root privileges via `sudo`, potentially requiring a recovery mode boot to fix. 🔒
+
+---
+
+# Basic Idea of File Permissions
+
+File permissions in Linux are the primary mechanism for controlling access to files and directories, ensuring system security by defining who can read, write, or execute a file.
+
+## 👥 Three User Categories
+
+Permissions are assigned to three distinct levels of ownership:
+
+- **Owner (u)**: The individual user who created the file or currently owns it.
+- **Group (g)**: A set of users who share the same access level to the file.
+- **Others (o)**: All other users on the system who are not the owner or part of the group.
+
+## 🔓 Access Types
+
+There are three basic types of permissions applied to each category:
+
+| **Permission** | **Symbol** | **Description for Files** | **Description for Directories** |
+| --- | --- | --- | --- |
+| **Read** | **r** | Can view the file contents. | Can list the files within the directory (`ls`). |
+| **Write** | **w** | Can modify or delete the file. | Can create, delete, or rename files in the directory. |
+| **Execute** | **x** | Can run the file as a program/script. | Can enter the directory (`cd`). |
+
+## 📝 Permission Notation
+
+Permissions are typically displayed as a 10-character string (e.g., `-rwxr-xr--`):
+
+1. **First Character**: Indicates the file type ( for file, `d` for directory).
+2. **Next 9 Characters**: Three sets of `rwx` representing **Owner**, **Group**, and **Others** in that specific order.
+
+---
+
+# File Permission Structure and Numeric Representation
+
+This page details how symbolic `rwx` permissions are mapped to numeric (octal) values for use with commands like `chmod`.
+
+## 🔢 The Numeric (Octal) Logic
+
+Each permission type is assigned a specific weight based on binary positions. To determine the total permission value for a user category, add these numbers together:
+
+## 🧮 Calculating Permission Sets
+
+The sum of these values represents the specific access level for a category (Owner, Group, or Others).
+
+- **7** (4+2+1): **rwx** (Read, Write, and Execute)
+- **6** (4+2+0): **rw-** (Read and Write)
+- **5** (4+0+1): **r-x** (Read and Execute)
+- **4** (4+0+0): **r--** (Read only)
+- **0** (0+0+0): **--** (No access)
+
+## 📝 Structure Summary
+
+The complete permission setting is expressed as a **three-digit number**:
+
+1. **First Digit**: Permissions for the **Owner** (User).
+2. **Second Digit**: Permissions for the **Group**.
+3. **Third Digit**: Permissions for **Others**.
+
+### Example: 754
+
+- **7** (Owner): $rwx$ (Full access)
+- **5** (Group): $r-x$ (Read and Execute)
+- **4** (Others): $r--$ (Read only)
+
+---
+
+# User, Group, and Others
+
+In Linux, every file and directory is associated with a specific owner and group. This structure allows for precise control over who can access or modify system resources.
+
+## 👤 Three Levels of Ownership
+
+### 1. Owner (User)
+
+- **Definition**: Usually the person who created the file.
+- **Privileges**: The owner can change the permissions of the file to grant or deny access to others.
+- **Notation**: Represented by the letter `u` in symbolic commands.
+
+### 2. Group
+
+- **Definition**: A collection of multiple user accounts. All users within the group share the same permissions defined for that group.
+- **Purpose**: Used to easily manage permissions for projects or departments without having to set them for each individual user.
+- **Notation**: Represented by the letter `g` in symbolic commands.
+
+### 3. Others
+
+- **Definition**: Any user on the system who is **not** the owner and is **not** a member of the group assigned to the file.
+- **Scope**: This is often referred to as "the world."
+- **Notation**: Represented by the letter `o` in symbolic commands.
+
+---
+
+# Common Permission Modes
+
+This table breaks down the four standard permission settings by each user category.
+
+| **Mode** | **Owner (u)** | **Group (g)** | **Others (o)** | **Symbolic** | **Description** |
+| --- | --- | --- | --- | --- | --- |
+| **755** | `rwx` (7) | `r-x` (5) | `r-x` (5) | `rwxr-xr-x` | **Public/Executable**: Full owner access; others can only read/execute. |
+| **644** | `rw-` (6) | `r--` (4) | `r--` (4) | `rw-r--r--` | **Public Data**: Owner can edit; others can only read. |
+| **700** | `rwx` (7) | `---` (0) | `---` (0) | `rwx------` | **Private Dir**: Only the owner can access or enter. |
+| **600** | `rw-` (6) | `---` (0) | `---` (0) | `rw-------` | **Private File**: Only the owner can read or edit. |
+
+---
+
+# `chmod` (Change Mode)
+
+The `chmod` command modifies file and directory permissions using either numeric or symbolic notation.
+
+### Core Arguments & Syntax
+
+- **NMN (Octal Mode)**: Sets absolute permissions for User, Group, and Others simultaneously (e.g., `chmod 755 file`).
+- **u+x**: Adds **Execute** permission specifically for the **User** (Owner).
+- **g-w**: Removes **Write** permission from the **Group**.
+- **a=r**: Sets the permission for **All** (User, Group, and Others) to **Read-only**, overwriting existing settings.
+- **R**: **Recursive** flag; applies the permission change to a directory and everything inside it.
+
+---
+
+# `chown` and `chgrp` (Ownership Management)
+
+These commands allow the modification of user and group ownership for files and directories.
+
+### chown (Change Owner)
+
+Used to change the owner and/or group of a file.
+
+- **`user:group`**: Changes both the owner and the group at once (e.g., `chown root:admin file.txt`).
+- **`user`**: Changes only the owner of the file.
+- **`:group`**: Changes only the group (shorthand for `chgrp`).
+
+### chgrp (Change Group)
+
+Specifically used to change the group ownership of a file.
+
+- **Example**: `chgrp students report.txt` changes the group to "students".
+
+---
+
+# Special Permissions
+
+Beyond standard `rwx`, Linux uses three special bits to manage executable behavior and directory security.
+
+### Special Permissions Table
+
+| **Permission** | **Bit Value** | **Symbolic** | **Effect on Files** | **Effect on Directories** |
+| --- | --- | --- | --- | --- |
+| **SetUID** (SUID) | **4** | `s` (in user) | File executes with the permissions of the **Owner**. | No effect. |
+| **SetGID** (SGID) | **2** | `s` (in group) | File executes with the permissions of the **Group**. | New files created inside inherit the **Parent Directory's Group**. |
+| **Sticky Bit** | **1** | `t` (in others) | No effect. | Only the **Owner** (or root) can delete or rename files inside. |
+
+### Implementation Examples
+
+Special bits are added as a **fourth digit** at the beginning of the octal mode:
+
+- **4755**: Sets **SUID** on an executable.
+- **2775**: Sets **SGID** on a shared directory for group collaboration.
+- **1777**: Sets the **Sticky Bit** (common for `/tmp` to prevent users from deleting each other's files).
+
+---
+
+# `umask` (User File-Creation Mask) 🎭
+
+The `umask` command defines the **default permissions** assigned to new files and directories by "masking" (subtracting) bits from the system's maximum possible permissions.
+
+### 📐 Core Logic
+
+- **Max Directory**: `777` ($rwxrwxrwx$) 📂
+- **Max File**: `666` ($rw-rw-rw-$) 📄 *(Note: Execution bits are never granted by default for safety)*
+- **Logic**: `Max Permissions` - `umask` = `Default Permission`
+
+### 🔢 Common umask Examples
+
+| **umask** | **File Result (666-mask)** | **Dir Result (777-mask)** | **Description** |
+| --- | --- | --- | --- |
+| **022** | **644** (`rw-r--r--`) | **755** (`rwxr-xr-x`) | **Default**: Owner can edit; others can read. 🌐 |
+| **077** | **600** (`rw-------`) | **700** (`rwx------`) | **Private**: Only owner has access. 🔒 |
+| **002** | **664** (`rw-rw-r--`) | **775** (`rwxrwxr-x`) | **Group Shared**: Team can also edit. 👥 |
+
+### ⌨️ Usage & Arguments
+
+- **`umask`**: Displays the current mask in **numeric** format. 🔢
+- **`umask -S`**: Displays the current default permissions in **symbolic** format (e.g., `u=rwx,g=rx,o=rx`). 🔡
+- **`umask NMN`**: Sets a new numeric mask for the current session (e.g., `umask 027`). 🛠️
+
+### 🛡️ Best Practice
+
+It is security recommended to append `umask 027` in `~/.bashrc` or `/etc/profile` for permanent setting.
+
+---
