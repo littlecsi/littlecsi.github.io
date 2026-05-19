@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] Linux Terminal, File System, and Package Management'
+title: '[Linux] 02 Linux Terminal, File System, and Package Management'
 subtitle: 'Linux Terminal, File System, and Package Management'
 categories: study
 tags: Linux
