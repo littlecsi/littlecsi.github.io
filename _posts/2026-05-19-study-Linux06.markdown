@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] 05 Linux Networking'
+title: '[Linux] 06 Linux Networking'
 subtitle: 'Linux Networking'
 categories: study
 tags: Linux
