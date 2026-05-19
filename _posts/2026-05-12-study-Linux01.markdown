@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] Linux Foundations & Infrastructure Setup'
+title: '[Linux] 01 Linux Foundations & Infrastructure Setup'
 subtitle: 'Linux Foundations & Infrastructure Setup'
 categories: study
 tags: Linux

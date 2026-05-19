@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] Linux User, Group, and Permission Management'
+title: '[Linux] 04 Linux User, Group, and Permission Management'
 subtitle: 'Linux User, Group, and Permission Management'
 categories: study
 tags: Linux
