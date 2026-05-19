@@ -1,0 +1,951 @@
+---
+layout: post
+title: '[Linux] 05 Linux Networking'
+subtitle: 'Linux Networking'
+categories: study
+tags: Linux
+comments: true
+---
+
+- [Learning Objectives: Network \& Cabling 🎯](#learning-objectives-network--cabling-)
+- [What is a Network?](#what-is-a-network)
+    - [💡 Core Definition](#-core-definition)
+    - [🏢 Everyday Analogy: The Logistics \& Post Office System](#-everyday-analogy-the-logistics--post-office-system)
+- [UTP Cable and RJ-45 Connector](#utp-cable-and-rj-45-connector)
+    - [🧵 1. UTP vs. STP: Choosing the Right Cable](#-1-utp-vs-stp-choosing-the-right-cable)
+    - [📊 Quick Cable Type Breakdown](#-quick-cable-type-breakdown)
+    - [⚡ 2. Category Specifications (Cat.5e vs. Cat.6)](#-2-category-specifications-cat5e-vs-cat6)
+    - [💎 3. The RJ-45 Connector Interface](#-3-the-rj-45-connector-interface)
+- [OSI 7 Layers at a Glance](#osi-7-layers-at-a-glance)
+    - [🗼 The Seven Logical Layers Breakdown](#-the-seven-logical-layers-breakdown)
+    - [💡 Core Takeaways \& Mental Model](#-core-takeaways--mental-model)
+- [Learning Objectives: IP Addressing 🎯](#learning-objectives-ip-addressing-)
+    - [🏛️ The Three Pillars of IP Configuration](#️-the-three-pillars-of-ip-configuration)
+- [IP Address](#ip-address)
+    - [💡 Core Definition](#-core-definition-1)
+    - [🗺️ The Dual-Structure of an IP Address](#️-the-dual-structure-of-an-ip-address)
+    - [📌 Critical Rules \& Characteristics to Remember](#-critical-rules--characteristics-to-remember)
+- [Private IP vs. Public IP](#private-ip-vs-public-ip)
+    - [🔍 1. Core Differences Between Private \& Public IPs](#-1-core-differences-between-private--public-ips)
+    - [📊 At-a-Glance Comparison](#-at-a-glance-comparison)
+    - [🛠️ 2. The Bridge: NAT (Network Address Translation)](#️-2-the-bridge-nat-network-address-translation)
+- [Subnet Mask](#subnet-mask)
+    - [💡 Core Definition: The Divider of Networks](#-core-definition-the-divider-of-networks)
+    - [🛠️ The Standard /24 Prefix (255.255.255.0)](#️-the-standard-24-prefix-2552552550)
+    - [📝 Key Rules of Subnet Math \& IP Allocations](#-key-rules-of-subnet-math--ip-allocations)
+- [Gateway](#gateway)
+    - [🚪 What is a Gateway?](#-what-is-a-gateway)
+    - [🔍 Everyday Problem: The "No Internet" Trap](#-everyday-problem-the-no-internet-trap)
+- [Learning Objectives: Router \& Routing 🎯](#learning-objectives-router--routing-)
+    - [🏛️ The Three Pillars of Router \& Routing Objectives](#️-the-three-pillars-of-router--routing-objectives)
+- [Home Router](#home-router)
+    - [🏢 1. The Three Identities Inside a Single Device](#-1-the-three-identities-inside-a-single-device)
+    - [🔌 2. Physical Decoupling: WAN vs. LAN Ports](#-2-physical-decoupling-wan-vs-lan-ports)
+    - [💡 3. Key Background Service: The DHCP Server](#-3-key-background-service-the-dhcp-server)
+- [NAT - How Private IP operates](#nat---how-private-ip-operates)
+    - [🔄 1. Outbound \& Inbound Data Flow](#-1-outbound--inbound-data-flow)
+    - [💡 2. The Core Value of NAT: Overcoming Address Scarcity](#-2-the-core-value-of-nat-overcoming-address-scarcity)
+- [Routing - finding a path to another network](#routing---finding-a-path-to-another-network)
+    - [💡 Core Definition: "One Stop at a Time"](#-core-definition-one-stop-at-a-time)
+    - [🗺️ The Decision Flow: How a Node Paths Packets](#️-the-decision-flow-how-a-node-paths-packets)
+    - [📋 The Pathfinder's Blueprint: The Routing Table](#-the-pathfinders-blueprint-the-routing-table)
+- [Learning Objectives: Ports, States, and Service Tests 🎯](#learning-objectives-ports-states-and-service-tests-)
+- [TCP vs. UDP](#tcp-vs-udp)
+    - [🤝 1. TCP (Transmission Control Protocol): The Reliable Courier](#-1-tcp-transmission-control-protocol-the-reliable-courier)
+    - [🏹 2. UDP (User Datagram Protocol): The High-Speed Streamer](#-2-udp-user-datagram-protocol-the-high-speed-streamer)
+    - [📊 Protocol Breakdown](#-protocol-breakdown)
+- [Concept: Port](#concept-port)
+    - [💡 Core Definition: The Application Identifier](#-core-definition-the-application-identifier)
+    - [🗂️ Port Ranges and Classifications](#️-port-ranges-and-classifications)
+    - [🔍 Real-World Multi-Tasking Scenario](#-real-world-multi-tasking-scenario)
+- [Checking Open Ports with `nc` and `telnet`](#checking-open-ports-with-nc-and-telnet)
+    - [🧰 1. `nc` (Netcat): The Swiss Army Knife of Networking](#-1-nc-netcat-the-swiss-army-knife-of-networking)
+    - [🔍 Interpreting `nc` Output States](#-interpreting-nc-output-states)
+    - [☎️ 2. `telnet`: The Legacy Port Tester](#️-2-telnet-the-legacy-port-tester)
+    - [💡 Core Troubleshooting Lesson: Ping vs. Port Check](#-core-troubleshooting-lesson-ping-vs-port-check)
+- [Learning Objectives: DNS \& DHCP 🎯](#learning-objectives-dns--dhcp-)
+- [DNS - Domain Name System](#dns---domain-name-system)
+    - [💡 Core Definition: The Internet's Phonebook](#-core-definition-the-internets-phonebook)
+    - [🔄 The Domain Resolution Workflow](#-the-domain-resolution-workflow)
+    - [🐧 Checking DNS Configuration in Linux: `/etc/resolv.conf`](#-checking-dns-configuration-in-linux-etcresolvconf)
+- [Local vs. Remote Name Resolution](#local-vs-remote-name-resolution)
+    - [🏠 1. `/etc/hosts` — The Local Priority Ledger](#-1-etchosts--the-local-priority-ledger)
+    - [🌐 2. `/etc/resolv.conf` — The External DNS Gateway](#-2-etcresolvconf--the-external-dns-gateway)
+    - [⏱️ 3. The Lookup Order: Who Wins?](#️-3-the-lookup-order-who-wins)
+- [DHCP - Dynamic Host Configuration Protocol](#dhcp---dynamic-host-configuration-protocol)
+    - [💡 Core Definition: The Automated IP Administrator](#-core-definition-the-automated-ip-administrator)
+    - [🔄 The 4-Step Network Lease Handshake: DORA](#-the-4-step-network-lease-handshake-dora)
+    - [💡 Core Takeaways](#-core-takeaways)
+- [Learning Objectives: Netplan, SSH, and UFW 🎯](#learning-objectives-netplan-ssh-and-ufw-)
+- [Netplan](#netplan)
+    - [💡 Core Definition: Declarative Network Management](#-core-definition-declarative-network-management)
+    - [🛠️ Practical Workflow: Modifying \& Applying Settings](#️-practical-workflow-modifying--applying-settings)
+    - [⚠️ Critical Warning: The YAML Indentation Trap](#️-critical-warning-the-yaml-indentation-trap)
+- [SSH — Secure Shell](#ssh--secure-shell)
+    - [💡 Core Definition: Encrypted Remote Terminal](#-core-definition-encrypted-remote-terminal)
+    - [🛠️ Practical Usage: Connection Command Syntax](#️-practical-usage-connection-command-syntax)
+    - [🔍 Real-World Connection Examples:](#-real-world-connection-examples)
+    - [🛡️ The First-Time Connection Flow](#️-the-first-time-connection-flow)
+- [SSH Key Authorization](#ssh-key-authorization)
+    - [💡 Core Definition: Passwordless Cryptographic Authentication](#-core-definition-passwordless-cryptographic-authentication)
+    - [🛠️ Practical Implementation Workflow](#️-practical-implementation-workflow)
+    - [🔒 4. Key Management Security Guidelines](#-4-key-management-security-guidelines)
+- [UFW — Uncomplicated Firewall](#ufw--uncomplicated-firewall)
+    - [💡 Core Definition: Simplified Port Protection](#-core-definition-simplified-port-protection)
+    - [🛠️ Practical Administration: The Core Command Set](#️-practical-administration-the-core-command-set)
+    - [1. Checking the Operational State 📊](#1-checking-the-operational-state-)
+    - [2. Toggling the Firewall State ⚙️](#2-toggling-the-firewall-state-️)
+    - [3. Opening Specific Application Ports (ALLOW Rules) 🟢](#3-opening-specific-application-ports-allow-rules-)
+    - [4. Closing or Deleting Rules (DENY/DELETE) 🔴](#4-closing-or-deleting-rules-denydelete-)
+
+
+# Learning Objectives: Network & Cabling 🎯
+
+- **1. Mapping out the Big Picture of Networks** 🌐
+    - **Objective**: Identify the basic structural components of a local network environment.
+    - **Core Concept**: Learn to explain the multi-staged **OSI 7-Layer Model** using intuitive, everyday analogies.
+- **2. Hands-on Ethernet Cable Assembly** 🛠️
+    - **Objective**: Handcraft structural network lines from scratch without depending on pre-made patch cables.
+    - **Core Concept**: Master the physical layout and execution rules of **LAN cable crimping** using standard tools.
+- **3. Troubleshooting Physical Connectivity Issues** ⚡
+    - **Objective**: Diagnose and resolve mechanical and physical deployment errors.
+    - **Core Concept**: Identify bad connection points and restore active operational links when a system fails to read a link connection.
+
+---
+
+# What is a Network?
+
+Page 3 establishes the foundational definition and primary purpose of a computer network, breaking down why isolated machines are linked together.
+
+### 💡 Core Definition
+
+- **A Network is a System of Connected Devices**: It is an interconnected web of computing devices—ranging from servers and personal computers to smartphones and IoT hardware—that are physically or wirelessly linked to communicate with one another.
+- **The Core Objective**: The fundamental goal of building a network is **Resource and Data Sharing**. Instead of keeping data isolated on a single hard drive, a network allows seamless, instantaneous transfer of files, web services, database entries, and hardware access across multiple distributed clients.
+
+---
+
+### 🏢 Everyday Analogy: The Logistics & Post Office System
+
+To understand how data travels across a network without getting lost, page 3 introduces a helpful analogy based on a postal delivery network:
+
+- **The Data (Packet) = A Mail Letter** ✉️
+    - When you want to send information, you pack it into structured blocks (packets), much like sliding a message into an envelope.
+- **The Network Devices = Post Offices & Delivery Hubs** 🏤
+    - Network hardware like switches and routers act as regional postal hubs. They inspect incoming items, check where they need to go, and hand them off to the next transport vehicle moving in that direction.
+- **IP Addresses = Mailing Addresses** 🏠
+    - Just like a letter requires a structured sender and recipient address (Country ➔ City ➔ Street ➔ House Number), network traffic relies on unambiguous, structured addressing frameworks to ensure it lands exactly where it belongs.
+
+---
+
+# UTP Cable and RJ-45 Connector
+
+### 🧵 1. UTP vs. STP: Choosing the Right Cable
+
+Ethernet copper cables are categorized by how they protect raw data signals against outside electromagnetic interference (EMI):
+
+- **UTP (Unshielded Twisted Pair)** 🏠
+    - **Design**: Contains 8 fine copper wires twisted into 4 pairs. It features **no additional shielding** jacket around the wires.
+    - **Why Twisted?** Twisting the internal pairs cancels out electromagnetic radiation and prevents **cross-talk** (signals bleeding into adjacent lines).
+    - **Pros/Cons**: Highly affordable and flexible.
+    - **Primary Use**: Standard deployments in homes and commercial offices.
+- **STP (Shielded Twisted Pair)** 🏭
+    - **Design**: Includes a protective foil or braided copper mesh screen wrapped around the twisted pairs.
+    - **Pros/Cons**: Significantly more expensive and rigid.
+    - **Primary Use**: Heavy industrial manufacturing facilities or environments plagued by high electrical noise.
+
+### 📊 Quick Cable Type Breakdown
+
+| **Type** | **Shielding Layer** | **Price Point** | **Primary Target Environment** |
+| --- | --- | --- | --- |
+| **UTP** | None | Low / Affordable | Domestic Residences & Corporate Offices |
+| **STP** | Foil / Mesh Screen | High / Premium | Factories & High-Noise Environments |
+
+### ⚡ 2. Category Specifications (Cat.5e vs. Cat.6)
+
+Performance capabilities differ based on structural engineering revisions:
+
+- **Cat.5e**: Supports a maximum throughput speed of **1 Gbps**. It is the historical baseline standard for standard Gigabit networks.
+- **Cat.6**: Supports massive network speeds up to **10 Gbps**. It relies on tighter internal twists and often includes a central plastic separator (spline) to minimize signal loss.
+
+### 💎 3. The RJ-45 Connector Interface
+
+The physical plug attached to the termination points of a network cable is the **RJ-45** (Registered Jack 45) connector.
+
+- **Structure**: A clear plastic modular plug housing **8 distinct gold-plated contact pins**.
+- **Connection Rule**: When crimping a cable, the 8 thin copper wire strands must be arranged according to a designated standard, inserted into the plastic tracks, and shoved all the way to the absolute tip of the connector so the gold pins can pierce the insulation to make proper electrical contact.
+
+---
+
+# OSI 7 Layers at a Glance
+
+### 🗼 The Seven Logical Layers Breakdown
+
+| **Layer** | **Name** | **Core Functional Scope & Protocols** | **Real-World Context / Example** |
+| --- | --- | --- | --- |
+| **L7** | **Application** | High-level user interface and applications.
+• Protocols: **HTTP, DNS, SSH**. | The structural programs we interact with directly (e.g., loading a webpage in Google Chrome). |
+| **L6** | **Presentation** | Manages data syntax, formatting, and structural transformations.
+• Examples: **TLS encryption, JPEG encoding**. | Decodes data so the program can read it; handles encryption and decryption. |
+| **L5** | **Session** | Initiates, coordinates, maintains, and terminates communication dialogues. | Keeps the discrete path or session open between two communicating nodes. |
+| **L4** | **Transport** | Manages end-to-end flow control and reliable transmission.
+• Protocols: **TCP, UDP**. | Governs connection channels via assigned **Port Numbers** (e.g., linking traffic to Port 80/8080). |
+| **L3** | **Network** | Evaluates target paths across disparate, logical network topologies.
+• Key elements: **IP Addresses, Routing**. | Determines how routers forward a packet to cross from one separate local network over to another. |
+| **L2** | **Data Link** | Handles node-to-node frame distribution inside the same network.
+• Key elements: **MAC Addresses, Switches, Ethernet**. | Directs local communication inside a switch where hardware devices read physical frame footprints. |
+| **L1** | **Physical** | Transmits raw unstructured bitstreams over mechanical hardware media. | **This is where manual LAN cable crimping belongs!** It maps directly to physical copper wires, pins, and electrical signals. |
+
+### 💡 Core Takeaways & Mental Model
+
+- **Simplifying Complex Systems**: Instead of looking at a network request as one massive, incomprehensible task, the OSI model slices it into 7 layers so that distinct components can execute their specialized jobs independently.
+- **Connecting to the Lab**: Physical engineering tasks—like aligning copper pin arrays, stripping jack blankets, and snapping plastic tabs—are classic **Layer 1 (Physical)** functions. The data flowing through that wire eventually climbs all the way to **Layer 7 (Application)** when a browser loads a site.
+
+---
+
+# Learning Objectives: IP Addressing 🎯
+
+### 🏛️ The Three Pillars of IP Configuration
+
+- **1. Distinguishing Private vs. Public IP Addresses** 🏠🌐
+    - **Objective**: Explain the operational difference between a local client's **Private IP** address and an internet router's external **Public IP** address.
+    - **Core Competency**: Articulate exactly *why* both types are mathematically required to conserve IPv4 resources and how routers use them to bridge communications.
+- **2. Determining Network Boundaries using Subnet Masks** 🗺️📏
+    - **Objective**: Analyze two given IP addresses alongside a subnet mask parameter (such as `/24` or `255.255.255.0`) to mathematically determine whether those machines belong to the **same local neighborhood** or **completely separate networks**.
+    - **Core Competency**: Understand when data packets can be delivered locally via a switch versus when they must travel through a router.
+- **3. Troubleshooting Local Gateways and Network Gateways** 🚪🛠️
+    - **Objective**: Correctly trace and diagnose connectivity faults between an endpoint device and its local gateway.
+    - **Core Competency**: Identify whether an internet outage stems from an internally broken local network link (failing to reach the gateway) or an external routing issue past the neighborhood boundary.
+
+---
+
+# IP Address
+
+### 💡 Core Definition
+
+- **A Logical "Home Address"**: An IP address serves as the network equivalent of a physical home address (e.g., *"152 Teheran-ro, Gangnam-gu, Seoul"*), logically scoping down from a broad geographic region down to a highly specific, target endpoint.
+- **Structure**: In an example address like `192.168.0.42`, the address systematically narrows down from a large operational domain directly down to an individual node.
+
+### 🗺️ The Dual-Structure of an IP Address
+
+An IP address is mathematically split into two distinct parts:
+
+1. **Network Part (Neighborhood ID)**: Represents the broader local community or neighborhood identity to which the device belongs.
+2. **Host Part (Individual House Number)**: Represents the precise specific unit number or individual computer operating within that shared local network.
+
+### 📌 Critical Rules & Characteristics to Remember
+
+- **Uniqueness Requirement**: Every single device operating within the exact same local network domain **must possess a distinct, unique host identifier** to prevent address collisions.
+- **Location-Dependent Flexibility**: Unlike a hardware-bound physical address (like a MAC address), an IP address is a **changeable variable**. Even on the exact same computer, your IP address dynamically changes whenever you move physical locations (such as shifting your connection from Home ➔ a local Cafe ➔ a University campus).
+
+---
+
+# Private IP vs. Public IP
+
+### 🔍 1. Core Differences Between Private & Public IPs
+
+- **Private IP (Internal Network Address)** 🏠
+    - **Scope**: Used strictly for communication **inside a local network** (such as within your home, office, or classroom).
+    - **Duplication**: Because they are completely isolated, different homes or companies can safely use the exact same private IP ranges simultaneously without causing any address conflicts on the internet.
+    - **Internet Access**: A device using only a private IP **cannot directly connect to the internet** on its own; it requires a middleman.
+- **Public IP (Global Internet Address)** 🌍
+    - **Scope**: A unique, globally recognized identifier assigned to your internet router or public-facing server that allows external entities to locate it across the global web.
+    - **Uniqueness**: Must be **completely unique worldwide**. No two devices connected directly to the global internet can share the same public IP address.
+    - **Internet Access**: Directly accessible from anywhere in the world across the internet (which also requires strict security configurations).
+
+### 📊 At-a-Glance Comparison
+
+| **Feature** | **Private IP (사설 IP)** | **Public IP (공인 IP)** |
+| --- | --- | --- |
+| **Main Purpose** | Internal local networking | Global internet communication |
+| **Uniqueness** | Unique *only* within the same local subnet | Globally unique across the entire world |
+| **Cost** | Free to configure and assign | Rented/purchased from an ISP |
+| **Direct Web Routing** | Impossible | Fully supported |
+
+### 🛠️ 2. The Bridge: NAT (Network Address Translation)
+
+Because the global pool of IPv4 addresses is limited to roughly 4.3 billion addresses while there are over 10 billion internet-connected hardware units worldwide, networks rely on **NAT**.
+
+- **How it works**: Your router maintains a translation table to track "who requested what".
+- When your internal laptop (`192.168.0.42`) requests a website, the router passes that request into the web using its single **Public IP** (`203.241.5.18`).
+- When the web service replies, the router checks its translation table and safely drops the response back into your computer's private address slot. This design allows dozens of internal office devices to share a single public IP efficiently.
+
+---
+
+# Subnet Mask
+
+### 💡 Core Definition: The Divider of Networks
+
+A subnet mask acts as a boundary marker. It takes a complete IP address and divides it into two functional segments:
+
+1. **Network Part**: Represents the broad "neighborhood ID". Devices sharing this identical network block can communicate directly with one another through a simple local switch without needing a router.
+2. **Host Part**: Represents the specific "house number" within that neighborhood. It uniquely identifies the individual device inside that local network range.
+
+### 🛠️ The Standard /24 Prefix (255.255.255.0)
+
+The page focuses heavily on the most widely used configuration: **`/24`** (expressed in dotted-decimal format as **`255.255.255.0`**).
+
+- **How it separates an address (`192.168.0.42 / 24`)**:
+    - **`192.168.0`** (First 3 blocks) = **Network Part** 🏘️
+    - **`.42`** (The final block) = **Host Part** 🏠
+
+### 📝 Key Rules of Subnet Math & IP Allocations
+
+When utilizing a standard `/24` subnet mask, the final block provides an 8-bit space representing numbers from **0 to 255** (256 total slots). However, you cannot freely assign all 256 addresses to computer hardware because **two slots are strictly reserved by network protocol regulations**:
+
+- **`.0` ➔ Network Address (대역 대표 주소)**: The very first address (e.g., `192.168.0.0`) is structurally reserved to identify the entire network community as a single collective entity. It cannot be assigned to an actual PC.
+- **`.255` ➔ Broadcast Address (브로드캐스트 주소)**: The absolute final address (e.g., `192.168.0.255`) is reserved for shouting messages to everyone simultaneously. When a packet is sent here, it automatically clones and broadcasts to every active node in the local zone.
+- **`1` to `254` ➔ Assignable Host Scope**: This leaves exactly **254 unique slots** available to be assigned to physical machines, network adapters, and local interfaces.
+
+---
+
+# Gateway
+
+🔧 Core Rule: Checking Boundaries
+
+To understand what a **Gateway** does, you must first look at how a computer determines where a packet needs to go. When you attempt to transmit data, your operating system compares the destination IP address against its own IP address and subnet mask:
+
+- **Same Network (Internal Neighborhood)** 🏘️
+    - **Condition**: The destination IP shares the exact same network ID part as your machine.
+    - **Action**: The data packet is delivered **directly** to the target device via a local Layer 2 switch using its physical MAC address. The router is completely bypassed.
+- **Different Network (External World)** 🌍
+    - **Condition**: The destination IP has a different network ID block than your machine (e.g., trying to access an internet website or a server in another building).
+    - **Action**: The system realizes it cannot deliver the packet locally. It bundles up the packet and drops it off at the **Default Gateway**.
+
+### 🚪 What is a Gateway?
+
+A **Gateway** is the explicit entrance and exit point (or doorway) that links a closed local private network out to the external internet or separate foreign network segments.
+
+- **The Physical Device**: In standard real-world setups, your default gateway is simply the internal private IP address assigned to your **internet router or sharing machine**.
+- **The Analogy**: Think of a local network like an apartment complex. If you want to visit a neighbor in room 102, you walk down the hall directly (L2 Switch). If you want to mail a letter to someone in a completely different city, you must walk down to the **main lobby exit door** (Gateway) and hand it to the mail carrier.
+
+### 🔍 Everyday Problem: The "No Internet" Trap
+
+Page 19 highlights a common troubleshooting scenario where a user complains: *"I can access our local office shared printer and files, but I have absolutely no internet connection!"*
+
+- **The Diagnostic Explanation**:
+    - Because the user can communicate with local office devices, their network line, local IP allocation, and local switch connections are working flawlessly.
+    - The disconnect happens because their device has an **incorrectly configured Gateway IP**, a frozen gateway router, or a broken connection right at the router's interface. Without a valid, functioning gateway doorway, your data packets are trapped inside the local neighborhood and have no way to exit out onto the global web.
+
+---
+
+# Learning Objectives: Router & Routing 🎯
+
+### 🏛️ The Three Pillars of Router & Routing Objectives
+
+- **1. Demystifying the "Three Identities" of a Router** 🛠️
+    - **Objective**: Define and identify the three separate operational functions bundled inside a consumer-grade router.
+    - **Core Competency**: Distinguish how a single physical appliance serves simultaneously as an access point/switch, a gateway, and a logical pathfinder.
+- **2. Decoupled Port Architectures: WAN vs. LAN Interfaces** 🔌
+    - **Objective**: Explain the physical and logical division between **WAN (Wide Area Network)** and **LAN (Local Area Network)** ports.
+    - **Core Competency**: Correctly identify where the upstream internet connection line attaches versus where internal corporate/home terminal computers connect, ensuring data paths are not accidentally bridged or isolated.
+- **3. Configuring a Live Multi-Network via Static Routing** 🗺️
+    - **Objective**: Manually program custom path entries directly into a device's **Routing Table**.
+    - **Core Competency**: Coordinate with a partner to link two distinct internal subnets, configuring matching outbound and return paths so that data packets can hop safely across custom network borders.
+
+---
+
+# Home Router
+
+### 🏢 1. The Three Identities Inside a Single Device
+
+A consumer-grade home router (often called a "공유기" in Korean) is not just a single piece of hardware. It is a highly efficient, integrated appliance that bundles **three independent network devices** into one physical box:
+
+- **The Router** 🗺️: Operates at Layer 3 (Network). It acts as a pathfinder and a bridge that connects completely separate networks—specifically, the global external Internet and your private internal home network.
+- **The Switch (Hub)** 🔌: Operates at Layer 2 (Data Link). It ties multiple local wired devices (like your PC, smart TV, or network storage) together into a single, shared internal local neighborhood. This is what allows local machines to communicate directly with one another without needing to go out to the Internet.
+- **The Wireless Access Point (AP)** 📶: Broadcasts radio frequencies (Wi-Fi) to allow mobile nodes, laptops, and smart devices to connect to the internal network seamlessly without physical cords.
+
+### 🔌 2. Physical Decoupling: WAN vs. LAN Ports
+
+Because the device manages both external pathfinding and internal local switching simultaneously, the ethernet ports on the back are strictly separated:
+
+- **WAN Port (Wide Area Network)**: Typically color-coded or separated, this is the single input port where your upstream Internet feed (from the wall jack or provider modem) plugs in. It represents the link to the outside world.
+- **LAN Ports (Local Area Network)**: The group of multiple adjacent ports used to plug in your internal local hardware units.
+
+### 💡 3. Key Background Service: The DHCP Server
+
+A home router features a built-in **DHCP (Dynamic Host Configuration Protocol) Server**.
+
+Instead of forcing users to manually calculate and assign complex networking parameters every time they connect a new device, the router automatically handles the administration. The moment a phone connects to the Wi-Fi or a laptop plugs into a LAN port, the DHCP server instantly leases a **unique, non-conflicting private IP address** alongside the correct Subnet Mask and Default Gateway parameters.
+
+---
+
+# NAT - How Private IP operates
+
+### 🔄 1. Outbound & Inbound Data Flow
+
+The slide demonstrates a continuous 4-step sequence showing how a router intercepts packets to rewrite address headers:
+
+- **Step 1 (Outbound Request)**: An internal PC (e.g., `192.168.0.42`) sends a packet intended for a web service on the internet.
+- **Step 2 (Source Translation)**: The packet reaches the router. The router completely strips away the internal private source IP (`192.168.0.42`) and swaps it out for the router's own **Public IP** (`203.241.5.18`) before pushing it out to the public web.
+- **Step 3 (The Translation Table)**: Crucially, the router remembers this event by logging exactly **"who requested what"** into a built-in state table.
+- **Step 4 (Inbound Return)**: When the external internet server drops a reply back to the router's public IP address, the router references its saved translation table, figures out which local client generated the transaction, and routes the response safely back to the original PC.
+
+### 💡 2. The Core Value of NAT: Overcoming Address Scarcity
+
+- **The Problem**: The global IPv4 protocol space caps out mathematically at roughly **4.3 billion** addresses, yet there are well over **10 billion** internet-connected hardware units deployed worldwide.
+- **The Solution**: By pairing **Private IPs + NAT**, a single public-facing IP leased to a single home or office router can easily support dozens of internal machines communicating over the internet simultaneously.
+
+---
+
+# Routing - finding a path to another network
+
+### 💡 Core Definition: "One Stop at a Time"
+
+- **Routing = Guidance/Direction Finding**: Routing is the process of delivering data packets step-by-step from their origin to their final destination network.
+- **The Delivery Analogy**: When a package travels from Busan to Seoul, it doesn't teleport directly. Instead, it passes through sequential checkpoints: **Busan Terminal ➔ Intermediate Hub ➔ Seoul Terminal ➔ Local Post Office ➔ Target House**. Network routing operates in the exact same manner, passing data forward **one hop (one station) at a time**.
+
+### 🗺️ The Decision Flow: How a Node Paths Packets
+
+Every single time a computer or network node prepares to send out an IP packet, it undergoes a binary decision tree based on its subnet configuration:
+
+1. **Is the Destination IP within the *Same Network*?** 🏘️
+    - **Action**: If yes, the sender delivers the packet **directly** to the destination client over the local network fabric (via a switch).
+2. **Is the Destination IP in a *Different Network*?** 🌍
+    - **Action**: If no, the sender realizes it cannot reach the node directly. It hands the packet over to its **Default Gateway** (the local router interface), asking the gateway to manage the cross-network journey.
+
+### 📋 The Pathfinder's Blueprint: The Routing Table
+
+Routers do not blindly forward data; they rely on an internal spreadsheet known as a **Routing Table.**
+
+- **The Address Book**: A router's internal table maps out exactly which exit interface or next-hop IP router corresponds to which target network block.
+- **Checking the Route**: When a packet arrives at the router from a local gateway client, the router scans its table:
+    - If it finds a matching network pathway rule, it passes the packet forward to that specific path.
+    - If no specific route matches, the packet is forwarded out through the **Default Route (`default via...`)**, which acts as the router's own exit door to the wider internet.
+
+---
+
+# Learning Objectives: Ports, States, and Service Tests 🎯
+
+- **1. Distinguish TCP vs. UDP Transport Methods (TCP와 UDP 운송 방식의 차이 이해)** 🔄
+    - **Objective**: Explain the functional differences between the two primary Layer 4 transport protocols.
+    - **Core Competency**: Understand how **TCP** prioritizes high accuracy (even if slower), whereas **UDP** prioritizes raw speed and rapid dissemination (even if data drops), and identify which services leverage each protocol.
+- **2. Leverage 4 Core Network Diagnostic Tools (진단 도구 4종 마스터)** 🩺
+    - **Objective**: Correctly deploy and interpret the outputs of foundational network administration utilities.
+    - **Core Competency**: Know precisely when to use and how to read the flags/results for:
+        - `ping` (verifying host reachability, round-trip latency, and packet loss).
+        - `traceroute` (mapping and debugging the sequential hop paths to a remote server).
+        - `ss` (checking active network sockets, connection states like `LISTEN`, and inspecting process mappings).
+        - `nc` (*Netcat*, the versatile utility used to verify if remote application ports are open or blocking traffic).
+- **3. Perform Nginx Port Modification & Verification (Nginx 포트 변경 실습)** 🌐
+    - **Objective**: Manipulate live web server configurations and audit accessibility boundaries.
+    - **Core Competency**: Learn how to modify the `listen` directive inside Nginx configuration files to swap application ports (e.g., changing from the default port `80` to an alternative port like `8080`). Students must successfully test and verify cross-network visibility to confirm the new service is serving traffic externally while factoring in system elements like the local firewall (UFW).
+
+---
+
+# TCP vs. UDP
+
+### 🤝 1. TCP (Transmission Control Protocol): The Reliable Courier
+
+- **Core Philosophy**: **"Reliability over Speed."** It prioritizes precise, error-free data delivery above all else.
+- **How it works**:
+    - **Connection-Oriented**: Before sending any real data, it initiates a **3-Way Handshake** to establish a secure, verified logical connection channel between the two nodes.
+    - **Guaranteed Delivery & Ordering**: It tracks packets sequentially. If a packet gets corrupted or lost in transit, TCP automatically requests a retransmission. It ensures that data is pieced back together in its exact original order.
+- **Real-World Analogy**: **Registered/Certified Mail (등기우편)** ✉️🔒. The mail carrier guarantees delivery, tracks the entire route, and demands a physical signature from the recipient to prove the packet arrived safely.
+- **Primary Use Cases**: Services where data loss is completely unacceptable: **HTTP/HTTPS (Web browsing), SSH (Remote access), FTP (File transfer)**.
+
+### 🏹 2. UDP (User Datagram Protocol): The High-Speed Streamer
+
+- **Core Philosophy**: **"Speed over Reliability."** It drops all connection overhead to transmit data as fast as physically possible.
+- **How it works**:
+    - **Connectionless**: It does not establish a connection, execute a handshake, or check if the receiver is ready. It simply throws packets toward the destination IP.
+    - **No Verification**: It does not confirm receipt, trace losses, or check packet ordering. If a packet drops into a black hole or arrives out of order, UDP ignores it and keeps pushing forward.
+- **Real-World Analogy**: **Throwing Flyers/Leaflets (전단지 뿌리기)** 📄🏃‍♂️. A person throws promotional papers out into a crowd. They don't check if every single person catches one or reads them sequentially; the goal is simply maximum, rapid distribution.
+- **Primary Use Cases**: Real-time services where speed matters and minor data loss is barely noticeable: **DNS queries, Video/Audio Streaming (YouTube Live, Zoom), Online Gaming**.
+
+### 📊 Protocol Breakdown
+
+| **Characteristic** | **TCP (Transmission Control Protocol)** | **UDP (User Datagram Protocol)** |
+| --- | --- | --- |
+| **Connection Type** | Connection-Oriented (Requires Handshake) | Connectionless (No Handshake) |
+| **Delivery Guarantee** | 100% Guaranteed & Ordered | Best-effort (Loss/Out-of-order possible) |
+| **Speed/Overhead** | Slower (High header/tracking overhead) | Maximum Speed (Extremely lightweight) |
+| **Analogy** | Certified Mail / Registered Post | Tossing Flyers into a Crowd |
+| **Core Protocols** | HTTP, HTTPS, SSH, FTP | DNS, Streaming (RTP), Live Gaming |
+
+---
+
+# Concept: Port
+
+### 💡 Core Definition: The Application Identifier
+
+An IP address only gets data to the machine's front door. A **Port Number** is a 16-bit logical address used to distinguish between different applications, services, or protocols operating simultaneously on that single device.
+
+- **The Analogy**: Think of an IP address as an **Apartment Building Address** (e.g., *"101 Tech Street"*). A port number represents the specific **Apartment Room Number** (e.g., *"Room 80" or "Room 22"*). Mail arriving at the building cannot be delivered properly unless the specific room number is stamped on the envelope.
+
+### 🗂️ Port Ranges and Classifications
+
+Port numbers stretch mathematically from **0 to 65,335** and are structurally divided into distinct ranges based on standardized usage rules:
+
+- **Well-Known Ports (0 ~ 1,023)** 🌐
+    - **Description**: Pre-assigned, highly standardized ports reserved for foundational operating system privileges and core internet protocols.
+    - **Key Examples**:
+        - **`22`**: SSH (Secure Remote Access)
+        - **`80`**: HTTP (Unencrypted Web Traffic)
+        - **`443`**: HTTPS (Secure/Encrypted Web Traffic)
+- **Registered / Dynamic Ports (1,024 ~ 65,335)** 🛠️
+    - **Description**: Ports open for user applications, custom web servers, database engines, or temporary outbound channels.
+    - **Key Examples**:
+        - **`3306`**: MySQL Database default port.
+        - **`8080`**: Alternative HTTP port commonly used during development or proxy testing.
+
+### 🔍 Real-World Multi-Tasking Scenario
+
+The slide presents a common scenario to illustrate why ports are necessary: **A single Linux server is running an Nginx Web Server, a MySQL Database, and an SSH remote access daemon all at the same time**.
+
+When a packet arrives from the outside world hitting the server's single Public IP address, the Linux kernel reads the Layer 4 header tracking the target port:
+
+- If the packet targets **Port 80**, it is seamlessly handed over to the **Nginx** process.
+- If it targets **Port 22**, it routes directly to the **SSH** daemon so the administrator can log in.
+- If it targets **Port 3306**, it connects straight to the **MySQL** service.
+
+Without port numbers, a computer would be restricted to running only one single network application at a time.
+
+---
+
+# Checking Open Ports with `nc` and `telnet`
+
+Page 37 introduces how to test port accessibility across a network. While utilities like `ping` verify whether a target host machine is alive at Layer 3, they cannot tell you if a specific application (like a web server or database) is actually listening at Layer 4. To solve this, administrators use **`nc` (Netcat)** and **`telnet`** to probe individual ports.
+
+### 🧰 1. `nc` (Netcat): The Swiss Army Knife of Networking
+
+`nc` is the primary, modern tool used by engineers to check if a remote port is accepting connections.
+
+- **Core Practice Syntax**:Bash
+    
+    ```bash
+    $ nc -zv [Target_IP_or_Domain] [Port_Number]
+    ```
+    
+- **Understanding the Flags**:
+    - **`z` (Zero-I/O mode)**: Configures `nc` to scan for an open daemon *without* sending any actual data payload. It connects, verifies the link, and instantly detaches.
+    - **`v` (Verbose)**: Instructs the tool to print detailed status messages so you can clearly read the result of the connection attempt.
+
+### 🔍 Interpreting `nc` Output States
+
+- **Success State (Open Port)** 🟢:Plaintext
+    
+    ```
+    Connection to 192.168.0.42 80 port [tcp/http] succeeded!
+    ```
+    
+    - *Meaning*: The target computer is fully reachable, and the application (e.g., Nginx) is active and running on that specific port.
+- **Failure State (Closed/Blocked Port)** 🔴:Plaintext
+    
+    ```
+    nc: connect to 192.168.0.42 port 8080 (tcp) failed: Connection refused
+    ```
+    
+    - *Meaning*: The physical machine is reachable, but either the software service is turned off, or a firewall (like UFW or an external security group) is actively blocking your access path.
+
+### ☎️ 2. `telnet`: The Legacy Port Tester
+
+Before `nc` became standard, `telnet` was the traditional utility used to test raw TCP handshakes.
+
+- **Core Practice Syntax**:Bash
+    
+    ```bash
+    $ telnet [Target_IP_or_Domain] [Port_Number]
+    ```
+    
+- **Real-World Output Analysis**:
+    - If the port is **open**, the terminal screen will instantly clear, display a message like `Connected to 192.168.0.42`, and hang open waiting for text inputs.
+    - **How to Escape a Hanging Telnet Session**: Because `telnet` keeps the connection alive, it can feel "stuck." To force an exit, press the escape sequence **`Ctrl + ]`**, type **`quit`**, and hit **Enter**.
+
+### 💡 Core Troubleshooting Lesson: Ping vs. Port Check
+
+The slide emphasizes a critical engineering takeaway: **Passing a `ping` test does not guarantee a service is working**.
+
+- If a web application goes down, running `ping 192.168.0.42` will often return a clean, successful response because the Linux operating system kernel is still running.
+- You must run `nc -zv 192.168.0.42 80` to determine if the specific web application layer itself is functioning or broken.
+
+---
+
+# Learning Objectives: DNS & DHCP 🎯
+
+- **1. Demystifying the Principles of DNS Name Resolution (DNS의 도메인 이름 변환 원리 이해)** 🌐🔍
+    - **Objective**: Explain the step-by-step mechanism of how a **DNS (Domain Name System)** server translates human-readable alphanumeric web domains (such as `google.com`) into computer-readable logical numeric **IP addresses** (such as `142.250.190.46`).
+    - **Core Competency**: Trace the lookup flow and understand why the internet relies on this mapping layer to remain user-friendly.
+- **2. Analyzing the DHCP Automatic IP Allocation Process (DHCP의 자동 IP 할당 과정 파악)** 🔌🤖
+    - **Objective**: Detail the exact transactional handshake that occurs when a device joins a network and automatically leases its IP configuration.
+    - **Core Competency**: Articulate the background automation steps that prevent administrators from having to manually hardcode configurations on hundreds of individual client terminals.
+- **3. Auditing Local Linux Network Configurations (`/etc/resolv.conf` 확인)** 🐧파일
+    - **Objective**: Locate, open, and audit the primary configuration file inside a Linux operating system filesystem where active DNS nameservers are assigned.
+    - **Core Competency**: Inspect the contents of the **`/etc/resolv.conf`** file on a running Linux server to troubleshoot name resolution failures and verify which upstream DNS server IP the machine is querying.
+
+---
+
+# DNS - Domain Name System
+
+### 💡 Core Definition: The Internet's Phonebook
+
+Computers, routers, and switches communicate exclusively using numbers called **IP addresses** (e.g., `223.130.200.104`). However, because strings of numbers are highly difficult for humans to memorize, we use friendly **Domain Names** (e.g., `naver.com`).
+
+- **The Analogy**: Think of DNS exactly like the **Contacts/Phonebook app** on your smartphone. You don't memorize your friend's exact 11-digit phone number; you simply tap their name, and the phone automatically looks up the underlying number to place the call. DNS executes this exact lookup service for every website you visit on the web.
+
+### 🔄 The Domain Resolution Workflow
+
+The slide illustrates the step-by-step transaction that occurs behind the scenes when you type a web domain into your browser address bar:
+
+1. **The User Request**: You type `naver.com` into your browser and hit Enter.
+2. **The DNS Query**: Your operating system doesn't know where to route the packet yet, so it sends a quick background query to your assigned **DNS Server** asking: *"What is the IP address for `naver.com`?"*
+3. **The Translation**: The DNS server searches its massive distributed database, finds the matching record, and replies back to your machine: *"The IP address is `223.130.200.104`."*
+4. **The Direct Connection**: Armed with the actual destination IP, your computer can now successfully package its Layer 3 headers and connect directly to the target server hosting the website.
+
+### 🐧 Checking DNS Configuration in Linux: `/etc/resolv.conf`
+
+For a Linux operating system to navigate the web, it must know which DNS server to query. This configuration is stored in a critical system file:
+
+- **File Location**: `/etc/resolv.conf`
+- **How to inspect it**:Bash
+    
+    ```bash
+    $ cat /etc/resolv.conf
+    ```
+    
+- **What you will see**: Inside, you will find lines starting with the keyword **`nameserver`** followed by an IP address:Plaintext
+    
+    ```
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+    
+    *(Note: `8.8.8.8` is Google's famous public DNS server, and `1.1.1.1` belongs to Cloudflare. If this file is empty or contains an incorrect IP, your Linux server will throw an error like "Temporary failure in name resolution" when trying to download packages or access external domains.)*
+    
+
+---
+
+# Local vs. Remote Name Resolution
+
+### 🏠 1. `/etc/hosts` — The Local Priority Ledger
+
+- **What it is**: A static, locally stored text file that acts as the computer's private, internal address book.
+- **How it works**: You can manually hardcode explicit IP-to-domain mappings here. When you type a domain name, the Linux kernel **always checks this file first** before asking the outside world.
+- **Typical Syntax**:Plaintext
+    
+    ```
+    127.0.0.1      localhost
+    192.168.0.105  my-test-server.local
+    ```
+    
+- **Use Case**: Ideal for development environments, routing traffic to a local loopback (`127.0.0.1`), or creating short, easy nicknames for internal staging servers without paying for or configuring a real public DNS record.
+
+### 🌐 2. `/etc/resolv.conf` — The External DNS Gateway
+
+- **What it is**: The system configuration file that designates which external **DNS Nameservers** the computer should query when a domain cannot be found locally.
+- **How it works**: If a domain is missing from `/etc/hosts`, the system reads this file to find a live nameserver IP address, then shoots a lookup request out across the network.
+- **Typical Syntax**:Plaintext
+    
+    ```
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+    
+- **Use Case**: Used for all standard global internet navigation (e.g., resolving `google.com` or `github.com`).
+
+### ⏱️ 3. The Lookup Order: Who Wins?
+
+When you execute a command like `curl naver.com`, Linux follows a strict, sequential order of operations to find the IP address:
+
+```
+graph TD
+    A[User requests domain] --> B{Is it listed in /etc/hosts?}
+    B -- Yes (Match Found) --> C[Use Local IP & Exit]
+    B -- No --> D[Read nameserver from /etc/resolv.conf]
+    D --> E[Query External DNS Server over network]
+```
+
+1. **Step 1: Check `/etc/hosts`** 🔍
+    - If a matching rule exists, the lookup **stops instantly**, and the system uses that local IP address. This means you can easily "spoof" a domain locally by mapping a famous URL to an internal IP address for testing purposes.
+2. **Step 2: Fallback to `/etc/resolv.conf`** 🌍
+    - If the domain is not found in the local hosts file, the operating system shifts down to check `/etc/resolv.conf`, pulls the active nameserver IP, and requests an external look-up.
+
+---
+
+# DHCP - Dynamic Host Configuration Protocol
+
+### 💡 Core Definition: The Automated IP Administrator
+
+For any device to communicate on a TCP/IP network, it strictly requires four key configuration parameters: an **IP Address**, a **Subnet Mask**, a **Default Gateway**, and a **DNS Server**.
+
+Instead of requiring an IT administrator to manually type these four numbers into every single smartphone, laptop, and server that connects to a network, the **DHCP Server** automates the entire distribution process. It maintains a pool of available IP addresses and dynamically leases them out to devices the moment they turn on or join the network.
+
+### 🔄 The 4-Step Network Lease Handshake: DORA
+
+When a device joins a network (like a phone connecting to a coffee shop's Wi-Fi), it executes a specific 4-step communication sequence nicknamed **DORA** to negotiate its settings:
+
+- **1. Discover (`DHCP Discover`)** 🔍
+    - *Client ➔ Server (Broadcast)*: The newly connected device has no IP address yet, so it shouts out blindly to the entire local network: *"Is there a DHCP Server out there? I need an IP address configuration!"*
+- **2. Offer (`DHCP Offer`)** 🙋‍♂️
+    - *Server ➔ Client (Unicast/Broadcast)*: The DHCP server (often built right inside your home router) hears the shout, checks its available pool, reserves an address, and replies back: *"I'm here! I can lease you the IP address `192.168.0.42` along with your subnet mask and gateway parameters."*
+- **3. Request (`DHCP Request`)** 📝
+    - *Client ➔ Server (Broadcast)*: The client device formalizes the arrangement by replying: *"That sounds perfect. I would officially like to request the lease for `192.168.0.42` as offered."*
+- **4. Acknowledgment (`DHCP Ack`)** ✅
+    - *Server ➔ Client*: The DHCP server writes the transaction down in its lease ledger, locks in the parameters for a set period, and sends a final confirmation: *"Confirmed! The address is officially yours to use. Welcome to the network."*
+
+### 💡 Core Takeaways
+
+- **Plug-and-Play Experience**: DHCP is the magic behind why you can walk into an airport or a library, connect to the Wi-Fi, and instantly start surfing the web without ever opening your network settings panel.
+- **IP Recycling (Lease Time)**: Addresses are not given away permanently; they are **leased** for a specific duration. When a device leaves the network, its lease eventually expires, and the DHCP server automatically drops that IP back into the shared pool to be handed out to the next guest.
+
+---
+
+# Learning Objectives: Netplan, SSH, and UFW 🎯
+
+- **1. Master Permanent IP Configuration via Netplan (Netplan을 이용한 영구적 IP 설정)** 🛠️
+    - **Objective**: Modify network adapter settings so that IP configurations persist across system reboots.
+    - **Core Competency**: Move away from temporary command-line assignments (which wipe on reboot) and learn how to write structured YAML configuration files inside the Netplan directory to declare static or dynamic IPs permanently.
+- **2. Establish and Secure Remote Terminals using SSH (SSH를 이용한 원격 접속)** 📡
+    - **Objective**: Configure and initialize a secure encrypted pipeline to control a target Linux server from a separate terminal client.
+    - **Core Competency**: Understand how the SSH daemon works, establish remote authentication sessions, and manage headless server infrastructure over the network.
+- **3. Enforce Network Security Boundaries via UFW Firewall (UFW 방화벽을 통한 포트 제어)** 🛡️
+    - **Objective**: Configure the **UFW (Uncomplicated Firewall)** application layer inside Ubuntu to selectively intercept or permit incoming traffic.
+    - **Core Competency**: Implement custom access policies by manually opening crucial ports (such as Port 22 for SSH or Port 80 for Nginx) while completely locking down and denying access to unauthorized ports, preventing outside attacks.
+
+---
+
+# Netplan
+
+### 💡 Core Definition: Declarative Network Management
+
+Historically, Linux network interfaces were configured via text files like `/etc/network/interfaces`. Netplan modernizes this by using a centralized, declarative approach. Instead of running complex imperative commands, administrators write out the desired network state inside a single **YAML** file. Netplan reads this file and automatically generates the low-level backend configurations.
+
+- **File Location**: Netplan files are stored inside the `/etc/netplan/` directory, typically named something like `01-netcfg.yaml` or `50-cloud-init.yaml`.
+- **The Renderers**: Netplan doesn't actually manage the network packets itself. It acts as an abstraction layer that writes configurations for backend engines (renderers) like **`networkd`** (typically used on headless servers) or **`NetworkManager`** (typically used on desktop environments with GUIs).
+
+### 🛠️ Practical Workflow: Modifying & Applying Settings
+
+To permanently change a system's IP address, subnet, gateway, or DNS settings using Netplan, an administrator must follow a specific three-step workflow:
+
+- **Step 1: Edit the YAML File** 📝
+    - Open and modify the configuration file using a text editor with root privileges (e.g., `sudo nano /etc/netplan/01-netcfg.yaml`). You can choose to set `dhcp4: true` for automatic IP allocation or explicitly spell out static parameters under the `addresses`, `routes`, and `nameservers` blocks.
+- **Step 2: Generate the Backend Configurations** ⚙️
+    - Run the command:Bash
+        
+        ```bash
+        $ sudo netplan generate
+        ```
+        
+    - *What it does*: This parses your YAML code, checks it for syntax structural compliance, and compiles it into the raw configuration files required by the underlying renderer (like `systemd-networkd`).
+- **Step 3: Apply the Live Changes** ✅
+    - Run the command:Bash
+        
+        ```bash
+        $ sudo netplan apply
+        ```
+        
+    - *What it does*: This instantly switches the active kernel networking states to match the new file configurations. Unlike older Linux network commands, this applies the updates live **without requiring a full operating system reboot**.
+
+### ⚠️ Critical Warning: The YAML Indentation Trap
+
+Because Netplan relies entirely on the **YAML** syntax, it is highly sensitive to text formatting rules.
+
+- **No Tabs Allowed**: You must use **spaces** exclusively for indentation. Pressing the `Tab` key inside the configuration file will cause Netplan to break and throw parser errors.
+- **Strict Alignment**: All matching blocks (like `ethernets:`, `version:`, and `renderer:`) must align horizontally down to the exact same column space, or the file will fail to generate.
+
+---
+
+# SSH — Secure Shell
+
+### 💡 Core Definition: Encrypted Remote Terminal
+
+Historically, administrators managed remote servers using tools like **Telnet** or **RSH**. However, those protocols transmit everything—including login passwords and commands—in **plain, clear text**. Anyone sniffing network packets on the same router could easily steal credentials.
+
+**SSH** completely replaces legacy protocols by establishing a **secure, fully encrypted cryptographic tunnel** between the client machine and the remote server. Even if an attacker intercepts the data packets mid-transit, the contents appear as unreadable garbage text.
+
+- **Standard Default Port**: SSH operates at Layer 4 using **TCP Port 22**.
+- **The Architecture**: It follows a classic **Client-Server model**:
+    - **SSH Server (`sshd`)**: A background daemon process running constantly on the remote Linux machine, listening for incoming connection requests on Port 22.
+    - **SSH Client**: The application run by the administrator (e.g., Terminal in macOS/Linux, PowerShell, or PuTTY in Windows) to request access.
+
+### 🛠️ Practical Usage: Connection Command Syntax
+
+To establish an encrypted remote session from your local terminal, you run the `ssh` command by declaring the destination user account and the target machine's location:
+
+Bash
+
+```bash
+$ ssh [Remote_Username]@[Target_IP_or_Domain]
+```
+
+### 🔍 Real-World Connection Examples:
+
+1. **Connecting via IP Address**:Bash
+    
+    ```bash
+    $ ssh ubuntu@192.168.0.42
+    ```
+    
+    - *What it does*: Requests a remote terminal shell on the computer at `192.168.0.42` logging in specifically as the user `ubuntu`.
+2. **Connecting to a Custom Port**:Bash
+    
+    If a network administrator changes the default SSH port from 22 to `2022` for security reasons, you append the `-p` flag:
+    
+    ```bash
+    $ ssh -p 2022 ubuntu@192.168.0.42
+    ```
+    
+
+### 🛡️ The First-Time Connection Flow
+
+When you connect to an SSH server for the very first time, the client software does not recognize the remote host's cryptographic identity fingerprint yet.
+
+The terminal will pause and present a security prompt:
+
+Plaintext
+
+```
+The authenticity of host '192.168.0.42 (192.168.0.42)' can't be established.
+ED25519 key fingerprint is SHA256:abc123xyz...
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
+
+- **The Action**: You must explicitly type **`yes`** and press Enter.
+- **Behind the Scenes**: Once you accept, the host's public key fingerprint is permanently saved into your local user directory inside a file named **`~/.ssh/known_hosts`**. On all subsequent connection attempts, your system will automatically verify this key in the background, allowing you to bypass the prompt and jump straight to password entry.
+
+---
+
+# SSH Key Authorization
+
+### 💡 Core Definition: Passwordless Cryptographic Authentication
+
+Standard password logins are vulnerable to brute-force guessing attacks and require users to repeatedly type long strings of text. SSH Key Authorization uses **Asymmetric Cryptography** to authenticate connections instead.
+
+This security model splits authentication into a mathematically linked **KeyPair (키 쌍)**:
+
+- **Public Key (공개키 - `id_rsa.pub`)** 🔓: The "lock." This key can be shared openly with the world and is uploaded directly to any remote Linux server you wish to access.
+- **Private Key (비밀키 - `id_rsa`)** 🔑: The "physical key." This file must remain **strictly confidential** and safely stored on your local client computer. Anyone who obtains your private key can instantly access your servers without knowing your account password.
+
+### 🛠️ Practical Implementation Workflow
+
+Setting up passwordless authentication on a Linux environment requires a specific, four-step administrative workflow:
+
+- **Step 1: Generate the Key Pair (`ssh-keygen`)** ⚙️Bash
+    
+    Run the generation utility on your local laptop terminal:
+    
+    ```bash
+    $ ssh-keygen -t rsa -b 4000
+    ```
+    
+    *What it does*: This creates your private/public asymmetric key files inside your hidden home directory (`~/.ssh/`).
+    
+- **Step 2: Copy the Public Key to the Remote Host (`ssh-copy-id`)** 📤Bash
+    
+    Push your public lock string up to the destination server:
+    
+    ```bash
+    $ ssh-copy-id ubuntu@192.168.0.42
+    ```
+    
+    *Behind the scenes*: This automatically appends your public key text block into a special security ledger on the remote server located at **`~/.ssh/authorized_keys`**.
+    
+- **Step 3: Establish the Connection** 🚀Bash
+    
+    ```bash
+    $ ssh ubuntu@192.168.0.42
+    ```
+    
+    The server challenges your client terminal using the public key. Your local system automatically signs the challenge using your hidden private key. The handshake succeeds, and you drop into the remote shell **instantly, without a password prompt**.
+    
+
+### 🔒 4. Key Management Security Guidelines
+
+To maintain infrastructure security, administrators must protect their key files by managing local file system permissions:
+
+- **Strict Directory Boundaries (`~/.ssh/` -> `700`)**: The hidden folder holding your keys must be locked down so only your specific Linux user account can read it.Bash
+    
+    ```bash
+    $ chmod 700 ~/.ssh
+    ```
+    
+- **Strict Private Key Isolation (`id_rsa` -> `600`)**: The private key file itself must have all group and public read/write permissions completely stripped.Bash
+    
+    ```bash
+    $ chmod 600 ~/.ssh/id_rsa
+    ```
+    
+    *(Note: If you leave your private key permissions open to other local users, the SSH client program will consider the key compromised, trigger a dramatic "WARNING: UNPROTECTED PRIVATE KEY FILE!" error, and completely refuse to connect until permissions are fixed.)*
+    
+
+---
+
+# UFW — Uncomplicated Firewall
+
+### 💡 Core Definition: Simplified Port Protection
+
+At its lower layer, Linux handles network filtering via a powerful framework called `iptables`. However, `iptables` requires writing highly complex, intimidating syntax commands. **UFW** was engineered as an abstraction layer to simplify this process. It provides an intuitive, easy-to-read command syntax so system administrators can lock down their ports without errors.
+
+- **Default Security Stance**: When turned on, UFW typically operates under a **"Deny All Inbound"** policy. This means it completely blocks all external incoming traffic attempts to your server by default, unless you explicitly write a rule to open a specific door.
+
+### 🛠️ Practical Administration: The Core Command Set
+
+Managing UFW requires running high-privilege administrative (`sudo`) commands to inspect status, modify access lists, or toggle the firewall engine:
+
+### 1. Checking the Operational State 📊
+
+Bash
+
+```bash
+$ sudo ufw status verbose
+```
+
+- *What it does*: Displays whether the firewall is currently active or inactive, along with an organized table listing every open port, protocol (TCP/UDP), and its traffic rule configuration (ALLOW/DENY).
+
+### 2. Toggling the Firewall State ⚙️
+
+- **To Activate UFW**:Bash
+    
+    ```bash
+    $ sudo ufw enable
+    ```
+    
+    *(⚠️ Critical Warning: If you are currently connected to your server remotely via SSH and you enable UFW without opening Port 22 first, the firewall will instantly drop your active line and permanently lock you out of your own server!)*
+    
+- **To Deactivate UFW**:Bash
+    
+    ```bash
+    $ sudo ufw disable
+    ```
+    
+
+### 3. Opening Specific Application Ports (ALLOW Rules) 🟢
+
+To let external web browsers or administrative clients connect to your system services, you must explicitly declare which ports are safe:
+
+- **Opening SSH (Port 22)**:Bash
+    
+    ```bash
+    $ sudo ufw allow 22/tcp
+    ```
+    
+- **Opening Web Services (Port 80/443)**:Bash
+    
+    ```bash
+    $ sudo ufw allow 80/tcp
+    ```
+    
+- **Opening Custom Services (e.g., Nginx development port 8080)**:Bash
+    
+    ```bash
+    $ sudo ufw allow 8080/tcp
+    ```
+    
+
+### 4. Closing or Deleting Rules (DENY/DELETE) 🔴
+
+If an application is decommissioned or a port is flagging security vulnerabilities, you can shut the door instantly:
+
+- **To explicitly block a port**:Bash
+    
+    ```bash
+    $ sudo ufw deny 8080/tcp
+    ```
+    
+- **To completely remove an existing rule string**:Bash
+    
+    ```bash
+    $ sudo ufw delete allow 8080/tcp
+    ```
+    
+
+---
