@@ -1,0 +1,1405 @@
+---
+layout: post
+title: '[Linux] 08 Linux Shell Programming & Git'
+subtitle: 'Linux Shell Programming & Git'
+categories: study
+tags: Linux
+comments: true
+---
+
+- [Period 1: What is Shell \& First Script](#period-1-what-is-shell--first-script)
+  - [🎯 Learning Objectives](#-learning-objectives)
+- [Shell Basics 🐚](#shell-basics-)
+  - [Main Structure](#main-structure)
+  - [Common Shell Types](#common-shell-types)
+- [Types of Shell at One Glance 🐚](#types-of-shell-at-one-glance-)
+  - [Key Point 💡](#key-point-)
+- [Shebang (`#!`) 📝](#shebang--)
+  - [Example](#example)
+  - [Purpose 🎯](#purpose-)
+  - [Common Interpreters](#common-interpreters)
+- [Two Ways of Running a Script ▶️](#two-ways-of-running-a-script-️)
+  - [1. Run with Shell Command](#1-run-with-shell-command)
+  - [2. Run as Executable File](#2-run-as-executable-file)
+- [Period 2: Variables \& Input](#period-2-variables--input)
+  - [🎯 Learning Objectives](#-learning-objectives-1)
+- [Variables 📦](#variables-)
+  - [Variable Declaration](#variable-declaration)
+  - [Using Variables](#using-variables)
+  - [Key Points 💡](#key-points-)
+- [Environment Variable \& `export` 🌎](#environment-variable--export-)
+  - [Exporting a Variable](#exporting-a-variable)
+  - [Checking Environment Variables](#checking-environment-variables)
+  - [Key Points 💡](#key-points--1)
+- [Special Variables ⚡](#special-variables-)
+  - [Common Special Variables](#common-special-variables)
+  - [Example](#example-1)
+- [`read` Command ⌨️](#read-command-️)
+  - [Basic Example](#basic-example)
+  - [With Arguments](#with-arguments)
+  - [Common Arguments](#common-arguments)
+  - [Key Points 💡](#key-points--2)
+- [Period 3: Control Flow, Functions \& Automation](#period-3-control-flow-functions--automation)
+  - [🎯 Learning Objectives](#-learning-objectives-2)
+- [Conditional Statements: `if / elif / else / fi` 🔀](#conditional-statements-if--elif--else--fi-)
+  - [Basic Structure](#basic-structure)
+  - [Example](#example-2)
+  - [Key Points 💡](#key-points--3)
+- [`test` Operator 🧪](#test-operator-)
+- [Loop Statements 🔁](#loop-statements-)
+  - [`for` Loop](#for-loop)
+  - [`while` Loop](#while-loop)
+  - [Key Points 💡](#key-points--4)
+- [Function 🛠️](#function-️)
+  - [Defining a Function](#defining-a-function)
+  - [Calling a Function](#calling-a-function)
+  - [Example](#example-3)
+  - [Key Points 💡](#key-points--5)
+- [Debugging 🐞](#debugging-)
+  - [Common Debugging Options](#common-debugging-options)
+  - [Example](#example-4)
+  - [Key Points 💡](#key-points--6)
+- [Period 4: Working / Staging / Repository](#period-4-working--staging--repository)
+  - [🎯 Learning Objectives](#-learning-objectives-3)
+- [Why Version Management is Necessary 📂](#why-version-management-is-necessary-)
+  - [Why It Is Needed](#why-it-is-needed)
+  - [Without Version Control ❌](#without-version-control-)
+  - [With Git ✅](#with-git-)
+- [3 Areas of Git: Working / Staging / Repository 🗂️](#3-areas-of-git-working--staging--repository-️)
+  - [1. Working Directory](#1-working-directory)
+  - [2. Staging Area](#2-staging-area)
+  - [3. Repository](#3-repository)
+  - [Git Workflow 🔄](#git-workflow-)
+- [`git add` \& `git commit` 📌](#git-add--git-commit-)
+  - [`git add`](#git-add)
+  - [`git commit`](#git-commit)
+  - [Key Points 💡](#key-points--7)
+  - [Workflow 🔄](#workflow-)
+- [`git status` `git diff` `git log` 🔍](#git-status-git-diff-git-log-)
+  - [`git status`](#git-status)
+  - [`git diff`](#git-diff)
+  - [`git log`](#git-log)
+  - [Key Points 💡](#key-points--8)
+- [Period 5: Branch / Merge / Conflict](#period-5-branch--merge--conflict)
+  - [🎯 Learning Objectives](#-learning-objectives-4)
+- [Branch 🌿](#branch-)
+  - [Create a Branch](#create-a-branch)
+  - [Switch Branch](#switch-branch)
+  - [Create and Switch at Once](#create-and-switch-at-once)
+  - [Key Points 💡](#key-points--9)
+- [Branch Commands: `branch` `switch` `checkout` 🌿](#branch-commands-branch-switch-checkout-)
+  - [`git branch`](#git-branch)
+  - [`git switch`](#git-switch)
+  - [`git checkout`](#git-checkout)
+  - [Key Points 💡](#key-points--10)
+- [2 Ways of Merge: Fast-Forward vs 3-Way Merge 🔀](#2-ways-of-merge-fast-forward-vs-3-way-merge-)
+  - [Fast-Forward Merge](#fast-forward-merge)
+  - [특징](#특징)
+  - [3-Way Merge](#3-way-merge)
+  - [특징](#특징-1)
+  - [Comparison 📊](#comparison-)
+- [Why Conflicts Occur? ⚠️](#why-conflicts-occur-️)
+  - [Common Causes](#common-causes)
+  - [Example Situation](#example-situation)
+  - [Conflict Example](#conflict-example)
+  - [Key Points 💡](#key-points--11)
+- [Period 6: Remote Repository \& Collaboration](#period-6-remote-repository--collaboration)
+  - [🎯 Learning Objectives](#-learning-objectives-5)
+- [Remote Storage: Local ↔ Server Relationship 🌐](#remote-storage-local--server-relationship-)
+  - [Relationship Structure](#relationship-structure)
+  - [Main Workflow](#main-workflow)
+  - [Key Points 💡](#key-points--12)
+- [`git push` \& `git pull` 🔄](#git-push--git-pull-)
+  - [`git push`](#git-push)
+  - [`u` Option](#u-option)
+  - [`git pull`](#git-pull)
+  - [How `pull` Works ⚙️](#how-pull-works-️)
+  - [Key Points 💡](#key-points--13)
+- [`git clone` 📥](#git-clone-)
+  - [Basic Command](#basic-command)
+  - [Example](#example-5)
+  - [Commonly Used Options](#commonly-used-options)
+- [`clone` vs `init` ⚖️](#clone-vs-init-️)
+  - [`git clone`](#git-clone)
+  - [`git init`](#git-init)
+  - [Comparison 📊](#comparison--1)
+- [`git fetch` vs `git pull` 🔄](#git-fetch-vs-git-pull-)
+- [`git fetch`](#git-fetch)
+  - [What It Does](#what-it-does)
+  - [Workflow](#workflow)
+  - [특징 💡](#특징-)
+- [`git pull`](#git-pull-1)
+  - [What It Does](#what-it-does-1)
+  - [Internal Process](#internal-process)
+  - [Workflow](#workflow-1)
+  - [특징 💡](#특징--1)
+- [Main Difference ⚖️](#main-difference-️)
+- [When to Use Each 🛠️](#when-to-use-each-️)
+  - [Use `fetch`](#use-fetch)
+  - [Use `pull`](#use-pull)
+- [Learning Objectives: Git Advanced \& AI 🎯](#learning-objectives-git-advanced--ai-)
+- [`git stash`: Temporary Storage Management 🗄️⏳](#git-stash-temporary-storage-management-️)
+  - [🚨 Typical Use Scenario: The Production Hotfix](#-typical-use-scenario-the-production-hotfix)
+  - [⌨️ Main Commands \& Operations](#️-main-commands--operations)
+  - [🔄 Restoring and Purging the Stack](#-restoring-and-purging-the-stack)
+- [Git Reset vs. Revert: Undoing Changes 🔄⚠️](#git-reset-vs-revert-undoing-changes-️)
+  - [⏳ History Modification: `git reset`](#-history-modification-git-reset)
+  - [The Three Reset Modes](#the-three-reset-modes)
+  - [🛡️ Safe History Reversal: `git revert`](#️-safe-history-reversal-git-revert)
+  - [📊 Summary: Reset vs. Revert](#-summary-reset-vs-revert)
+- [File Tracking Exclusion: .gitignore Rules 🛡️🚫](#file-tracking-exclusion-gitignore-rules-️)
+  - [💡 Why Exclusion is Mandatory](#-why-exclusion-is-mandatory)
+  - [Core Exclusion Categories:](#core-exclusion-categories)
+  - [⌨️ Structural Syntax \& Pattern Rules](#️-structural-syntax--pattern-rules)
+  - [⚠️ The Golden Rule of `.gitignore`](#️-the-golden-rule-of-gitignore)
+  - [How to fix an already-tracked file:](#how-to-fix-an-already-tracked-file)
+- [Git Commit Message Conventions 📝✨](#git-commit-message-conventions-)
+  - [🏗️ The Standard 3-Part Structural Layout](#️-the-standard-3-part-structural-layout)
+  - [🏷️ Prefixes: Commit Classification Types](#️-prefixes-commit-classification-types)
+  - [📜 The 5 Golden Rules of Writing Effective Commits](#-the-5-golden-rules-of-writing-effective-commits)
+
+
+## Period 1: What is Shell & First Script
+
+### 🎯 Learning Objectives
+
+- Understand what the **Linux shell** is
+- Learn the relationship between:
+    - 👤 User
+    - 💻 Shell
+    - ⚙️ Kernel
+- Explore common shells:
+    - `sh`, `bash`, `zsh`, `dash`
+- Understand what a **shell script** is
+- Create and run a simple `.sh` script
+- Learn basic command automation with shell scripting
+
+---
+
+## Shell Basics 🐚
+
+- A **shell** is a command interpreter in Linux
+- It connects the 👤 user and ⚙️ Linux kernel
+- Users enter commands through the shell
+- The shell interprets commands and passes them to the kernel
+
+### Main Structure
+
+👤 User → 🐚 Shell → ⚙️ Kernel
+
+### Common Shell Types
+
+- `sh` : original UNIX shell
+- `bash` : most common Linux shell
+- `zsh` : advanced/customizable shell
+- `dash` : lightweight and fast shell
+
+---
+
+## Types of Shell at One Glance 🐚
+
+| Shell | 특징 |
+| --- | --- |
+| `sh` | 기본 UNIX shell |
+| `bash` | 가장 널리 사용되는 Linux shell |
+| `zsh` | 강력한 기능 + 높은 사용자 설정 가능 |
+| `dash` | 가볍고 빠른 shell |
+
+### Key Point 💡
+
+Different shells provide different:
+
+- 기능 (features)
+- 성능 (performance)
+- 사용자 경험 (user experience)
+
+---
+
+## Shebang (`#!`) 📝
+
+A shebang specifies which shell or interpreter should execute the script. It is written on the first line of a script file and helps ensure the script runs in the correct environment.
+
+### Example
+
+```bash
+#!/bin/bash
+```
+
+### Purpose 🎯
+
+- Ensures the script runs with the correct shell
+- Improves script consistency across environments
+
+### Common Interpreters
+
+- `/bin/bash`
+- `/bin/sh`
+- `/usr/bin/python`
+
+---
+
+## Two Ways of Running a Script ▶️
+
+Shell scripts can be executed in two main ways.
+
+### 1. Run with Shell Command
+
+This method explicitly runs the script using a shell interpreter.
+
+```bash
+bash script.sh
+```
+
+- No execute permission required
+- Useful for testing scripts quickly
+
+### 2. Run as Executable File
+
+This method runs the script directly as a program.
+
+```bash
+./script.sh
+```
+
+Before execution, permission must be added:
+
+```bash
+chmod +x script.sh
+```
+
+- Requires execute permission
+- Commonly used for actual script execution
+
+---
+
+## Period 2: Variables & Input
+
+### 🎯 Learning Objectives
+
+- Understand how to declare and use variables in shell scripts
+- Learn the difference between:
+    - local variables
+    - environment variables
+- Receive user input using the `read` command
+- Display variable values with `echo`
+- Build simple interactive shell scripts
+
+---
+
+## Variables 📦
+
+Variables are used to store data in shell scripts. Values can be saved and reused later in the script.
+
+### Variable Declaration
+
+```bash
+name="Alice"
+```
+
+### Using Variables
+
+```bash
+echo $name
+```
+
+### Key Points 💡
+
+- No spaces around `=`
+- Access variables using `$`
+- Variables help make scripts flexible and reusable
+
+---
+
+## Environment Variable & `export` 🌎
+
+Environment variables are variables shared across the system or child processes. They are commonly used to store system settings and configuration values.
+
+### Exporting a Variable
+
+```bash
+export NAME="Alice"
+```
+
+### Checking Environment Variables
+
+```bash
+echo $NAME
+```
+
+### Key Points 💡
+
+- `export` makes a variable available to child shells/processes
+- Environment variables can be accessed globally within the session
+- Common examples:
+    - `PATH`
+    - `HOME`
+    - `USER`
+
+---
+
+## Special Variables ⚡
+
+Special variables store important information automatically provided by the shell.
+
+### Common Special Variables
+
+- `$0` : script name
+- `$1`, `$2` ... : command-line arguments
+- `$#` : number of arguments
+- `$@` : all arguments
+- `$$` : current process ID
+- `$?` : exit status of previous command
+
+### Example
+
+```bash
+echo $1
+```
+
+This prints the first command-line argument passed to the script.
+
+---
+
+## `read` Command ⌨️
+
+The `read` command is used to receive input from the user during script execution.
+
+### Basic Example
+
+```bash
+read name
+echo $name
+```
+
+### With Arguments
+
+```bash
+read -p "Enter your name: " name
+```
+
+### Common Arguments
+
+- `p` : display a prompt message
+- `s` : hide user input (e.g. password)
+- `t` : set time limit for input
+
+### Key Points 💡
+
+- Stores user input into variables
+- Useful for interactive scripts
+- Often combined with `echo`
+
+---
+
+## Period 3: Control Flow, Functions & Automation
+
+### 🎯 Learning Objectives
+
+- Understand conditional statements using `if`
+- Learn repetition with loops:
+    - `for`
+    - `while`
+- Create reusable functions in shell scripts
+- Automate repetitive tasks using scripts
+- Combine variables, input, and control flow to build practical shell programs
+
+---
+
+## Conditional Statements: `if / elif / else / fi` 🔀
+
+Conditional statements allow scripts to make decisions based on conditions.
+
+### Basic Structure
+
+```bash
+if [ condition ]; then
+    command
+elif [ condition ]; then
+    command
+else
+    command
+fi
+```
+
+### Example
+
+```bash
+if [ $num -gt 0 ]; then
+    echo "positive"
+else
+    echo "not positive"
+fi
+```
+
+### Key Points 💡
+
+- `if` checks a condition
+- `elif` adds additional conditions
+- `else` runs when all conditions are false
+- `fi` ends the conditional block
+
+---
+
+## `test` Operator 🧪
+
+The `test` operator is used to evaluate conditions in shell scripts. It is commonly written inside `[ ]`.
+
+```bash
+if [ condition ]; then
+    command
+fi
+```
+
+| Number Comparison | Meaning |
+| --- | --- |
+| `-eq` | equal to |
+| `-ne` | not equal to |
+| `-gt` | greater than |
+| `-lt` | less than |
+| `-ge` | greater than or equal to |
+| `-le` | less than or equal to |
+
+| String Comparison | Meaning |
+| --- | --- |
+| `=` | strings are equal |
+| `!=` | strings are different |
+| `-z` | string is empty |
+| `-n` | string is not empty |
+
+| File Validation | Meaning |
+| --- | --- |
+| `-f` | file exists and is a regular file |
+| `-d` | directory exists |
+| `-e` | file or directory exists |
+| `-r` | file is readable |
+| `-w` | file is writable |
+| `-x` | file is executable |
+
+---
+
+## Loop Statements 🔁
+
+Loop statements repeatedly execute commands while a condition is satisfied.
+
+### `for` Loop
+
+The `for` loop repeats commands for a list of values.
+
+```bash
+for i in 1 2 3
+do
+    echo $i
+done
+```
+
+### `while` Loop
+
+The `while` loop repeats commands while a condition is true.
+
+```bash
+count=1
+
+while [ $count -le 3 ]
+do
+    echo $count
+    count=$((count+1))
+done
+```
+
+### Key Points 💡
+
+- `for` is useful when the number of repetitions is known
+- `while` is useful when repetition depends on a condition
+- `done` ends the loop block
+
+---
+
+## Function 🛠️
+
+Functions are reusable blocks of commands in shell scripts. They help organize code and avoid repetition.
+
+### Defining a Function
+
+```bash
+	hello() {
+    echo "Hello"
+}
+```
+
+### Calling a Function
+
+```bash
+hello
+```
+
+### Example
+
+```bash
+greet() {
+	echo "Hello, $1"
+}
+
+function add() {
+	echo $(($1 + $2))
+}
+
+greet Lian # Hello, Lian
+add 3 5 # 8
+
+result=$(add 10 20)
+echo "SUM: $result" # sum: 30
+```
+
+### Key Points 💡
+
+- Functions improve code reusability
+- A function runs only when it is called
+- Useful for automation and modular scripting
+
+---
+
+## Debugging 🐞
+
+Debugging helps identify and fix errors in shell scripts. Shell options can display execution details and stop scripts when problems occur.
+
+### Common Debugging Options
+
+| Option | Meaning |
+| --- | --- |
+| `-x` | display commands and arguments during execution |
+| `-e` | exit immediately if a command fails |
+| `-u` | treat undefined variables as errors |
+
+### Example
+
+```bash
+bash -x script.sh
+# run script in debug mode and print each command
+
+bash -e script.sh
+# stop script immediately when an error occurs
+
+bash -u script.sh
+# generate an error if an undefined variable is used
+```
+
+### Key Points 💡
+
+- Useful for finding script errors quickly
+- Helps trace command execution step-by-step
+- Improves script reliability and troubleshooting
+
+---
+
+## Period 4: Working / Staging / Repository
+
+### 🎯 Learning Objectives
+
+- Understand the basic structure of Git
+- Learn the difference between:
+    - Working Directory
+    - Staging Area
+    - Repository
+- Track file changes using Git
+- Move files through the Git workflow:
+    - edit → stage → commit
+- Understand how version control manages project history
+
+---
+
+## Why Version Management is Necessary 📂
+
+Version management helps track and manage changes in files and projects over time. It is especially important when multiple people work on the same project.
+
+### Why It Is Needed
+
+- Prevents file overwrite problems
+- Makes collaboration easier
+- Allows recovery of previous versions
+- Tracks who changed what and when
+- Helps manage project history systematically
+
+### Without Version Control ❌
+
+- Multiple copied files:
+    
+    ```
+    final_v1
+    final_v2
+    final_real_final
+    ```
+    
+- Difficult to track changes
+- High risk of mistakes
+
+### With Git ✅
+
+- Organized change history
+- Easy rollback and recovery
+- Efficient team collaboration
+
+---
+
+## 3 Areas of Git: Working / Staging / Repository 🗂️
+
+Git manages files through three main areas during version control.
+
+### 1. Working Directory
+
+The area where files are created and edited.
+
+- Actual project files exist here
+- Changes are not yet tracked by commit
+
+### 2. Staging Area
+
+A temporary area that prepares files before committing.
+
+```bash
+git add file.txt
+# move file to staging area
+```
+
+- Selects which changes will be included in the commit
+- Also called the "index"
+
+### 3. Repository
+
+The area where committed versions are permanently stored.
+
+```bash
+git commit -m "update file"
+# save staged changes into repository
+```
+
+- Stores project history
+- Allows version tracking and recovery
+
+### Git Workflow 🔄
+
+```
+Working Directory → Staging Area → Repository
+```
+
+---
+
+## `git add` & `git commit` 📌
+
+`git add` and `git commit` are core Git commands used to save project changes.
+
+### `git add`
+
+The `git add` command moves changes from the Working Directory to the Staging Area.
+
+```bash
+git add file.txt
+# stage a specific file
+
+git add .
+# stage all changed files
+```
+
+### `git commit`
+
+The `git commit` command saves staged changes into the Repository.
+
+```bash
+git commit -m "update file"
+# create a commit with a message
+```
+
+### Key Points 💡
+
+- `git add` prepares files for commit
+- `git commit` permanently records changes
+- Commit messages should clearly describe the change
+
+### Workflow 🔄
+
+```
+Working Directory → git add → Staging Area → git commit → Repository
+```
+
+---
+
+## `git status` `git diff` `git log` 🔍
+
+These commands help check file changes and Git history.
+
+### `git status`
+
+Shows the current state of files in the repository.
+
+```bash
+git status
+# check modified, staged, or untracked files
+```
+
+### `git diff`
+
+Shows detailed differences between file versions.
+
+```bash
+git diff
+# compare current changes with previous state
+```
+
+### `git log`
+
+Displays commit history.
+
+```bash
+git log
+# show commit records and history
+```
+
+### Key Points 💡
+
+- `status` checks current repository state
+- `diff` shows exact file changes
+- `log` tracks commit history and previous work
+
+---
+
+## Period 5: Branch / Merge / Conflict
+
+### 🎯 Learning Objectives
+
+- Understand the purpose of Git branches
+- Create and switch between branches
+- Merge changes from different branches
+- Understand what merge conflicts are
+- Learn basic conflict resolution during collaboration
+- Use branching workflows for safer development and teamwork
+
+---
+
+## Branch 🌿
+
+A branch is an independent line of development in Git. It allows developers to work on new features or changes without affecting the main project.
+
+### Create a Branch
+
+```bash
+git branch feature
+# create a new branch named "feature"
+```
+
+### Switch Branch
+
+```bash
+git checkout feature
+# move to the "feature" branch
+```
+
+### Create and Switch at Once
+
+```bash
+git checkout -b feature
+# create and immediately switch to branch
+```
+
+### Key Points 💡
+
+- Branches allow parallel development
+- Changes in one branch do not affect others immediately
+- Commonly used for:
+    - new features
+    - bug fixes
+    - experiments
+
+---
+
+## Branch Commands: `branch` `switch` `checkout` 🌿
+
+These commands are used to create, view, and move between Git branches.
+
+### `git branch`
+
+Creates or lists branches.
+
+```bash
+git branch
+# show all branches
+
+git branch feature
+# create a new branch named "feature"
+
+git branch -d feature
+# delete branch named "feature"
+# -D is force delete
+
+git branch -m feature-image
+# Rename current branch to "feature-image"
+```
+
+### `git switch`
+
+Moves to another branch.
+
+```bash
+git switch feature
+# switch to the "feature" branch
+
+git switch -c feature
+# create a new branch named "feature" and switch to it.
+# *** This is mostly used. ***
+```
+
+### `git checkout`
+
+Older command used for switching branches and restoring files.
+
+```bash
+git checkout feature
+# switch to the "feature" branch
+```
+
+### Key Points 💡
+
+- `branch` manages branches
+- `switch` is mainly for changing branches
+- `checkout` is an older multifunction command
+- `switch` is generally clearer and safer for branch switching
+
+---
+
+## 2 Ways of Merge: Fast-Forward vs 3-Way Merge 🔀
+
+Git provides different merge methods depending on branch history.
+
+### Fast-Forward Merge
+
+A fast-forward merge occurs when the target branch has no new commits, so Git simply moves the branch pointer forward.
+
+```bash
+git merge feature
+# branch pointer moves forward directly
+```
+
+### 특징
+
+- Simple and clean history
+- No extra merge commit created
+- Happens when histories do not diverge
+
+---
+
+### 3-Way Merge
+
+A 3-way merge occurs when both branches have separate commits. Git creates a new merge commit to combine histories.
+
+```bash
+git merge feature
+# create merge commit when histories diverged
+```
+
+### 특징
+
+- Preserves branch history
+- Creates an additional merge commit
+- Used when branches changed independently
+
+### Comparison 📊
+
+| Merge Type | 특징 |
+| --- | --- |
+| Fast-Forward | simple linear history |
+| 3-Way Merge | combines separate branch histories |
+
+---
+
+## Why Conflicts Occur? ⚠️
+
+A merge conflict occurs when Git cannot automatically combine changes from different branches.
+
+### Common Causes
+
+- Two branches modify the same line of a file
+- One branch deletes a file while another edits it
+- Different developers make incompatible changes
+
+### Example Situation
+
+```
+Branch A → edits line 10
+Branch B → also edits line 10
+```
+
+Git cannot determine which change should be kept automatically.
+
+### Conflict Example
+
+```bash
+<<<<<<< HEAD
+Hello World
+=======
+Hello Git
+>>>>>>> feature
+```
+
+### Key Points 💡
+
+- Conflicts usually happen during `merge`
+- Developers must manually choose or combine changes
+- After resolving conflicts:
+    
+    ```bash
+    git add .
+    git commit
+    ```
+    
+
+---
+
+## Period 6: Remote Repository & Collaboration
+
+### 🎯 Learning Objectives
+
+- Understand the role of remote repositories
+- Connect local repositories with remote repositories
+- Learn basic collaboration workflow using Git
+- Upload and download changes using:
+    - `push`
+    - `pull`
+    - `clone`
+- Collaborate with multiple developers through shared repositories
+- Understand basic GitHub-based teamwork
+
+---
+
+## Remote Storage: Local ↔ Server Relationship 🌐
+
+A remote repository is a shared repository stored on a server such as GitHub. Developers synchronize local work with the remote repository for collaboration.
+
+### Relationship Structure
+
+```
+Local Repository ↔ Remote Repository(Server)
+```
+
+### Main Workflow
+
+- Upload local changes:
+    
+    ```bash
+    git push
+    # send local commits to remote repository
+    ```
+    
+- Download remote changes:
+    
+    ```bash
+    git pull
+    # fetch and merge changes from remote repository
+    ```
+    
+- Copy remote repository:
+    
+    ```bash
+    git clone URL
+    # create local copy of remote repository
+    ```
+    
+
+### Key Points 💡
+
+- Local repository stores personal work
+- Remote repository enables collaboration and backup
+- Team members share code through the remote server
+
+---
+
+## `git push` & `git pull` 🔄
+
+`git push` and `git pull` are used to synchronize local and remote repositories.
+
+### `git push`
+
+Uploads local commits to the remote repository.
+
+```bash
+git push -u origin main
+# upload commits and set upstream branch
+```
+
+### `u` Option
+
+- `u` means `-set-upstream`
+- Connects the local branch with the remote branch
+- After setting upstream, shorter commands can be used:
+    
+    ```bash
+    git push
+    git pull
+    ```
+    
+
+### `git pull`
+
+Downloads changes from the remote repository and merges them into the local repository.
+
+```bash
+git pull origin main
+# fetch + merge remote changes
+```
+
+### How `pull` Works ⚙️
+
+`git pull` is a combination of:
+
+```bash
+git fetch
+# download remote changes
+
+git merge origin/master
+# merge downloaded changes into current branch
+```
+
+### Key Points 💡
+
+- `push` uploads local work to the server
+- `pull` updates the local repository
+- `pull = fetch + merge`
+- Used for synchronization and collaboration
+
+---
+
+## `git clone` 📥
+
+`git clone` creates a local copy of a remote repository. It automatically downloads the repository, including commit history and branches.
+
+### Basic Command
+
+```bash
+git clone <repository_url>
+# copy remote repository to local machine
+```
+
+### Example
+
+```bash
+git clone <https://github.com/user/project.git>
+# clone GitHub repository
+```
+
+### Commonly Used Options
+
+```bash
+git clone -b dev <repository_url>
+# clone and switch to specific branch
+
+git clone --depth=1 <repository_url>
+# shallow clone with limited commit history
+```
+
+| Option | Meaning |
+| --- | --- |
+| `-b <branch>` | clone specific branch |
+| `--depth 1` | download only recent commit history |
+
+## `clone` vs `init` ⚖️
+
+### `git clone`
+
+Used when copying an existing remote repository.
+
+```bash
+git clone <repository_url>
+```
+
+- Downloads existing project
+- Includes commit history and branches
+- Automatically connects remote repository
+
+### `git init`
+
+Used when creating a new local Git repository.
+
+```bash
+git init
+```
+
+- Starts a new empty repository
+- No remote connection by default
+- Used for new projects
+
+### Comparison 📊
+
+| Command | Purpose |
+| --- | --- |
+| `git clone` | copy existing remote repository |
+| `git init` | create new local repository |
+
+---
+
+## `git fetch` vs `git pull` 🔄
+
+Both commands retrieve changes from a remote repository, but they behave differently.
+
+## `git fetch`
+
+`git fetch` downloads changes from the remote repository without modifying the current working branch.
+
+```bash
+git fetch origin
+# download remote updates only
+```
+
+### What It Does
+
+- Downloads new commits and branch information
+- Updates remote tracking branches
+- Does NOT change local files automatically
+- Allows developers to review changes safely before merging
+
+### Workflow
+
+```
+Remote Repository → Local Remote Tracking Branch
+```
+
+### 특징 💡
+
+- Safe operation
+- No automatic merge
+- Useful before manual review
+
+## `git pull`
+
+`git pull` downloads remote changes and immediately merges them into the current branch.
+
+```bash
+git pull origin main
+# fetch + merge remote changes
+```
+
+### What It Does
+
+1. Fetch remote changes
+2. Automatically merge into current branch
+
+### Internal Process
+
+```bash
+git fetch
+git merge
+```
+
+### Workflow
+
+```
+Remote Repository → Fetch → Merge → Current Branch
+```
+
+### 특징 💡
+
+- Faster and more convenient
+- Automatically updates local branch
+- May immediately create merge conflicts
+
+## Main Difference ⚖️
+
+| Command | Downloads Changes | Automatically Merges | Safer for Review |
+| --- | --- | --- | --- |
+| `git fetch` | ✅ | ❌ | ✅ |
+| `git pull` | ✅ | ✅ | ❌ |
+
+## When to Use Each 🛠️
+
+### Use `fetch`
+
+- when checking remote changes first
+- when working carefully in team projects
+- before manual merge or rebase
+
+### Use `pull`
+
+- when quickly syncing repositories
+- when automatic merge is acceptable
+- during routine collaboration updates
+
+---
+
+## Learning Objectives: Git Advanced & AI 🎯
+
+- **1. Temporary Storage (`git stash`)** 🗄️⏳
+    - Learn to temporarily shelve uncommitted work to quickly switch branches without forcing a commit.
+- **2. Git Recovery & Exclusion (`reset` / `revert` / `.gitignore`)** 🔄🛡Target
+    - Contrast **`git reset`** (rewinding history) with **`git revert`** (safe history reversal via a new commit).
+    - Configure a **`.gitignore`** file to exclude build artifacts and secrets from version tracking.
+- **3. AI-Assisted Development** 🤖🧪
+    - Integrate AI coding assistants with explicit prompting.
+    - Develop a validation-first mindset to test and review AI code instead of blindly trusting it.
+
+---
+
+## `git stash`: Temporary Storage Management 🗄️⏳
+
+### 🚨 Typical Use Scenario: The Production Hotfix
+
+- **The Problem**: You are deep in the middle of developing a complex new feature on a branch. Your code is currently broken, experimental, and incomplete. Suddenly, a critical bug is discovered in production that requires an immediate hotfix on the `main` branch.
+- **The Conflict**: Git will block you from switching branches (`git checkout main`) if your uncommitted local changes conflict with the target branch, and you do not want to run `git commit` because your feature code is unstable and half-written.
+- **The Solution**: Running `git stash` safely lifts your modified, uncommitted work out of the directory and stores it on an internal stack. Your working tree becomes completely clean, letting you switch to `main`, apply the emergency patch, and then return later to seamlessly retrieve your feature draft.
+
+### ⌨️ Main Commands & Operations
+
+- **`git stash`**: Takes all current modifications in your working directory and staging area, moves them onto the stash stack, and resets the local directory back to a clean `HEAD` state.
+- **`git stash push -m "name"`**: The modern, explicit syntax used to save changes with a descriptive label. This custom identifier makes it much easier to distinguish between different saved states when managing a large stack.
+- **`git stash list`**: Outputs a structured chronological list of all saved stash items currently stored on your stack (formatted as a zero-indexed tracking layout: `stash@{0}`, `stash@{1}`, etc.).
+- **`git stash show -p`**: Generates a detailed, line-by-line patch comparison (`p`) showing the exact code changes hidden inside a specific stash entry.
+
+### 🔄 Restoring and Purging the Stack
+
+- **`git stash pop`** 🍿: Extracts the modifications from the top item (`stash@{0}`) or a specified index, applies them back into your working directory, and **automatically deletes** that entry from the stash stack.
+- **`git stash apply`** 📋: Re-integrates the stashed changes back into your working workspace exactly like `pop`, but **safely leaves the original copy intact** on the stash stack for future use or cross-branch testing.
+- **`git stash drop stash@{0}`** 🗑️: Permanently deletes a single, specific stash entry from the tracking list without applying any of its code modifications to your project directory.
+- **`git stash clear`** 🧹: Wipes out the entire stash storage area simultaneously, permanently deleting all saved entries.
+
+---
+
+## Git Reset vs. Revert: Undoing Changes 🔄⚠️
+
+### ⏳ History Modification: `git reset`
+
+`git reset` rewinds your current branch pointer to a previous commit, changing the timeline.
+
+- **The Collaboration Rule**: Because `git reset` alters the commit history, it can cause sync issues for your team if applied to commits that are already pushed to a shared remote repository. **Only use `git reset` for local, unpushed cleanup tasks**.
+
+### The Three Reset Modes
+
+The syntax relies on explicit flags to determine what happens to your pending changes in the **Staging Area** and **Working Directory**:
+
+```bash
+$ git reset [--mode] [Commit_Hash]
+```
+
+- **`-soft` Mode (Keep Changes Staged)** 🟢: Moves the history pointer back, but preserves all your code changes safely inside the Staging Area. Useful for squashing commits.
+- **`-mixed` Mode (Unstage Changes - Default)** 🟡: Moves the history pointer back and resets the Staging Area, but leaves your files intact in the Working Directory. Changes become unstaged modifications.
+- **`-hard` Mode (Absolute Destruction)** 🔴: Moves the history pointer back and **wipes out both the Staging Area and Working Directory** to match the target commit precisely. *Uncommitted or reset changes are permanently erased*.
+
+### 🛡️ Safe History Reversal: `git revert`
+
+`git revert` rolls back a commit's changes by creating a new commit that does the opposite, leaving the past timeline intact.
+
+```bash
+$ git revert [Commit_Hash_To_Undo]
+```
+
+- **How it Works**: Instead of deleting anything from the timeline, `git revert` looks at the target commit, determines what lines were added or removed, and **applies a new inversion commit** that neutralizes those changes.
+- **Safe for Collaboration**: Because it only appends a new commit to the end of the history, **`git revert` is completely safe to use on public, shared remote branches**. It resolves errors cleanly without causing history conflicts for other developers.
+
+### 📊 Summary: Reset vs. Revert
+
+| **Feature** | **git reset** | **git revert** |
+| --- | --- | --- |
+| **Action** | Deletes/Rewinds commits | Creates a new inverse commit |
+| **Timeline Alteration** | Alters history (Destructive) | Appends history (Safe) |
+| **Best Workspace** | Local, unpushed branches only | Shared, public remote branches |
+
+---
+
+## File Tracking Exclusion: .gitignore Rules 🛡️🚫
+
+### 💡 Why Exclusion is Mandatory
+
+In a real software engineering workspace, not every file in your folder belongs in a shared source repository. Checking in everything clutters history, inflates directory sizes, and exposes vulnerabilities.
+
+### Core Exclusion Categories:
+
+- **Security Credentials & Secrets**: Private API keys, database credentials, ssh configurations, and environment configuration values (e.g., `.env`).
+- **Local Workspace Layouts**: IDE configurations or user preference settings (e.g., `.vscode/`, `.idea/`, `.suo`) that vary from programmer to programmer.
+- **Build Artifacts & Generated Files**: Compiled binaries, build directories, or node dependency frameworks (e.g., `node_modules/`, `target/`, `.exe`, `.log`) that can easily be regenerated via build tools.
+
+### ⌨️ Structural Syntax & Pattern Rules
+
+The `.gitignore` engine uses an adaptive text-pattern syntax called **globbing** to map files:
+
+```
+# 1. Specific Single File Exclusion
+secret_token.txt
+
+# 2. Entire Directory Exclusion (trailing slash)
+node_modules/
+dist/
+
+# 3. Extension Wildcard Pattern (any file ending with this extension)
+*.log
+*.tmp
+
+# 4. Inversion / Exception Whitelisting (negation mark)
+!important.log
+```
+
+- **`secret_token.txt`**: Completely hides a single, explicit file anywhere inside the workspace.
+- **`node_modules/`**: Recursively targets and blocks an entire directory and all files nested inside it.
+- **`.log`**: Uses the wild card asterisk () to target any file matching the specified extension, regardless of which subdirectory it lives in.
+- **`!important.log`**: Uses an exclamation mark (`!`) to create a whitelist rule override. This forces Git to track `important.log` even if a previous rule (like `.log`) explicitly hidden it.
+
+### ⚠️ The Golden Rule of `.gitignore`
+
+> **"`.gitignore` only blocks untracked files!"**
+> 
+
+If a file has already been added and committed to the repository history in the past, **adding its name to `.gitignore` later will do absolutely nothing**. Git already tracks it, so it will continue monitoring adjustments.
+
+### How to fix an already-tracked file:
+
+If you accidentally committed a secret file or massive cache folder before adding it to your ignore list, you must manually strip it from Git's tracking engine using the cached removal flag before the ignore rules can apply:
+
+```bash
+# Untracks the file from the index while keeping your actual local copy safe
+$ git rm --cached secret_token.txt
+
+# Commit the removal to freeze tracking, then append to .gitignore
+$ git commit -m "chore: untrack sensitive credential file"
+```
+
+---
+
+## Git Commit Message Conventions 📝✨
+
+A commit message is more than just a random text block—it serves as the structural documentation of a repository’s evolution. Adhering to professional commit conventions ensures automated changelog generation, easy filtering with `git log`, and seamless code reviews across teams.
+
+### 🏗️ The Standard 3-Part Structural Layout
+
+A formal commit message follows a strict hierarchical layout composed of a **Header**, an optional **Body**, and an optional **Footer**:
+
+```
+type: Subject line summarizes changes in under 50 characters
+
+[Optional Body]
+Detailed explanation describing the conceptual "why" behind the change,
+not the "what" (the code diff tells you the what). Wrap lines at 72 characters.
+
+[Optional Footer]
+Resolves: #128 (Issue tracker tracking references or breaking changes)
+```
+
+1. **Header (Subject Line)**: A single concise phrase containing the prefix classification and short title.
+2. **Body**: Used for substantial adjustments requiring context. It clarifies the engineering motive and logic.
+3. **Footer**: Used to reference tracking tickets (e.g., Jira, GitHub issues) or call out breaking changes.
+
+### 🏷️ Prefixes: Commit Classification Types
+
+To achieve standard semantic versioning, every commit summary must begin with a standardized classification keyword detailing the precise nature of the change:
+
+| **Type** | **Intended Purpose** | **Real-World Example** |
+| --- | --- | --- |
+| **`feat`** | Production introduction of a completely new feature or tool | `feat: add user authentication endpoint` |
+| **`fix`** | Direct bug resolution or error patching | `fix: prevent null pointer exception on logout` |
+| **`docs`** | Changes confined strictly to documentation files (like `README.md`) | `docs: add deployment steps to readme` |
+| **`style`** | Code adjustments that do not affect operational logic (white-space, formatting, linting) | `style: run prettier formatter on checkout component` |
+| **`refactor`** | Operational code modifications that neither fix bugs nor add new features | `refactor: extract duplicate validation into helper function` |
+| **`test`** | Introducing new test modules or fixing existing test coverage | `test: add unit tests for daily backup routine` |
+| **`chore`** | Routine workspace changes, auxiliary dependencies, or build tool adjustments | `chore: untrack sensitive credential file` |
+
+### 📜 The 5 Golden Rules of Writing Effective Commits
+
+- **Rule 1: Separate Subject from Body with a Blank Line** Git's parsing engines utilize the initial empty line break to cleanly distinguish the shorthand subject line header from the verbose body paragraph.
+- **Rule 2: Limit the Subject Line to 50 Characters** Keep headers crisp and compact. This ensures messages do not get truncated or overflow when rendering in short-log repository summaries or UI interfaces.
+- **Rule 3: Do Not End the Subject Line with a Period** A subject line acts as an active title card or command string. Eliminating trailing punctuation keeps lines clean.
+- **Rule 4: Use Imperative Mood in the Subject Line** Write your subject line as a direct command stating what the commit *does*, not what it *did*.
+    - ❌ *Incorrect:* `fixed user session timeout bug` or `feat: adds verification`
+    - 🟢 *Correct:* `fix: resolve user session timeout bug` or `feat: add verification`
+- **Rule 5: Use the Body to Focus on "Why" and "How", Not "What"** The actual programmatic file diff inherently displays *what* lines changed. The commit body paragraph exists to preserve the developer's architectural reasoning—explaining *why* a particular path was selected and *how* it fixes the underlying constraint.
