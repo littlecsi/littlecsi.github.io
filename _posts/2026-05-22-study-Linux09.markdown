@@ -1,0 +1,530 @@
+---
+layout: post
+title: '[Linux] Linux 09 Digital Security & Docker'
+subtitle: 'Digital Security & Docker'
+categories: study
+tags: Linux
+comments: true
+---
+
+- [Digital Security \& Encryption](#digital-security--encryption)
+  - [Why Security is Required: The 3 Core Information Threats 🛡️⚠️](#why-security-is-required-the-3-core-information-threats-️️)
+    - [🛑 The 3 Major Information Threats](#-the-3-major-information-threats)
+    - [🎯 Key Focus: Catching Data Tampering](#-key-focus-catching-data-tampering)
+  - [Irreversible Data Verification: Hash Functions 🔢🛡️](#irreversible-data-verification-hash-functions-️)
+    - [⚙️ The Three Golden Rules of Hashing](#️-the-three-golden-rules-of-hashing)
+    - [🎯 Primary Use Cases for Hashing](#-primary-use-cases-for-hashing)
+  - [Cryptographic Hash Algorithm Matrix 🔢🛡️](#cryptographic-hash-algorithm-matrix-️)
+    - [📊 Cryptographic Hashing Algorithm Comparison](#-cryptographic-hashing-algorithm-comparison)
+    - [💡 Core Takeaways from the Matrix](#-core-takeaways-from-the-matrix)
+  - [File Trustworthiness: Integrity Verification 🛡️🔍](#file-trustworthiness-integrity-verification-️)
+    - [💡 Core Mechanics of Integrity Verification](#-core-mechanics-of-integrity-verification)
+    - [🌐 Real-World Implementation Scenarios](#-real-world-implementation-scenarios)
+    - [🔑 Key Takeaway](#-key-takeaway)
+  - [Secure Password Storage: Salt and Rainbow Tables 🧂🔒](#secure-password-storage-salt-and-rainbow-tables-)
+    - [⚠️ The Core Vulnerability: Determinism \& Rainbow Tables](#️-the-core-vulnerability-determinism--rainbow-tables)
+    - [🧂 The Solution: Adding "Salt" to the Mix](#-the-solution-adding-salt-to-the-mix)
+    - [⚙️ How Salt Operates:](#️-how-salt-operates)
+- [Encryption \& Digital Signature](#encryption--digital-signature)
+    - [🔑 Symmetric Encryption (대칭키 암호화)](#-symmetric-encryption-대칭키-암호화)
+    - [🔑 Asymmetric Encryption (비대칭키 암호화)](#-asymmetric-encryption-비대칭키-암호화)
+    - [⚖️ Symmetric vs. Asymmetric Comparison](#️-symmetric-vs-asymmetric-comparison)
+    - [✍️ Digital Signature (전자서명)](#️-digital-signature-전자서명)
+- [HTTPS, TLS, X.509 Certificate](#https-tls-x509-certificate)
+    - [🌐 HTTP vs. HTTPS](#-http-vs-https)
+    - [🔑 Symmetric Key Practice](#-symmetric-key-practice)
+    - [🔑 Asymmetric Key Practice](#-asymmetric-key-practice)
+    - [🧩 Hybrid Encryption (하이브리드 암호화)](#-hybrid-encryption-하이브리드-암호화)
+    - [🌐 HTTPS Entire Process](#-https-entire-process)
+    - [rootCA → Server certificate practice](#rootca--server-certificate-practice)
+      - [Generating CA - rootCA.pem](#generating-ca---rootcapem)
+      - [Server Certificate Request](#server-certificate-request)
+- [Containerize Everything](#containerize-everything)
+    - [🐳 VM vs. Container (가상머신과 컨테이너)](#-vm-vs-container-가상머신과-컨테이너)
+    - [🐳 3 Core Elements of Docker (도커의 3대 요소)](#-3-core-elements-of-docker-도커의-3대-요소)
+    - [Commonly Used Docker Commands](#commonly-used-docker-commands)
+    - [Docker Installation](#docker-installation)
+- [Port, Volume, Dockerfile, Compose](#port-volume-dockerfile-compose)
+    - [🌐 Port Mapping](#-port-mapping)
+    - [💾 Volume Mount](#-volume-mount)
+    - [🛠️ Dockerfile](#️-dockerfile)
+    - [🎼 Docker Compose](#-docker-compose)
+
+
+# Digital Security & Encryption
+
+- **1. Digital Threat Vectors** 👤❌
+    - Identify and map network vulnerabilities to protect data from eavesdropping (sniffing), tampering (spoofing), and identity theft.
+- **2. Cryptographic Architecture** 🔑📐
+    - Compare **Symmetric Encryption** (fast, shared key) with **Asymmetric Encryption** (public/private key pairing).
+    - Master irreversible **Hash Functions** and **Digital Signatures** to guarantee data integrity and authenticity.
+- **3. Web Security & HTTPS** 🌐🔒
+    - Deconstruct the mechanics of an **HTTPS handshake** and understand how Certificate Authorities (CAs) validate and issue SSL/TLS certificates.
+
+---
+
+## Why Security is Required: The 3 Core Information Threats 🛡️⚠️
+
+### 🛑 The 3 Major Information Threats
+
+Whenever data is being actively **transmitted, received, or stored**, it is vulnerable to three specific vectors:
+
+- **1. 도청 (Eavesdropping)** 👁️📡
+    - **The Risk**: A malicious third party intercepts and looks at your private messages or data payloads.
+    - **Real-World Scenario**: Connecting to a public café Wi-Fi hotspot where a hacker on the exact same local area network captures data packets to harvest login credentials.
+    - **The Solution**: **Encryption (암호화)** — scrambling the data text so unauthorized sniffers cannot read it.
+- **2. 변조 (Tampering)** ✍️❌
+    - **The Risk**: The data packet is interceptively altered, modified, or corrupted in mid-transit between host systems.
+    - **Real-World Scenario**: An interception changes a banking payload from *"Wire $1,000"* to *"Wire $10,000"*, or an internet download experiences a single bit-flip that corrupts an OS installer and causes the system to malfunction.
+    - **The Solution**: **Hash Functions (해시)** — generating mathematical signatures to detect edits instantly.
+- **3. 위장 (Impersonation)** 👤🎭
+    - **The Risk**: You cannot guarantee that the party or system you are communicating with is actually who they claim to be.
+    - **Real-World Scenario**: Navigating to a phishing web server explicitly labeled *"Naver"* that copies the branding to steal data, or getting message requests from a fake account masquerading as a close contact asking for immediate financial assistance.
+    - **The Solution**: **Certificates & Digital Signatures (인증서·서명)** — validating identities through verifiable authorities.
+
+### 🎯 Key Focus: Catching Data Tampering
+
+The slide concludes by specifying that the immediate core focus of this lecture period is **변조 (Tampering)**. To detect and stop unauthorized file changes, developers implement **Hash (해시)** functions—a checksum technique used to verify if a file is identical to the original version.
+
+---
+
+## Irreversible Data Verification: Hash Functions 🔢🛡️
+
+Page 4 introduces the mathematical foundation of data integrity: the **Hash Function** (해시 함수). A hash function takes an input (like a text password or an entire file) and converts it into a fixed-length string of seemingly random characters, known as a **Hash Value** or Digest.
+
+### ⚙️ The Three Golden Rules of Hashing
+
+To be cryptographically secure, a hash function must strictly adhere to three mathematical properties:
+
+- **1. One-Way Direction (단방향성 - Irreversibility)** ⛔➡️
+    - You can easily generate a hash from a password, but it is mathematically impossible to take a hash and reverse-engineer it back into the original password. Once data is hashed, it cannot be decrypted.
+- **2. The Avalanche Effect (입력값의 민감성)** ❄️💥
+    - Even the tiniest change to the input data will completely and drastically change the resulting hash output.
+    - *Example*: Hashing the word "Hello" might output `A1B2C...`. Hashing the word "hello" (lowercase 'h') will output something entirely different, like `X9Y8Z...`.
+- **3. Fixed Output Length (고정된 출력 길이)** 📏
+    - Whether you hash a single 3-letter word or a massive 50-Gigabyte 4K video file, the resulting hash output will always be the exact same length (e.g., exactly 256 bits for SHA-256).
+
+### 🎯 Primary Use Cases for Hashing
+
+Because of these unique properties, hash functions are used specifically to stop data tampering and protect credentials:
+
+- **File Integrity Checks (무결성 검증)**: When downloading software, the developer provides a known hash. After downloading, you hash the file yourself. If the two hashes match perfectly, you guarantee the file was not corrupted or modified by hackers during transit.
+- **Password Storage (비밀번호 저장)**: Databases never store raw passwords. They store the hash of the password. When a user logs in, the system hashes their typed input and compares it to the database hash. Even if the database is stolen, the hackers only get irreversible hashes, not the actual passwords.
+
+---
+
+## Cryptographic Hash Algorithm Matrix 🔢🛡️
+
+### 📊 Cryptographic Hashing Algorithm Comparison
+
+| **Safety Status** | **Algorithm Name** | **Output Bit-Length** | **Reference Output Sample / Behavior** | **Modern Status & Usage** |
+| --- | --- | --- | --- | --- |
+| **DEAD** ❌ | **MD5** | 128 bits | `7ee787bc...` | **Broken.** Highly vulnerable to collision attacks where two different inputs yield the identical hash. **Never use** for security purposes. |
+| **WEAK** ⚠️ | **SHA-1** | 160 bits | `58a6ff48...` | **Deprecated.** Phased out of enterprise security due to theoretical and practical collision vulnerabilities. Kept only for legacy system compatibility. |
+| **GOOD** 🟢 | **SHA-256** | 256 bits | `bc8cffa5d6ff...` | **Industry Standard.** Widely implemented across blockchain architectures, SSL/TLS certificates, and secure Linux file verification pipelines. |
+| **STRONG** ⚡ | **SHA-512** | 512 bits | `3fb950d29922ff5f...` | **Maximum Security.** Offers deep cryptographic margin. Excellent for 64-bit systems architecture execution, providing top-tier resistance against future brute-force vectors. |
+
+### 💡 Core Takeaways from the Matrix
+
+- **The Relationship of Length to Security**: As the output bits scale upward (from 128 up to 512 bits), the computational difficulty required for a hacker to fake or break a hash via a brute-force collision increases exponentially.
+- **The Collision Warning**: An algorithm is classified as **DEAD** or **WEAK** the moment cryptographic mathematicians discover a shortcut method to produce identical output digests from differing source payloads.
+- **Practical Selection Guideline**: For current server deployment architectures, **SHA-256** serves as the optimal baseline choice for balancing processing speed and cryptographic integrity.
+
+---
+
+## File Trustworthiness: Integrity Verification 🛡️🔍
+
+### 💡 Core Mechanics of Integrity Verification
+
+- **Comparison with the Master Fingerprint**: The file provider (server) computes the hash value of the original, clean file beforehand and publishes it openly. After downloading the file, the user computes its hash locally on their machine.
+- **Guaranteeing a Perfect Match**: If the two hash strings match perfectly down to every single character, it mathematically proves that the file is in its pristine, original state. This guarantees that no malicious code insertion (tampering) or packet loss (corruption) occurred over the network during transit.
+
+### 🌐 Real-World Implementation Scenarios
+
+1. **Open Source Software Verification** 📦
+    - Linux distributions (such as Ubuntu or CentOS) and massive open-source project mirrors always host a companion file like `SHA256SUMS` right next to their standard ISO download buttons.
+    - Users can execute `sha256sum [filename]` on their terminal after a download completes to ensure that the mirror server wasn't compromised or swapped with a malicious spyware bundle.
+2. **Automated Package Managers (`apt`, `yum`, `pip`)** ⚙️
+    - When running commands like `apt install` or `pip install`, package managers handle integrity checks automatically under the hood.
+    - The utility downloads the package binary, hashes it locally, and verifies it against a centralized, trusted master database of safe hashes. If even a single bit differs, the manager aborts the installation immediately and triggers a security warning.
+
+### 🔑 Key Takeaway
+
+> **"Integrity verification via hash functions is the primary mechanism used to neutralize 'Tampering' (변조) risks, establishing complete mathematical trust across unstable communication networks."**
+> 
+
+---
+
+## Secure Password Storage: Salt and Rainbow Tables 🧂🔒
+
+### ⚠️ The Core Vulnerability: Determinism & Rainbow Tables
+
+Even though strong cryptographic hash functions (like SHA-256) are mathematically irreversible, they suffer from a design weakness known as **Determinism**:
+
+- **The Problem**: A specific password string (e.g., `"password123"`) will **always** yield the exact same 256-bit hash value every single time it passes through an algorithm.
+- **The Rainbow Table Attack**: Hackers exploit this trait by generating pre-computed dictionaries called **Rainbow Tables**. If a hacker steals a user database full of raw hashes, they do not attempt to crack the math—they simply look up the stolen hashes inside their massive lookup lists to uncover the matching plain text passwords instantly.
+- **The Identical Hash Problem**: If two separate users happen to register with the exact same password, their entries in the database will display matching hash values, allowing an attacker to identify password sharing patterns.
+
+### 🧂 The Solution: Adding "Salt" to the Mix
+
+To prevent dictionary lookups, security engineers deploy **Salt**—a unique, completely randomized string of secondary data appended to a password *before* it is run through a hash engine.
+
+$$
+\text{Plain Text Password} + \textbf{Random Salt String} \longrightarrow \text{Hash Function} \longrightarrow \text{Unique Extended Digest}
+$$
+
+### ⚙️ How Salt Operates:
+
+1. **Unique Values Per Row**: When a user creates an account, the server generates a completely random, unique salt value specifically for that individual user.
+2. **Dynamic Outputs**: Even if ten different users select `"123456"` as their login credential, their unique salts guarantee that **all ten entries store completely unique hash strings** in the database.
+3. **Neutralizing Pre-computation**: Because the salt changes for every row, pre-computed lookup catalogs like **Rainbow Tables become completely useless**. Attackers are forced to exhaustively brute-force every single account entirely from scratch, rendering large-scale database breaches significantly safer.
+
+---
+
+# Encryption & Digital Signature
+
+- 🛡️ **Understand Container Isolation & Virtualization**: Learn how Docker isolates processes using Linux kernel namespaces and cgroups to ensure secure, independent environments.
+- 🐳 **Master Docker Network & Data Storage**: Understand the underlying mechanisms of Docker networking modes and how persistent data is managed through volumes and bind mounts.
+- 🔒 **Implement Docker Security Best Practices**: Explore practical methods to secure containerized applications, including managing non-root privileges, controlling resource limits, and mitigating common security vulnerabilities.
+
+---
+
+### 🔑 Symmetric Encryption (대칭키 암호화)
+
+Here is the summary of page 13 from the lecture notes:
+
+- 🔒 **Core Concept**: Symmetric encryption uses the **same single secret key** for both encrypting the plaintext and decrypting the ciphertext.
+- 🤝 **Key Sharing Requirement**: Because the same key is used for both operations, both the sender and the receiver must safely share and possess the exact same secret key beforehand.
+- ⚡ **Main Advantage**: It features **fast processing speeds**, making it highly efficient for encrypting large volumes of data.
+- ⚠️ **Main Disadvantage**: The biggest challenge is **Key Distribution (Key Exchange)**. If the key is intercepted by an attacker while being shared over an insecure network, the entire encrypted communication becomes vulnerable.
+- 🛠️ **Representative Algorithms**:
+    - **AES** (Advanced Encryption Standard) — *The current global standard*
+    - **DES / 3DES** (Data Encryption Standard) — *Legacy/Older standards*
+    - **SEED** — *A historically widely-used standard in South Korea*
+
+---
+
+### 🔑 Asymmetric Encryption (비대칭키 암호화)
+
+Here is the summary of page 14 from the lecture notes:
+
+- 👥 **Core Concept (Key Pairs)**: Asymmetric encryption works with a **pair of keys** instead of just one.
+    - 🌐 **Public Key (공개키)**: Distributed openly to anyone. It is used strictly for **encrypting** data.
+    - 🔒 **Private Key (개인키/비밀키)**: Kept completely hidden and known only to the owner. It is used strictly for **decrypting** data.
+- ✨ **Main Advantage (Solves Key Exchange)**: Since the public key can be openly shared with anyone over an insecure network without a threat, it perfectly **resolves the key distribution problem** found in symmetric encryption.
+- 🐌 **Main Disadvantage**: Because the underlying mathematical operations are highly complex, its **processing speed is significantly slower** compared to symmetric encryption.
+- 🤝 **Hybrid Usage (현대적 활용)**: In the real world (such as SSL/TLS protocols), it is commonly used in a **hybrid manner**—asymmetric encryption securely exchanges a temporary symmetric key, and then that fast symmetric key is used to encrypt the actual bulk data.
+- 🛠️ **Representative Algorithms**:
+    - **RSA** (Rivest–Shamir–Adleman) — *The traditional and widely-used standard based on prime factorization*
+    - **ECC** (Elliptic Curve Cryptography) — *A highly efficient modern standard offering strong security with much shorter key lengths*
+
+---
+
+### ⚖️ Symmetric vs. Asymmetric Comparison
+
+| **Feature** | **Symmetric Encryption (대칭키)** | **Asymmetric Encryption (비대칭키)** |
+| --- | --- | --- |
+| **Key Used** | One shared key for both sides | A pair (Public & Private) |
+| **Key Distribution** | Difficult (must share secretly) | Easy (public key is shared openly) |
+| **Processing Speed** | **Very Fast** | Relatively Slow |
+| **Primary Use Case** | Large volume data encryption | Secure key exchange & digital signatures |
+- **Complementary Strengths**: Rather than choosing one, modern systems (like HTTPS/TLS) use a **hybrid approach** to leverage the best of both:
+    - **Asymmetric encryption** is used first to securely exchange a symmetric key.
+    - Once established, **symmetric encryption** is used for the actual high-speed communication of data.
+
+---
+
+### ✍️ Digital Signature (전자서명)
+
+- **🛡️ Core Objective (Non-Repudiation)**: The primary goal of a digital signature is **non-repudiation** (부인방지). Because a digital signature is created using the signer's **private key**—which only the owner possesses—the signer cannot later deny having signed the document. It serves as the foundation for legal validity in digital transactions.
+- **⚙️ How It Works**: A digital signature effectively combines hashing and asymmetric encryption:
+    1. The document's content is hashed to create a fixed-size "fingerprint."
+    2. This hash is encrypted using the sender's **private key**.
+    3. The recipient verifies the signature by decrypting it with the sender's **public key** and comparing the resulting hash with a freshly generated hash of the received document.
+- **🔑 Key Role**: The mechanism relies entirely on the secrecy of the private key. If the private key is kept secure, the signature acts as an unforgeable, authentic proof of origin and integrity.
+
+---
+
+# HTTPS, TLS, X.509 Certificate
+
+- 🌐 **Understand HTTPS & TLS**: Learn how HTTP over TLS (HTTPS) provides secure communication by encrypting data transmitted between a web client and a server.
+- 🔐 **Mechanism of TLS Handshake**: Explore the step-by-step TLS handshake process, which includes cipher suite negotiation, server authentication, and the exchange of session keys.
+- 📜 **Master X.509 Certificates**: Understand the structure and role of X.509 digital certificates in verifying the identity of servers and establishing trust through a Certificate Authority (CA).
+- ✅ **Trust Infrastructure**: Examine the chain of trust (Root CA, Intermediate CA) and how browsers/clients validate certificates to prevent man-in-the-middle attacks.
+
+---
+
+### 🌐 HTTP vs. HTTPS
+
+Here is a summary of the key differences between HTTP and HTTPS:
+
+- **HTTP (HyperText Transfer Protocol)**:
+    - **Data Transmission**: Transfers data in **plaintext** (unencrypted).
+    - **Security Risk**: Because data is not encrypted, it is vulnerable to eavesdropping, packet sniffing, and tampering by malicious third parties.
+    - **Port**: Uses port **80** by default.
+- **HTTPS (HTTP Secure)**:
+    - **Data Transmission**: Transfers data over an encrypted connection using **TLS (Transport Layer Security)**.
+    - **Core Benefits**:
+        - **Confidentiality**: Encrypts the session so attackers cannot read the data.
+        - **Integrity**: Ensures that data has not been altered during transit.
+        - **Authentication**: Uses SSL/TLS certificates to verify that the website is genuine and owned by the entity it claims to be.
+    - **Port**: Uses port **443** by default.
+
+---
+
+### 🔑 Symmetric Key Practice
+
+- **Practical Objective**: The goal is to experience the actual encryption/decryption process and visually confirm that the data cannot be read without the correct key.
+- **Key Commands Used**:
+    - **Encryption**: Uses the `openssl enc` command with a symmetric algorithm (e.g., AES) to turn plaintext into ciphertext.
+    - **Decryption**: Uses the `openssl enc -d` command to revert the ciphertext back to the original plaintext using the same secret key.
+- **Testing Steps**:
+    1. Create a sample text file (e.g., containing sensitive info like `steven0123:abcd1234`).
+    2. Perform encryption and decryption to verify the process.
+    3. Confirm that attempting to decrypt with an incorrect key results in a failure, demonstrating the critical importance of keeping the secret key secure and correctly shared.
+
+```bash
+# Encryption example
+$ openssl enc -aes-256-cbc -salt -pbkdf2 -in <input filename> -out <output filename>
+
+# Decryption example
+$ openssl enc -d -aes-256-cbc -pbkdf2 -in <input filename> -out <output filename>
+```
+
+---
+
+### 🔑 Asymmetric Key Practice
+
+- **Objective**: To gain hands-on experience by performing encryption and decryption to verify the security mechanism of asymmetric key pairs.
+- **Practical Steps**:
+    1. Create a sample text file (`plain.txt`) containing sensitive data.
+    2. Use the `openssl pkeyutl -encrypt` command with a public key (`public-key.pem`) to generate a ciphertext file (`cipher.bin`).
+    3. Use the `openssl pkeyutl -decrypt` command with the matching private key (`private-key.pem`) to restore the original plaintext.
+- **Takeaway**: This exercise visually confirms that unauthorized parties lacking the correct private key cannot decrypt the data, effectively illustrating the security of asymmetric encryption.
+
+```bash
+# Generate RSA private key
+$ openssl genrsa -out <private key> 2048 # 2048-bit RSA
+
+# Extract public key
+$ openssl rsa -in <private key> -pubout -out <public key>
+
+# Signing digital signature
+$ openssl dgst -sha256 -sign <private key> -out <output file> <input file>
+
+# Validating digital signature
+$ openssl dgst -sha256 -verify <public key> -signature <signature file> <signature message file>
+```
+
+---
+
+### 🧩 Hybrid Encryption (하이브리드 암호화)
+
+- **The Problem**:
+    - Symmetric encryption is **fast** but suffers from a difficult **key distribution** problem.
+    - Asymmetric encryption solves the key distribution problem but is **significantly slower**.
+- **The Solution (Hybrid)**:
+    - It uses **asymmetric encryption** to securely share a temporary **symmetric key** (often called a Session Key) between the sender and receiver.
+    - Once the session key is safely exchanged, the actual large-volume data is encrypted and transmitted using that fast **symmetric key**.
+- **Real-World Application**: This is the fundamental mechanism behind secure web communications like **HTTPS (TLS)**, where a handshake establishes a secure session key using asymmetric encryption, followed by symmetric encryption for the rest of the data transfer.
+
+---
+
+### 🌐 HTTPS Entire Process
+
+- **1. Initial Handshake & Authentication**:
+    - The client initiates the connection to the server.
+    - The server sends its **Digital Certificate (X.509)** to the client.
+    - The client verifies the certificate using a trusted Certificate Authority (CA) to ensure the server is authentic.
+- **2. Session Key Exchange (Asymmetric)**:
+    - The client and server perform an asymmetric key exchange (e.g., using RSA or Diffie-Hellman) to securely agree upon a temporary **Symmetric Session Key**.
+- **3. Secure Data Transmission (Symmetric)**:
+    - Once the session key is established, both parties switch to **Symmetric Encryption** to encrypt all subsequent HTTP data transferred during the session.
+    - This provides high-speed encryption for the actual application data while maintaining high security.
+
+---
+
+### rootCA → Server certificate practice
+
+#### Generating CA - rootCA.pem
+
+```bash
+# Generate a 4096-bit RSA private key and save to rootCA.key
+$ openssl genrsa -out rootCA.key 4096
+
+# Generate a self-signed X.509 certificate for a root CA, using the private key generated
+$ openssl req -x509 -new -key rootCA.key -days 3650 \
+  -out rootCA.pem -subj "/CN=KopoRootCA"
+  
+# Inspect the root CA certificate without extracting or modifying it
+$ openssl x509 -in rootCA.pem -noout -subject -issuer
+```
+
+#### Server Certificate Request
+
+```bash
+# Generate a Certificate Signing Request (CSR) for a server certificate
+$ openssl req -new -key private-key.pem -out server.csr \
+  -subj "/CN=stevenjlee.net"
+  
+# Sign the server CSR with the root CA, producing a valid server certificate
+$ openssl x509 -req -in server.csr \
+  -CA rootCA.pem -CAkey rootCA.key -CAcreateserial \
+  -out certificate-public.pem -days 365
+  
+# Verify that the server certificate was properly signed by the root CA
+$ openssl verify -CAfile rootCA.pem certificate-public.pem
+```
+
+---
+
+# Containerize Everything
+
+- **🐳 Containerize Legacy Architectures**: Learn how to transition monolithic or traditional multi-tier software structures into fully containerized application environments.
+- **⚙️ Implement Complete Application Stacks**: Master the deployment of coupled software environments—such as a Java/Spring backend, a database instance, and a load balancer—running seamlessly together inside a container ecosystem.
+- **🛡️ Hardening & Resource Optimization**: Explore how to configurationally lock down container permissions, apply precise memory/CPU cgroup limits, and eliminate redundant system components to achieve lightweight, high-performance runtime architectures.
+
+---
+
+### 🐳 VM vs. Container (가상머신과 컨테이너)
+
+- **💻 Virtual Machines (Hypervisor-based Virtualization)**:
+    - **Structure**: Runs on a **Hypervisor** layer above the physical hardware. Each VM includes a complete **Guest OS**, along with all necessary binaries, libraries, and the application itself.
+    - **Characteristics**: Highly isolated and secure, but carries significant overhead. It requires a lot of memory and storage, and boot times are relatively slow because an entire operating system must initialize.
+- **📦 Containers (OS-level Virtualization)**:
+    - **Structure**: Runs directly on top of the host operating system's kernel using a **Container Engine** (like Docker). Instead of bundling a Guest OS, containers share the **Host OS kernel** and isolate applications at the process level using Linux namespaces and cgroups.
+    - **Characteristics**: Extremely lightweight, highly efficient with resource utilization (CPU/Memory), and boots almost instantly (within seconds).
+
+---
+
+### 🐳 3 Core Elements of Docker (도커의 3대 요소)
+
+- **🖼️ 1. Image (이미지 · 설계도)**:
+    - A **read-only snapshot** that bundles the OS, libraries, and application environment needed to run a piece of software.
+    - Once created, it is completely immutable (unchanging).
+    - *Analogy*: A blueprint, recipe, or a CD-ROM game block.
+- **📦 2. Container (컨테이너 · 실행체)**:
+    - An **active, isolated process** created by executing an Image.
+    - While the underlying image remains read-only, the container adds a writable layer on top so it can store and alter runtime state independently.
+    - *Analogy*: A building constructed from the blueprint, a dish cooked from the recipe, or the game actively running on a console.
+- **🌐 3. Registry (레지스트리 · 보관소)**:
+    - A centralized service or **storage repository** where Docker Images are uploaded, stored, and shared.
+    - **Docker Hub** serves as the default public registry, but organizations often use private registries for proprietary security.
+    - *Analogy*: An App Store, Git Repository, or cloud drive for blueprints.
+
+---
+
+### Commonly Used Docker Commands
+
+- **🐳 Image Management**:
+    - `docker pull <image_name>`: Downloads a target image from a remote storage registry (e.g., Docker Hub) to your local environment.
+    - `docker images`: Displays a comprehensive list of all Docker images currently stored locally on your host machine.
+    - `docker rmi <image_id>`: Removes one or more specified local images to free up host disk space.
+    - `docker search <image_name>` : Searches the image name in Docker Hub.
+- **📦 Container Lifecycle & Operations**:
+    - `docker run <options> <image_name>`: Creates and dynamically launches a new container instance from a designated image.
+    - `docker ps`: Lists all actively running containers. Appending the `a` flag (`docker ps -a`) reveals all containers, including those that have exited or stopped.
+    - `docker stop <container_id>`: Gracefully terminates an active container process.
+    - `docker rm <container_id>`: Permanently deletes a stopped container environment from the host system.
+- **🔍 Monitoring & Debugging**:
+    - `docker logs <container_id>`: Fetches and displays the standard output (stdout) and error logs generated inside the container, essential for diagnostic troubleshooting.
+    - `docker exec -it <container_id> <command>`: Opens an interactive terminal session inside a running container, allowing you to directly inspect internal files and state.
+
+---
+
+### Docker Installation
+
+```bash
+# 1. Storage Preparation
+$ sudo apt update
+$ sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# 2. Docker Installation
+$ sudo apt update
+$ sudo apt install docker-ce docker-ce-cli containerd.io
+
+# 3. Validate status
+sudo systemctl status docker # Use 4. commands if it does not work
+sudo usermod -aG docker $USER # Must restart to take effect
+sudo docker run hello-world
+
+# === 4. Solution ===
+$ sudo systemctl reset-failed docker.service docker.socket
+$ sudo systemctl start docker.socket
+$ sudo systemctl start docker.service
+```
+
+---
+
+# Port, Volume, Dockerfile, Compose
+
+- 🌐 **Port Forwarding**: Learn how to bridge network traffic between the host machine and isolated containers, allowing external clients to access containerized services.
+- 💾 **Data Persistence & Volumes**: Master mechanisms to decouple data storage from the container lifecycle, ensuring that database updates or user uploads are safely preserved even if a container is deleted or recreated.
+- 🛠️ **Infrastructure as Code with Dockerfile**: Understand how to write a text script containing automated build instructions to generate customized, reproducible Docker images from scratch.
+- 🎼 **Multi-Container Orchestration with Docker Compose**: Explore how to use a single YAML file to define, configure, and orchestrate complex, interconnected application architectures (such as linking a web server, API backend, and database).
+
+---
+
+### 🌐 Port Mapping
+
+- **🧱 The Problem (Network Isolation)**:
+    - By default, a Docker container runs inside its own isolated network namespace.
+    - Even if a web server application inside the container is listening on a specific port (e.g., port 80), external clients cannot access it because the container's network is completely private and hidden from the host's external network interface.
+- **⚙️ The Solution (Port Mapping)**:
+    - Port mapping connects a specific port on the **Host OS** to a designated port inside the **Container**.
+    - This connection is defined using the `d` flag when running a container:
+        
+        `docker run -d <Host_Port>:<Container_Port> <Image_Name>`.
+        
+- **🚗 How Traffic Flows**:
+    - When an external request arrives at the specified port on the host machine, the host network interface transparently forwards that traffic directly into the isolated container's target port.
+    - *Example*: If you map `d 8080:80`, any traffic coming to `http://localhost:8080` on the host machine will automatically redirect to port `80` inside the container.
+
+---
+
+### 💾 Volume Mount
+
+- **❌ The Problem (Data Loss)**:
+    - By default, a Docker container's internal writable layer is **ephemeral**.
+    - If a database container is stopped and deleted (`docker rm`), any data written to it (such as database logs, configurations, or tables) is completely lost with the container.
+- **⚙️ The Solution (Volume Mount)**:
+    - To solve this data volatility problem, Docker maps a designated storage directory on the **Host machine** to a target folder path inside the **Container**.
+    - This persists data onto the host's actual disk storage independently of the container's lifecycle.
+- **🛠️ Command Syntax**:
+    - Volume mounts are specified at runtime using the `v` flag:
+        
+        `docker run -v <Host_Directory_Path>:<Container_Directory_Path> <Image_Name>`
+        
+    - **Example**: Mapping `v /my/host/data:/var/lib/mysql` ensures that any logs, transactions, or state configurations generated inside the database directory are instantly recorded and safely kept on the host system.
+- **✨ Key Benefits**:
+    - **Data Persistence**: Upgrading or deleting the container will not lose critical system or application data.
+    - **Data Sharing**: Allows multiple container processes or the host system to easily read and write to the same shared files simultaneously.
+
+---
+
+### 🛠️ Dockerfile
+
+- **📜 Core Definition**: A text file that contains an ordered series of sequential instructions or commands used to build a customized, reproducible Docker image from scratch. Instead of configuring environments manually, it allows you to define your system infrastructure completely as code.
+- **🧱 Key DSL Keywords (주요 핵심 키워드)**:
+    - **`FROM` (기반 이미지)**: Specifies the base starter image from which the build starts (e.g., `ubuntu`, `alpine`, `node:20`, `nginx:alpine`).
+    - **`COPY` (파일 복사)**: Transfers local source codes, configuration files, or static web assets from the host machine directly into the file layer inside the target Docker image.
+    - **`RUN` (명령어 실행 / 빌드 타임)**: Runs shell commands (such as package installations like `apt-get install` or package updates) **during the image building phase** to create permanent static layers inside the image.
+    - **`CMD` (컨테이너 실행 명령 / 런타임)**: Specifies the final default executable runtime process that executes automatically **when the container is launched** (e.g., initializing a java backend script or launching a web server).
+
+---
+
+### 🎼 Docker Compose
+
+- **❌ The Problem (Complex Management)**:
+    - Real-world applications rarely consist of just a single container. They usually require multiple interconnected services, such as a frontend web server, a backend API, and a database.
+    - Managing these services manually using standard `docker run` commands becomes tedious, error-prone, and difficult to maintain as you have to manually configure networks, volumes, and links for every single container.
+- **⚙️ The Solution (Docker Compose)**:
+    - Docker Compose allows you to define your entire multi-container application architecture in a single, human-readable configuration file named **`docker-compose.yml`**.
+    - It treats your infrastructure as code, enabling you to spin up or tear down the entire stack with a single command.
+- **🛠️ Core Commands**:
+    - `docker compose up`: Automatically builds, creates, connects, and starts all the containers and resources defined in the configuration file simultaneously.
+    - `docker compose down`: Gracefully stops and completely removes all the containers, networks, and volumes created by the `up` command, leaving the host system clean.
+
+---
