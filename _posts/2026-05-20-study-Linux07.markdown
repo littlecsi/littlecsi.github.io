@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] 07 Linux Storage & Monitoring'
+title: '[Linux] 07 Storage & Monitoring'
 subtitle: 'Linux Storage & Monitoring'
 categories: study
 tags: Linux
