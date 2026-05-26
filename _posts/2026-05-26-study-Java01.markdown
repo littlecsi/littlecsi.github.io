@@ -35,7 +35,7 @@ comments: true
 - [Period 5 — 연산자와 사용자 입력](#period-5--연산자와-사용자-입력)
   - [산술 연산자 5가지 + 대입 축약](#산술-연산자-5가지--대입-축약)
   - [비교 연산자 (Comparison Operators) — 결과는 항상 boolean](#비교-연산자-comparison-operators--결과는-항상-boolean)
-  - [논리 연산자 (Logical Operators) — \&\& • || • !](#논리-연산자-logical-operators------)
+  - [논리 연산자 (Logical Operators)](#논리-연산자-logical-operators)
   - [Scanner (화면 입력) — 콘솔에서 값 입력 받기](#scanner-화면-입력--콘솔에서-값-입력-받기)
   - [실습 1 — 두 수 입력받아 더하기](#실습-1--두-수-입력받아-더하기)
   - [실습 2 — BMI 계산기](#실습-2--bmi-계산기)
@@ -636,7 +636,7 @@ public class PriceCalculator {
 
 ---
 
-## 논리 연산자 (Logical Operators) — && • || • !
+## 논리 연산자 (Logical Operators)
 
 - **🧠 논리 연산자의 개념**:
     - 주어진 복수의 조건식(또는 참/거짓 값)들을 결합하여 하나의 거대한 논리적 판단을 수행하는 연산자임.
