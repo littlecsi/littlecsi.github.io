@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] Linux 09 Digital Security & Docker'
+title: '[Linux] 09 Digital Security & Docker'
 subtitle: 'Digital Security & Docker'
 categories: study
 tags: Linux

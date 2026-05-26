@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '[Linux] 08 Linux Shell Programming & Git'
+title: '[Linux] 08 Shell Programming & Git'
 subtitle: 'Linux Shell Programming & Git'
 categories: study
 tags: Linux
