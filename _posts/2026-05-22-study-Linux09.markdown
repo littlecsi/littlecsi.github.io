@@ -7,6 +7,8 @@ tags: Linux
 comments: true
 ---
 
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
 - [Digital Security \& Encryption](#digital-security--encryption)
   - [Why Security is Required: The 3 Core Information Threats 🛡️⚠️](#why-security-is-required-the-3-core-information-threats-️️)
     - [🛑 The 3 Major Information Threats](#-the-3-major-information-threats)

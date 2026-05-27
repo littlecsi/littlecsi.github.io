@@ -7,6 +7,8 @@ tags: Linux
 comments: true
 ---
 
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
 - [Learning Objectives: Block Devices \& Disk Usage 🎯](#learning-objectives-block-devices--disk-usage-)
 - [Storage Devices](#storage-devices)
     - [💡 Core Definition: Computer's "Chest of Drawers"](#-core-definition-computers-chest-of-drawers)
