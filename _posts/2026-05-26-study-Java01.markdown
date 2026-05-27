@@ -7,6 +7,8 @@ tags: Java
 comments: true
 ---
 
+![Java](/assets/img/study/java.jpeg)
+
 - [Period 1 — JDK 21 • IntelliJ • Claude Code • HelloWorld](#period-1--jdk-21--intellij--claude-code--helloworld)
   - [자바는 어떤 언어인가?](#자바는-어떤-언어인가)
   - [WORA — Write Once, Run Anyware](#wora--write-once-run-anyware)

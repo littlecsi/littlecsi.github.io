@@ -7,6 +7,8 @@ tags: Java
 comments: true
 ---
 
+![Java](/assets/img/study/java.jpeg)
+
 - [Period 01 — 분기를 시작하다](#period-01--분기를-시작하다)
   - [제어문이 필요한가?](#제어문이-필요한가)
   - [if문 (조건문) — 조건이 참일 때만](#if문-조건문--조건이-참일-때만)
