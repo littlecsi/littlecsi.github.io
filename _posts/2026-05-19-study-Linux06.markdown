@@ -7,6 +7,8 @@ tags: Linux
 comments: true
 ---
 
+![Ubuntu](/assets/img/study/linux/ubuntu.svg)
+
 - [Learning Objectives: Network \& Cabling 🎯](#learning-objectives-network--cabling-)
 - [What is a Network?](#what-is-a-network)
     - [💡 Core Definition](#-core-definition)
