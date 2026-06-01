@@ -1,7 +1,7 @@
 ---
 layout: post
-title: '[Java] Java 04 Starter to Object-Oriented Programming'
-subtitle: 'Starter to Object-Oriented Programming'
+title: '[Java] Java 05 Relationship between Objects'
+subtitle: 'Relationship between Objects'
 categories: study
 tags: Java
 comments: true
@@ -9,1560 +9,977 @@ comments: true
 
 ![Java](/assets/img/study/java.jpeg)
 
-- [Period 01 — 이름과 점수를 따로따로 들고 다니지 마세요](#period-01--이름과-점수를-따로따로-들고-다니지-마세요)
-  - [붕어빵틀과 붕어빵 — “묶음”을 자바가 부르는 이름](#붕어빵틀과-붕어빵--묶음을-자바가-부르는-이름)
-  - [실습 1 — 평행 배열, 한 번 직접 써본다](#실습-1--평행-배열-한-번-직접-써본다)
-  - [실습 2 - 이름을 가나다순으로 정렬하면, 어떻게 되나?](#실습-2---이름을-가나다순으로-정렬하면-어떻게-되나)
-  - [데이터 무결성 붕괴 현장 — 조용히 주인이 바뀌다](#데이터-무결성-붕괴-현장--조용히-주인이-바뀌다)
-  - [실습 3 — “한 묶음”을 만들어볼 수 없을까? (String\[\]\[\] 시도)](#실습-3--한-묶음을-만들어볼-수-없을까-string-시도)
-- [Period 02 — 붕어빵틀과 붕어빵](#period-02--붕어빵틀과-붕어빵)
-  - [한 줄 코드, 메모리 두 곳에 흔적](#한-줄-코드-메모리-두-곳에-흔적)
-  - [실습 1 — 첫 클래스 (Student 정의 + 객체 1개 만들기)](#실습-1--첫-클래스-student-정의--객체-1개-만들기)
-  - [실습 2 — 붕어빵 3마리 (한 틀로 객체 여러 개)](#실습-2--붕어빵-3마리-한-틀로-객체-여러-개)
-  - [new없는 참조의 운명 — NullPointerException](#new없는-참조의-운명--nullpointerexception)
-  - [실습 3 — 객체 배열의 함정(만들었는데 또 NullPointerException?)](#실습-3--객체-배열의-함정만들었는데-또-nullpointerexception)
-  - [도전 문제 — BankAccount 클래스](#도전-문제--bankaccount-클래스)
-- [Period 03 — 객체에게 일을 시키자](#period-03--객체에게-일을-시키자)
-  - [객체 안에는 두 칸이 있다 — 상태와 동작](#객체-안에는-두-칸이-있다--상태와-동작)
-  - [실습 1 — 첫 메서드 introduce()](#실습-1--첫-메서드-introduce)
-  - [실습 2 — 변환값 있는 메서드 bonus()](#실습-2--변환값-있는-메서드-bonus)
-  - ["보기엔 같은데" 실험 — 참조 비교의 본질](#보기엔-같은데-실험--참조-비교의-본질)
-  - [실습 3 — “값 동일성”을 직접 만들기 sameAs()](#실습-3--값-동일성을-직접-만들기-sameas)
-    - [1) `a.sameAs(a)` — 자기 자신과 비교하면?](#1-asameasa--자기-자신과-비교하면)
-    - [2) `a.sameAs(null)` — null 넣으면?](#2-asameasnull--null-넣으면)
-    - [3) name만 다르고 score는 같으면? 점수만 다르면?](#3-name만-다르고-score는-같으면-점수만-다르면)
-  - [도전 문제 — Book의 isExpensive() + sameAs()](#도전-문제--book의-isexpensive--sameas)
-    - [**완성 후 추가 도전.** Book 객체 4권을 \*\*Book\[4\]\*\*에 담아 for로 돌면서 비싼 책만 골라 제목을 출력하세요.](#완성-후-추가-도전book-객체-4권을book4에-담아-for로-돌면서-비싼-책만-골라-제목을-출력하세요)
-- [Period 04 — 객체는 어떻게 태어나는가](#period-04--객체는-어떻게-태어나는가)
-  - [생성자 문법 + this의 정체](#생성자-문법--this의-정체)
-  - [실습 1 — 매개변수 있는 생성자 (한 줄로 객체 만들기)](#실습-1--매개변수-있는-생성자-한-줄로-객체-만들기)
-  - [실습 2 — 생성자 오버로딩 (같은 이름, 다른 시그니처)](#실습-2--생성자-오버로딩-같은-이름-다른-시그니처)
-  - [사라진 기본 생성자 — 컴파일러의 배신](#사라진-기본-생성자--컴파일러의-배신)
-  - [실습 3 — 실험 (this를 빼면 어떻게 될까?)](#실습-3--실험-this를-빼면-어떻게-될까)
-  - [도전 문제 — Car 클래스 (생성자 3종 오버로딩)](#도전-문제--car-클래스-생성자-3종-오버로딩)
-- [Period 05 — 외부와 내부, 그 사이의 벽](#period-05--외부와-내부-그-사이의-벽)
-  - [접근 제어자 + Getter / Setter 패턴](#접근-제어자--getter--setter-패턴)
-  - [실습 1 — 필드 private + getter/setter (컴파일러가 막아준다)](#실습-1--필드-private--gettersetter-컴파일러가-막아준다)
-  - [setter에 문지기 — 검증 로직 넣기](#setter에-문지기--검증-로직-넣기)
-  - [잠깐 — getter/setter 다 만들면 private의 의미가 없잖아?](#잠깐--gettersetter-다-만들면-private의-의미가-없잖아)
-  - [실습 3 — read-only (한 번 정해지면 못 바꾸는 필드)](#실습-3--read-only-한-번-정해지면-못-바꾸는-필드)
-  - [도전 문제 — Account 클래스 (deposit / withdraw로만 잔액을 바꾼다)](#도전-문제--account-클래스-deposit--withdraw로만-잔액을-바꾼다)
-    - [transfer(Account other, int amount)](#transferaccount-other-int-amount)
-- [Period 06 — 객체에 속하는가 클래스에 속하는가](#period-06--객체에-속하는가-클래스에-속하는가)
-  - [메모리 — 세 번째 영역 등장 (Static / Method 영역)](#메모리--세-번째-영역-등장-static--method-영역)
-  - [실습 1 — 학생 인원 세기 (static int totalCount)](#실습-1--학생-인원-세기-static-int-totalcount)
-  - [실습 2 — 유틸리티 메서드 (객체와 무관한 일)](#실습-2--유틸리티-메서드-객체와-무관한-일)
-    - [언제 static 메서드?](#언제-static-메서드)
-      - [적합한 경우](#적합한-경우)
-      - [부적합한 경우](#부적합한-경우)
-  - ["모두 함께 바뀐다" 실험 — static 변수의 공유성](#모두-함께-바뀐다-실험--static-변수의-공유성)
-  - [실습 3 — static 안에서 instance 필드를 쓰면?](#실습-3--static-안에서-instance-필드를-쓰면)
-  - [도전 문제 — Counter(instance 버전 vs static 버전, 출력으로 차이 증명)](#도전-문제--counterinstance-버전-vs-static-버전-출력으로-차이-증명)
-- [Period 07 — v0를 객체로 다시 짓다](#period-07--v0를-객체로-다시-짓다)
-    - [Student  완성](#student--완성)
-    - [GradeAppV1](#gradeappv1)
-  - [메뉴 \[5\] 학번 검색 + 메뉴 \[6\] 학생 추가 — 한계까지 가보기](#메뉴-5-학번-검색--메뉴-6-학생-추가--한계까지-가보기)
+- [Period 01 상속(extends) — 코드 복붙을 끝내자](#period-01-상속extends--코드-복붙을-끝내자)
+  - [extends 문법 + 관계 그림 (UML)](#extends-문법--관계-그림-uml)
+  - [실습 2 Person → Student 첫 상속](#실습-2-person--student-첫-상속)
+  - [실습 2 Teacher를 추가해라 — 코드 중복이 사라진다](#실습-2-teacher를-추가해라--코드-중복이-사라진다)
+  - [잠깐 — Person을 건드렸을 뿐인데 Student가 죽는다](#잠깐--person을-건드렸을-뿐인데-student가-죽는다)
+    - [자바 컴파일러의 숨은 규칙](#자바-컴파일러의-숨은-규칙)
+  - [실습 3 고치는 법 — super(name, age) 명시 호출](#실습-3-고치는-법--supername-age-명시-호출)
+  - [도전 문제 — Vehicle 가족 만들기](#도전-문제--vehicle-가족-만들기)
+    - [Vehicle에서 매개변수 생성자를 지우고 자식만 두면?](#vehicle에서-매개변수-생성자를-지우고-자식만-두면)
+- [Period 02 오버라이딩(@Override) — 자식이 부모를 덮어쓰는 법](#period-02-오버라이딩override--자식이-부모를-덮어쓰는-법)
+  - [왜 오버라이딩 — 부모 그대로면 어색하다](#왜-오버라이딩--부모-그대로면-어색하다)
+  - [오버라이딩 규칙 — 시그니처가 완전히 같아야 한다](#오버라이딩-규칙--시그니처가-완전히-같아야-한다)
+  - [실습 1 greet() 오버라이딩 — 학생과 교사를 다르게](#실습-1-greet-오버라이딩--학생과-교사를-다르게)
+  - [실습 2 super.greet() — 부모 인사를 먼저, 내 인사를 나중에](#실습-2-supergreet--부모-인사를-먼저-내-인사를-나중에)
+  - [잠깐 — `toString()`은 영원히 호출되지 않는다](#잠깐--tostring은-영원히-호출되지-않는다)
+    - [진실 — 자바는 두 메서드를 별개로 본다](#진실--자바는-두-메서드를-별개로-본다)
+    - [@Override를 붙였다면?](#override를-붙였다면)
+  - [실습 3 toString() 정확히 — println이 자동으로 부르는 메서드](#실습-3-tostring-정확히--println이-자동으로-부르는-메서드)
+  - [도전 문제 — Bird 가족의 비행](#도전-문제--bird-가족의-비행)
+    - [flay() 오타](#flay-오타)
+    - [완성 후 추가 도전](#완성-후-추가-도전)
+- [Period 03 다형성 • 업캐스팅 • 다운캐스팅 • instanceof](#period-03-다형성--업캐스팅--다운캐스팅--instanceof)
+  - [업캐스팅(자동) vs 다운캐스팅(명시)](#업캐스팅자동-vs-다운캐스팅명시)
+  - [실습 1 Person\[\]에 학생 • 교사 섞어 담기](#실습-1-person에-학생--교사-섞어-담기)
+  - [실습 2 instanceof — 학생일 때만 study() 호출하기](#실습-2-instanceof--학생일-때만-study-호출하기)
+  - [잠깐 — 객체는 Student인데 study()를 못 부른다고?](#잠깐--객체는-student인데-study를-못-부른다고)
+  - [위험한 캐스팅 vs 안전한 캐스팅](#위험한-캐스팅-vs-안전한-캐스팅)
+    - [위험 — CCE 시연](#위험--cce-시연)
+    - [안전 — instanceof 안전벨트](#안전--instanceof-안전벨트)
+  - [도전 문제 — 도서관 자료실](#도전-문제--도서관-자료실)
+- [Period 04 추상 클래스 abstract — 자식에게 강제하는 약속](#period-04-추상-클래스-abstract--자식에게-강제하는-약속)
+  - [abstract 문법 + UML 표기](#abstract-문법--uml-표기)
+  - [실습 1 abstract Person → Student / Teacher](#실습-1-abstract-person--student--teacher)
+  - [실습 2 Staff 추가 — Person 코드는 한 줄도 안 바뀜](#실습-2-staff-추가--person-코드는-한-줄도-안-바뀜)
+  - [잠깐 — abstract는 두 가지를 거절한다](#잠깐--abstract는-두-가지를-거절한다)
+  - [실습 3 — 일반 메서드 + 추상 메서드의 공존](#실습-3--일반-메서드--추상-메서드의-공존)
+  - [도전 문제 Employee 추상 계층](#도전-문제-employee-추상-계층)
+- [Period 05 인터페이스 — 능력 약속 + 다중 구현](#period-05-인터페이스--능력-약속--다중-구현)
+  - [interface 문법 + default 메서드](#interface-문법--default-메서드)
+  - [실습 1 Printable 인터페이스 + 다형성 그릇](#실습-1-printable-인터페이스--다형성-그릇)
+  - [실습 2 Loggable 추가 — Student는 두 능력을 가진다](#실습-2-loggable-추가--student는-두-능력을-가진다)
+  - [📌 47페이지: 잠깐 — 두 default가 같은 이름이면 다이아몬드](#-47페이지-잠깐--두-default가-같은-이름이면-다이아몬드)
+  - [실습 3 언제 abstract, 언제 interface?](#실습-3-언제-abstract-언제-interface)
+    - [abstract class vs interface 비교 요약](#abstract-class-vs-interface-비교-요약)
+  - [도전 문제 — Rankbale로 정렬](#도전-문제--rankbale로-정렬)
 
 
-# Period 01 — 이름과 점수를 따로따로 들고 다니지 마세요
+# Period 01 상속(extends) — 코드 복붙을 끝내자
 
-1. `String[] names`와 `int[] scores`를 따로 두면 어떤 위험이 있는지 설명할 수 있다.
-2. 평행 배열에서 한쪽만 정렬했을 때 데이터가 깨지는 현상을 직접 코드로 재현할 수 있다.
-3. “이름+점수는 한 사람의 정보다”라는 사실을 자바가 표현하지 못한다는 점을 알아챈다.
-4. “객체(object)”라는 개념이 왜 등장하는지, 다음 교시 `class`가 어떤 답이 될지 예측할 수 있다.
+1. `class B extends A` 문법으로 두 클래스를 부모-자식 관계로 만들 수 있다
+2. 자식 클래스에서 부모의 필드와 메서드를 그대로 재사용할 수 있다
+3. 객체 생성 시 `부모 -> 자식` 순서로 생성자가 호출되는 흐름을 설명할 수 있다
+4. 자식 생성자 첫 줄에 `super()`가 숨어 있으며, 부모에 기본 생성자가 없으면 컴파일 오류가 나는 이유를 안다
 
 ---
 
-## 붕어빵틀과 붕어빵 — “묶음”을 자바가 부르는 이름
+## extends 문법 + 관계 그림 (UML)
 
-- **🏗️ 클래스(Class)의 정의**
-    - 객체를 생성하기 위한 **설계도(Blueprint)** 또는 틀이다.
-    - 클래스 자체는 개념이자 규격일 뿐이며, 메모리에 물리적인 실체로 존재하며 작동하는 데이터가 아니다.
-- **🧱 객체(Object)의 정의**
-    - 클래스라는 설계도를 바탕으로 **메모리에 실제로 구현된 실체**이다.
-    - 자바 프로그램이 실행되는 동안 메모리 위에서 살아서 움직이는 모든 데이터 단위를 의미한다.
-- **⚡ 붕어빵틀과 붕어빵의 비유**
-    - 붕어빵틀(클래스)은 하나만 있으면 되지만, 이를 통해 찍어내는 붕어빵(객체)은 메모리 허용량이 허락하는 한 무한히 만들어낼 수 있다.
-    - 각각의 붕어빵은 메모리상에서 서로 독립적인 상태를 유지한다.
-
----
-
-## 실습 1 — 평행 배열, 한 번 직접 써본다
+- **🏗️ extends 키워드를 통한 상속 정의**
+    - 자바에서 상속을 구현할 때는 자식 클래스 선언 뒤에 `extends` 키워드를 붙이고 부모 클래스명을 지정한다. 이는 부모의 필드와 메서드를 자식이 물려받아 확장하겠다는 명시적 선언이다.
+- **🧱 UML 클래스 다이어그램의 상속 표현 규칙**
+    - 소프트웨어 설계도인 UML에서 상속 관계는 자식 클래스에서 부모 클래스를 향해 속이 빈 삼각형 화살표(실선)로 연결하여 표현한다. 화살표의 방향이 데이터의 흐름과 달리 자식에서 부모를 가리킨다는 점에 유의해야 한다.
+- **⚡ 단일 상속(Single Inheritance)의 원칙**
+    - 자바는 다중 상속을 허용하지 않으므로 `extends` 뒤에는 오직 단 하나의 클래스만 올 수 있다. 이를 통해 복잡한 다중 상속 구조에서 발생할 수 있는 메서드 모호성 문제를 원천적으로 차단한다.
 
 ```java
-public class StudentList {
-  public static void main(String[] args) {
-    String[] names  = {"홍길동", "김철수", "이민호", "박영희"};
-    int[]    scores = {92,        45,        88,        71      };
+public class Person {
+  protected String name;
+  protected int age;
 
-    System.out.println("=== 학생 목록 ===");
-    for (int i=0; i<names.length; i++) {
-      System.out.println(
-        (i+1) + ". " + names[i] + " — " + scores[i] + "점");
-    }
+  public void greet() {
+    System.out.println("안녕하세요 " + name);
   }
 }
-```
 
----
+public class Student extends Person {
+  private int score;     // 자식만의 추가 필드
 
-## 실습 2 - 이름을 가나다순으로 정렬하면, 어떻게 되나?
-
-```java
-import java.util.Arrays;
-
-public class StudentSort {
-  public static void main(String[] args) {
-    String[] names  = {"홍길동", "김철수", "이민호", "박영희"};
-    int[]    scores = {92,        45,        88,        71      };
-
-    // 이름만 가나다순으로 정렬해보자
-    Arrays.sort(names);   // ← 이 한 줄만!
-
-    for (int i=0; i<names.length; i++) {
-      System.out.println(
-        names[i] + " — " + scores[i] + "점");
-    }
+  public void study() {  // 자식만의 추가 메서드
+    System.out.println(name + " 공부 중");
   }
 }
-```
-
----
-
-## 데이터 무결성 붕괴 현장 — 조용히 주인이 바뀌다
-
-- **🏗️ 평행 배열 정렬의 치명적인 함정**
-    - `String[] names`와 `int[] scores`를 따로 운영하는 상황이 존재한다.
-    - 이때 이름 배열만 가나다순으로 정렬하는 `Arrays.sort(names)`를 실행하면 데이터 간의 동기화가 완전히 깨진다.
-- **🧱 데이터와 데이터의 연결고리 상실**
-    - 이름 배열의 인덱스는 마구 뒤섞이지만 점수 배열은 정렬되지 않고 기존 위치에 그대로 머물러 있게 된다.
-    - 이로 인해 원래 데이터의 쌍이 완전히 찢어지며, 특정 사람의 점수가 다른 사람의 점수로 둔갑하는 치명적인 왜곡이 발생한다.
-- **⚡ 무결성(Integrity) 파괴의 정의**
-    - 데이터가 정확성과 일관성의 규칙을 잃고 현실의 실체와 일치하지 않게 된 상태를 의미한다.
-    - 자바 컴파일러는 이 현상을 에러로 잡아내지 못하므로 시스템의 신뢰도를 떨어뜨리는 가장 무서운 버그가 된다.
-
----
-
-## 실습 3 — “한 묶음”을 만들어볼 수 없을까? (String[][] 시도)
-
-```java
-String[][] students = {
-  {"홍길동", "92"},   // ← 점수가 문자열이 됨!
-  {"김철수", "45"},
-  {"이민호", "88"},
-  {"박영희", "71"}
-};
-
-int sum = 0;
-for (String[] s : students) {
-  // "92"는 String — 더하려면 변환 필요
-  sum += Integer.parseInt(s[1]);
-}
-System.out.println("합계: " + sum);
 ```
 
 <aside>
-🚧
+🔑
 
-**살짝 나아짐**
-
-이름과 점수가 같은 행에 들어있다 — 동기화 위험 ⬇️
-학생 한 명을 한 객체처럼 다룰 수 있다 (students[i])
+**핵심:** Student는 `name age greet()`를 한줄도 안 적고 가집니다. `extends Person` 한 단어가 전부.
 
 </aside>
 
 ---
 
-# Period 02 — 붕어빵틀과 붕어빵
-
-1. `class Student { ... }`로 클래스를 정의하고 필드를 선언할 수 있다.
-2. `new Student()`로 객체를 만드로 `.`연산자로 필드에 접근할 수 있다.
-3. Stack의 참조 변수와 Heap의 객체를 메모리 그림으로 구분할 수 있다.
-4. NullPointerException이 왜 나는지, `new`없이는 무엇이 비어 있는지 설명할 수 있다.
-
----
-
-## 한 줄 코드, 메모리 두 곳에 흔적
-
-- **🏗️ 객체 생성 시 발생하는 물리적 분리 구조**
-    - `Student student = new Student();`와 같은 한 줄의 선언 코드가 실행되면, 자바 가상 머신(JVM)은 메모리를 단일 공간으로 처리하지 않고 **Stack(스택)** 영역과 **Heap(힙)** 영역 두 곳에 물리적인 흔적을 동시에 남긴다.
-- **🧱 Stack 영역의 흔적: 참조 변수(손)**
-    - 선언부인 `Student student`에 의해 Stack 영역에 실제 객체의 주소값(예: `0x2C7B`)을 가리킬 수 있는 변수 공간이 생성된다.
-    - 이는 실제 데이터 본체가 아니라, 데이터가 위치한 메모리 주소를 붙잡고 있는 '손'의 역할을 수행한다.
-- **⚡ Heap 영역의 흔적: 인스턴스 본체(제품)**
-    - 연산자 구문인 `new Student()`에 의해 Heap 영역의 빈 공간에 객체의 필드(상태)와 실제 데이터가 살아 움직일 수 있는 물리적인 인스턴스 본체가 독립적으로 할당된다.
-    - 최종적으로 Stack에 생성된 참조 변수방에 Heap 영역 인스턴스의 메모리 주소값이 대입되면서 두 곳의 메모리 흔적이 하나로 연결된다.
-
----
-
-## 실습 1 — 첫 클래스 (Student 정의 + 객체 1개 만들기)
+## 실습 2 Person → Student 첫 상속
 
 ```java
-// Student.java
-public class Student {
-  String name;
-  int    score;
+public class Person {
+  protected String name;
+  protected int age;
+
+  public void greet() {
+    System.out.println("안녕하세요 " + name);
+  }
 }
 ```
 
 ```java
-// StudentApp.java
-public class StudentApp {
+public class Student extends Person {
+  private int score;
+
+  public void study() {
+    System.out.println(name + "이(가) 공부합니다");
+  }
+}
+```
+
+```java
+public class SchoolMain {
   public static void main(String[] args) {
     Student s = new Student();
-    s.name  = "홍길동";
-    s.score = 92;
+    s.name = "홍길동";  // 부모 필드 사용
+    s.age = 20;
 
-    System.out.println(s.name + " " + s.score + "점");
+    s.greet();   // 부모 메서드 호출
+    s.study();   // 자식 메서드 호출
   }
 }
 ```
 
+```java
+안녕하세요 홍길동
+홍길동이(가) 공부합니다
+```
+
+> **관찰:** Student엔 name도 greet()도 한 줄도 없는데 **그대로 사용**된다. 부모가 가진 모든 것을 자식이 물려받았기 때문이다.
+> 
+
 ---
 
-## 실습 2 — 붕어빵 3마리 (한 틀로 객체 여러 개)
+## 실습 2 Teacher를 추가해라 — 코드 중복이 사라진다
 
 ```java
-public class StudentApp {
+public class Teacher extends Person {
+  private String subject;
+
+  public void teach() {
+    System.out.println(name + "이(가) 가르칩니다");
+  }
+}
+```
+
+```java
+public class SchoolMain {
   public static void main(String[] args) {
-    Student s1 = new Student();
-    s1.name="홍길동";  s1.score=92;
+    Student s = new Student();
+    s.name = "홍길동";
+    s.greet();  s.study();
 
-    Student s2 = new Student();
-    s2.name="김철수";  s2.score=45;
-
-    Student s3 = new Student();
-    s3.name="이민호";  s3.score=88;
-
-    System.out.println(s1.name+" "+s1.score);
-    System.out.println(s2.name+" "+s2.score);
-    System.out.println(s3.name+" "+s3.score);
+    Teacher t = new Teacher();
+    t.name = "김선생";
+    t.greet();  t.teach();
   }
 }
 ```
 
+```java
+안녕하세요 홍길동
+홍길동이(가) 공부합니다
+안녕하세요 김선생
+김선생이(가) 가르칩니다
+```
+
 ---
 
-## new없는 참조의 운명 — NullPointerException
+## 잠깐 — Person을 건드렸을 뿐인데 Student가 죽는다
+
+- **🏗️ 부모 클래스 변경의 연쇄 작용**
+    - 상속 관계에서 부모 클래스(`Person`)의 필드 타입이나 메서드 시그니처를 수정하면, 이를 상속받은 자식 클래스(`Student`)에 즉각적인 영향을 미친다. 부모를 수정했음에도 자식 클래스에서 컴파일 에러가 발생하는 '죽는' 현상이 나타난다.
+- **🧱 부모에 대한 과도한 의존성 (Tight Coupling)**
+    - 자식 클래스가 부모 클래스의 내부 구조를 너무 깊게 알고 의존하고 있을 때 이러한 문제가 발생한다. 부모 클래스의 사소한 변화가 자식 클래스 전체의 무결성을 깨뜨리며, 시스템의 유지보수 효율을 극도로 떨어뜨리는 결합도의 부작용이다.
+- **⚡ 캡슐화로 해결하는 상속의 위기**
+    - 자식 클래스에게 부모의 구현 세부 사항을 직접 노출하지 않고, 메서드 등을 통해 간접적으로 접근하도록 설계해야 한다. 상속은 강력한 도구이지만, 부모의 변경이 자식에게 전이되지 않도록 적절한 캡슐화 전략이 수반되어야 안전하다.
 
 ```java
-public class NpeDemo {
-  public static void main(String[] args) {
-    Student s;          // 선언만, new는 없음
+// Person.java — 매개변수 생성자 하나 추가
+public class Person {
+  protected String name;
+  protected int age;
 
-    System.out.println(s.name);  // ??
+  public Person(String name, int age) {
+    this.name = name;
+    this.age  = age;
+  }
+  // 기본 생성자(Person()) 자동 생성 멈춤!
+}
+
+// Student.java — 그대로 두면…
+public class Student extends Person {
+  private int score;
+  // public Student() { super(); }  ← 컴파일러가 몰래 넣음
+}
+```
+
+```
+Student.java:1: error: constructor Person in class Person
+cannot be applied to given types;
+required: String,int
+found: no arguments
+```
+
+### 자바 컴파일러의 숨은 규칙
+
+모든 자식 생성자의 **맨 첫줄**에 `super();` (인자 없는 부모 호출)가 **자동으로 끼워진다**. 학생이 적은 적이 없어도.
+
+```java
+public Student() {
+  super(); // ← 자동 삽입
+}
+```
+
+---
+
+## 실습 3 고치는 법 — super(name, age) 명시 호출
+
+```java
+public class Person {
+  protected String name;
+  protected int age;
+
+  public Person(String name, int age) {
+    this.name = name;
+    this.age  = age;
+    System.out.println("  ▶ Person 생성: " + name);
   }
 }
 ```
 
-- **🏗️ 참조 변수 선언과 null 초기화**
-    - `Student student;`와 같이 참조 변수만 선언하고 `new` 연산자를 이용해 객체를 생성하지 않으면 Stack 영역의 변수 공간에는 아무런 메모리 주소도 할당되지 않는다.
-    - 이 상태의 변수에는 가리키는 대상이 없음을 명시하는 `null` 값이 들어간다. 즉, 주소록에 이름만 적어두고 주소 칸은 비워둔 상태와 같다.
-- **🧱 가리킬 곳이 없는 점(`.`) 연산자의 실행**
-    - 자바에서 점(`.`) 연산자는 참조 변수에 저장된 메모리 주소(위치)로 찾아가서 필드나 메서드에 접근하라는 명령이다.
-    - 변수에 `null`이 들어있는 상태에서 `student.name = "홍길동";`과 같이 주소로 찾아가라는 명령을 내리면, 참조할 물리적 공간 자체가 존재하지 않기 때문에 컴퓨터는 길을 잃게 된다.
-- **⚡ NullPointerException (NPE) 발생의 결과**
-    - 가리킬 주소가 없는 상태에서 멤버에 접근을 시도하면 자바 가상 머신(JVM)은 즉시 `NullPointerException`이라는 치명적인 런타임 에러를 발생시킨다.
-    - 자바 컴파일러는 코드 문법 자체에 문제가 없으므로 컴파일 시점에 이를 잡아내지 못하며, 프로그램 실행 중에 시스템이 강제 종료되는 결과를 초래한다.
-
 ```java
-class Box { Student s; }   // 필드는 자동 null
+public class Student extends Person {
+  private int score;
 
-Box b = new Box();
-System.out.println(b.s.name);
-// Exception in thread "main"
-// java.lang.NullPointerException: Cannot read field
-//   "name" because "this.s" is null
-```
-
----
-
-## 실습 3 — 객체 배열의 함정(만들었는데 또 NullPointerException?)
-
-```java
-Student[] arr = new Student[3];
-
-// 배열은 만들어졌다 — 그런데 안의 Student는?
-System.out.println(arr[0]);          // → null
-System.out.println(arr[0].name);     // 💥
-```
-
-```bash
-$ java StudentArr
-null
-Exception in thread "main"
-java.lang.NullPointerException:
-Cannot read field "name"
-because "arr[0]" is null
-```
-
-```java
-// 올바른 사용 — 각 칸마다 new
-for (int i=0; i<arr.length; i++) {
-  arr[i] = new Student();
-  arr[i].name  = "학생" + i;
-  arr[i].score = 80 + i;
+  public Student(String name, int age, int score) {
+    super(name, age);    // ← 부모를 명시적으로 호출
+    this.score = score;
+    System.out.println("  ▶ Student 생성 완료");
+  }
 }
 ```
 
+```
+// new Student("홍길동", 20, 92);
+▶ Person 생성: 홍길동
+▶ Student 생성 완료
+```
+
 ---
 
-## 도전 문제 — BankAccount 클래스
+## 도전 문제 — Vehicle 가족 만들기
 
 > 
 > 
 > 
 > **// 문제**
 > 
-> **BankAccount** 클래스를 정의하고, **main**에서 2개의 계좌 객체를 만들어 잔액 출력
+> 부모 **Vehicle(int speed)**과 자식 두 종류 **Car(String brand)**, **Bicycle(int gear)**을 만들어라. 각 자식은 run() 메서드로 자기 정보를 출력해야 한다.
 > 
-> **// 클래스 요구사항**
+> **// 조건**
 > 
-> - 필드: **String** owner, **int** balance
-> - a1: 홍길동·10000, a2: 김철수·50000
-> 
-> **// 추가 미션**
-> 
-> 1. 두 계좌 출력 (예: "홍길동: 10000원")
-> 2. 일부러 **`BankAccount a3;`** 선언만 하고 a3.owner 출력 시 메시지 적어 오기
+> - Vehicle은 매개변수 생성자 **하나만** 정의 (기본 생성자 X)
+> - 각 자식 생성자에서 super(speed)를 명시 호출
+> - main에서 Car와 Bicycle을 각각 생성해 run() 호출
 
 ```java
-public class BankApp {
-    public static void main(String[] args) {
-        BankAccount a1 = new BankAccount();
-        a1.owner = "홍길동";
-        a1.balance = 10000;
-
-        BankAccount a2 = new BankAccount();
-        a2.owner = "김철수";
-        a2.balance = 50000;
-
-        System.out.println("=== 계좌 목록 ===");
-        System.out.println(a1.owner+": "+a1.balance+"원");
-        System.out.println(a2.owner+": "+a2.balance+"원");
-
-        BankAccount a3 = new BankAccount();
-        System.out.println(a3.owner);
+public class Vehicle {
+    protected int speed;
+    public Vehicle(int speed) {
+        this.speed = speed;
     }
 }
 ```
 
----
-
-# Period 03 — 객체에게 일을 시키자
-
-1. 클래스에 메서드를 정의하고 `객체.메서드()`로 호출할 수 있다
-2. 메서드 안에서 자기 필드를 읽고 쓰는 동작을 작성할 수 있다
-3. `==` 는 참조(주소)를 비교하고 `equals`는 값을 비교한다는 차이를 설명할 수 있다
-4. 두 객체의 “값 동일성”을 판별하는 `sameAs()`메서드를 직접 작성할 수 있다
-
----
-
-## 객체 안에는 두 칸이 있다 — 상태와 동작
-
-- **🏗️ 상태(Field)와 동작(Method)의 물리적 분리**
-    - 클래스를 통해 Heap 영역에 생성된 인스턴스(객체) 내부 구조를 들여다보면, 메모리상에서 크게 고유 데이터 상태를 담는 칸과 실행 코드를 가리키는 칸 두 가지 영역으로 정밀하게 쪼개져 존재한다.
-- **🧱 첫 번째 칸: 인스턴스 멤버 변수 (상태)**
-    - 객체가 가져야 하는 고유한 속성값들이 저장되는 공간이다. 예를 들어 `Student` 객체라면 `name`, `score` 같은 필드 데이터가 각각 변수 타입에 맞는 크기만큼 할당되어 실제 데이터 값을 보관한다.
-    - 이 영역은 Heap 메모리에 생성되는 객체마다 완전히 독립된 물리 공간으로 매번 새로 할당되므로, 객체 고유의 상태를 유지할 수 있다.
-- **⚡ 두 번째 칸: 메서드 영역 참조 주소 (동작)**
-    - 객체의 동작을 정의하는 메서드 코드가 저장되는 공간이다. 다만, 수천 개의 객체가 생성될 때마다 동일한 실행 코드(메서드 바디)를 Heap 영역에 중복해서 복사하면 메모리가 극심하게 낭비된다.
-    - 이를 방지하기 위해 객체 내부의 메서드 칸에는 실제 동작 코드가 아닌, JVM의 **Method(Static) 영역**에 단 하나만 로드되어 있는 해당 메서드 소스코드의 메모리 주소값(참조값)만을 보관한다. 객체의 메서드를 호출하면 이 칸에 적힌 주소를 타고 공유 영역으로 이동하여 코드를 실행한다.
+```java
+public class Car extends Vehicle {
+    private String brand;
+    public Car(String brand, int speed) {
+        super(speed);
+        this.brand = brand;
+    }
+    public void run() {
+        System.out.printf(
+                "[Car / %s] %dkm/h 로 달립니다%n", brand, speed);
+    }
+}
+```
 
 ```java
-class Student {
-  String name;
-  int    score;
+public class Bicycle extends Vehicle {
+    private int gear;
+    public Bicycle(int gear, int speed) {
+        super(speed);
+        this.gear = gear;
+    }
+    public void run() {
+        System.out.printf(
+                "[Bicycle / %d단] %dkm/h 로 달립니다%n", gear, speed);
+    }
+}
+```
 
-  void introduce() {     // ← 메서드 정의
-    System.out.println("안녕하세요 " + name);
+```java
+public class VehicleMain {
+    public static void main(String[] args) {
+        Car c = new Car("현대", 120);
+        Bicycle b = new Bicycle(7, 25);
+
+        c.run(); b.run();
+    }
+}
+```
+
+```
+[Car / 현대] 120km/h 로 달립니다
+[Bicycle / 7단] 25km/h 로 달립니다
+```
+
+### Vehicle에서 매개변수 생성자를 지우고 자식만 두면?
+
+```
+java: constructor Vehicle in class p1.Vehicle cannot be applied to given types;
+  required: no arguments
+  found:    int
+  reason: actual and formal argument lists differ in length
+```
+
+---
+
+# Period 02 오버라이딩(@Override) — 자식이 부모를 덮어쓰는 법
+
+1. 부모 메서드와 같은 시그니처로 `@Override` 메서드를 작성할 수 있다
+2. 자식 메서드 안에서 `super.메서드()`로 부모 동작을 재사용할 수 있다
+3. `@Override` 어노테이션이 오타로 인한 “보이지 않는 버그”를 어떻게 막는지 설명할 수 있다
+4. Object의 `toString()`을 자식이 오버라이딩해  println에 활용할 수 있다
+
+---
+
+## 왜 오버라이딩 — 부모 그대로면 어색하다
+
+- **🏗️ 상속 후 발생하는 부모 메서드의 불일치**
+    - 부모 클래스로부터 물려받은 메서드(`toString` 등)가 자식 클래스의 특성이나 기대하는 동작 방식과 일치하지 않는 경우가 발생한다.
+    - 부모의 코드를 그대로 사용하면 정보가 부정확하거나 부모 클래스의 사양(예: 객체 주소 출력)이 그대로 나타나기 때문에 결과가 어색해진다.
+- **🧱 오버라이딩(Overriding)의 정의**
+    - 부모 클래스의 메서드와 **이름, 매개변수 타입, 개수**가 완전히 동일한 메서드를 자식 클래스에서 다시 정의하는 것이다.
+    - 자식 클래스에서 부모와 동일한 서명의 메서드를 구현하면, 자식 객체를 통해 해당 메서드를 호출할 때 부모 버전이 가려지고 **자식 버전이 실행**된다.
+- **⚡ 오버라이딩을 통한 다형성 구현**
+    - 오버라이딩은 부모 타입의 참조 변수로 자식 객체를 다룰 때도(다형성), 객체 본연의 실제 타입에 맞는 고유한 동작을 수행하도록 보장한다.
+    - 올바른 오버라이딩을 위해 `@Override` 어노테이션을 사용하는 것이 권장되며, 이를 통해 컴파일 시점에 메서드 이름이 부모와 일치하는지 명확히 검증받을 수 있다.
+
+<aside>
+💡
+
+**오버라이딩(Overriding)** = “부모와 같은 이름 / 매개변수의 메서드를 자식이 다시 쓰기.” 자식 객체에서 호출하면 **자식 버전이 실행**된다 — 부모 버전이 가려진다.
+
+</aside>
+
+---
+
+## 오버라이딩 규칙 — 시그니처가 완전히 같아야 한다
+
+- **🏗️ 시그니처의 필수 구성 요소**
+    - 오버라이딩은 부모 클래스의 메서드를 자식 클래스에서 재정의할 때 적용되는 원칙입니다.
+    - 이때 부모 메서드와 메서드 이름, 매개변수 타입, 매개변수 개수(순서 포함)가 완전히 동일해야 합니다. 이를 메서드의 '시그니처'라고 하며, 이 부분이 일치하지 않으면 오버라이딩이 아닌 '오버로딩'으로 처리되거나 컴파일 에러가 발생합니다.
+- **🧱 일치하지 않을 때 발생하는 문제**
+    - 시그니처의 일부(예: 매개변수의 타입이나 개수)만이라도 다르면 자바 컴파일러는 이를 새로운 메서드를 추가하는 '오버로딩'으로 인식합니다.
+    - 결과적으로 자식 클래스에는 부모로부터 물려받은 원본 메서드와 자식이 새로 만든 메서드가 공존하게 되어, 다형성을 활용한 메서드 호출 시 의도치 않은 동작이 발생할 수 있습니다.
+- **⚡ 명확한 의도 전달을 위한 @Override**
+    - 실수로 시그니처를 다르게 작성하는 것을 방지하기 위해 `@Override` 어노테이션 사용이 강력히 권장됩니다.
+    - 이 어노테이션을 붙이면 컴파일러가 부모 클래스에 동일한 시그니처의 메서드가 있는지 강제로 확인하므로, 오타나 파라미터 불일치로 인한 논리적 버그를 사전에 차단할 수 있습니다.
+
+```java
+public class Student extends Person {
+
+  @Override          // "나, 부모 거 덮어쓸게요"
+  public void greet() {
+    System.out.println("공부 중인 " + name);
+  }
+}
+```
+
+> `@Override`는 **“이 메서드는 부모 거를 덮어쓰는 거야”**라고 컴파일러에게 알리는 표시다. 만약 시그니처가 부모와 다르면 `method does not override or implement a method from a supertype`오류를 띄워준다.
+> 
+
+> // 참고 — 오버라이딩 vs 오버로딩
+**오버라이딩(Override):** 부모-자식 사이, 시그니처 동일
+**오버로딩(Overload):** 같은 클래스 안, 이름은 같고 **매개변수가 다름**
+> 
+
+---
+
+## 실습 1 greet() 오버라이딩 — 학생과 교사를 다르게
+
+```java
+public class Student extends Person {
+  public Student(String n, int a) {
+    super(n, a);
+  }
+
+  @Override
+  public void greet() {
+    System.out.println("공부 중인 " + name + "입니다");
+  }
+}
+```
+
+```java
+public class Teacher extends Person {
+  public Teacher(String n, int a) {
+    super(n, a);
+  }
+
+  @Override
+  public void greet() {
+    System.out.println("가르치는 " + name + "입니다");
+  }
+}
+```
+
+```java
+public class SchoolMain {
+  public static void main(String[] args) {
+    Student s = new Student("홍길동", 20);
+    Teacher t = new Teacher("김선생", 40);
+
+    s.greet();   // 학생 버전 실행
+    t.greet();   // 교사 버전 실행
+  }
+}
+```
+
+```java
+공부 중인 홍길동입니다
+가르치는 김선생입니다
+```
+
+> **관찰:** 두 객체가 모두 greet()를 호출했지만, 각자 **자기 버전**이 실행됐다. 부모의 인사말은 가려졌다.
+> 
+
+---
+
+## 실습 2 super.greet() — 부모 인사를 먼저, 내 인사를 나중에
+
+```java
+public class Student extends Person {
+  public Student(String n, int a) { super(n, a); }
+
+  @Override
+  public void greet() {
+    super.greet();      // 부모 인사 먼저
+    System.out.println("  → 공부 중인 학생입니다");
+  }
+}
+```
+
+```java
+public class Teacher extends Person {
+  public Teacher(String n, int a) { super(n, a); }
+
+  @Override
+  public void greet() {
+    super.greet();
+    System.out.println("  → 가르치는 선생님입니다");
+  }
+}
+```
+
+```java
+// new Student("홍길동", 20).greet();
+안녕하세요 홍길동 ← 부모
+→ 공부 중인 학생입니다 ← 자식
+
+// new Teacher("김선생", 40).greet();
+안녕하세요 김선생 ← 부모
+→ 가르치는 선생님입니다 ← 자식
+```
+
+---
+
+## 잠깐 — `toString()`은 영원히 호출되지 않는다
+
+- **🏗️ 기본 제공 `toString()`의 한계**
+    - 모든 클래스는 `Object` 클래스를 상속받으므로 `toString()` 메서드를 기본적으로 물려받지만, 그 기본 구현은 객체의 해시코드 값을 포함한 내부 주소 정보를 출력하는 데 그친다.
+    - 자식 클래스에서 이 메서드를 오버라이딩하여 필드 값들을 출력하도록 재정의하지 않는다면, 프로그램에서 객체 정보를 확인하려고 할 때 의도한 데이터가 아닌 난해한 16진수 문자열만 보게 된다.
+- **🧱 메서드 호출을 위한 명시적 오버라이딩**
+    - `System.out.println()`에 객체를 직접 전달하면 자바는 내부적으로 해당 객체의 `toString()`을 호출한다.
+    - 하지만 개발자가 자식 클래스에서 이 메서드를 오버라이딩하지 않았다면, 부모인 `Object` 클래스의 원본 메서드가 호출되어 객체 내부의 실제 데이터(필드 값)는 영원히 출력되지 않는다.
+- **⚡ 오버라이딩을 통한 데이터 가시성 확보**
+    - 객체의 상태를 올바르게 출력하려면 자식 클래스 내부에 필드 정보를 문자열로 조합하여 반환하도록 `toString()`을 반드시 재정의해야 한다.
+    - 오버라이딩을 완료하면 자바의 다형성 원리에 의해 부모의 메서드가 아닌 자식이 정의한 출력 로직이 실행되어, 객체의 필드 정보를 정상적으로 확인할 수 있게 된다.
+
+```java
+public class Student extends Person {
+  public Student(String n) { super(n, 20); }
+
+  // @Override 안 붙임 + 소문자 오타
+  public String tostring() {   // ← 진짜 이름은 toString
+    return "Student[" + name + "]";
   }
 }
 
-// main
-Student s = new Student();
-s.name = "홍길동";
-s.introduce();          // ← 호출
+// main:
+Student s = new Student("홍길동");
+System.out.println(s);
+```
+
+```bash
+$ javac Student.java
+$ # 컴파일 성공!
+$ java SchoolMain
+Student@1b6d3586 # 부모의 기본 toString이 호출됨
+```
+
+### 진실 — 자바는 두 메서드를 별개로 본다
+
+- toString() ← 부모 Object에 존재
+- **tostring()** ← 학생이 새로 만든 메서드
+
+이름이 다르므로 **오버라이딩이 아니다**. 단지 "Student에만 있는 메서드"가 하나 더 생긴 것. 그래서 println(s)가 부르는 toString은 **여전히 부모 거**.
+
+### @Override를 붙였다면?
+
+```java
+@Override
+public String tostring() { /* ... */ }
+```
+
+```
+error: method does not override or implement
+a method from a supertype
+```
+
+---
+
+## 실습 3 toString() 정확히 — println이 자동으로 부르는 메서드
+
+```java
+public class Person {
+  protected String name;
+  protected int age;
+  // 생성자 생략
+
+  @Override
+  public String toString() {
+    return "Person(" + name + "," + age + ")";
+  }
+}
+```
+
+```java
+public class Student extends Person {
+  private int score;
+  // 생성자 생략
+
+  @Override
+  public String toString() {
+    return "Student[" + name + ",점수=" + score + "]";
+  }
+}
+```
+
+```java
+public class SchoolMain {
+  public static void main(String[] args) {
+    Person p = new Person("이서연", 35);
+    Student s = new Student("홍길동", 20, 92);
+
+    System.out.println(p);   // 자동으로 p.toString() 호출
+    System.out.println(s);   // 자동으로 s.toString() 호출
+  }
+}
+```
+
+```java
+Person(이서연,35)
+Student[홍길동,점수=92]
 ```
 
 <aside>
 ❗
 
-메서드 안에서 name이라고만 적어도 자기 객체의 name을 의미한다. 
+`System.out.println(obj)`는 내부에서 자동으로 `obj.toString()`을 호출한다. 자식이 toString을 오버라이딩하면 그 버전이 실행되어 객체를 보기 좋게 출력할 수 있다.
 
 </aside>
 
 ---
 
-## 실습 1 — 첫 메서드 introduce()
+## 도전 문제 — Bird 가족의 비행
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> 부모 **Bird**의 fly()는 "난다"를 출력한다. 자식 **Eagle**·**Sparrow**·**Penguin** 세 종류를 만들어 각자 다른 비행 메시지를 출력하도록 오버라이딩하라. 펭귄은 "헤엄친다 (못 난다)" 처럼.
+> 
+> **// 조건**
+> 
+> - 모든 자식 메서드에 @Override 어노테이션 필수
+> - Sparrow의 fly()를 일부러 flay()로 오타내고 @Override 없이 컴파일 → 실행 결과 적어 오기
+> - @Override를 붙였을 때 컴파일러가 띄우는 메시지도 캡처
 
 ```java
-// Student.java
-public class Student {
-  String name;
-  int    score;
-
-  void introduce() {
-    System.out.println(
-      "안녕하세요! 저는 " + name +
-      "이고 " + score + "점입니다.");
-  }
+public class Bird {
+    public void fly() { System.out.println("난다"); }
 }
 ```
 
 ```java
-// IntroApp.java
-public class IntroApp {
+public class Eagle extends Bird {
+    @Override
+    public void fly() { System.out.println("독수리: 하늘 높이 활공한다"); }
+}
+```
+
+```java
+public class Sparrow extends Bird {
+    @Override
+    public void fly() { System.out.println("참새: 짹짹 날아간다"); }
+}
+```
+
+```java
+public class Penguin extends Bird {
+    @Override
+    public void fly() { System.out.println("펭귄: 헤엄친다 (못 난다)"); }
+}
+```
+
+```java
+public class BirdMain {
+    public static void main(String[] args) {
+        Eagle e = new Eagle();
+        Sparrow s = new Sparrow();
+        Penguin p = new Penguin();
+
+        e.fly(); s.fly(); p.fly();
+    }
+}
+```
+
+```
+독수리: 하늘 높이 활공한다
+참새: 짹짹 날아간다
+펭귄: 헤엄친다 (못 난다)
+```
+
+### flay() 오타
+
+```
+java: method does not override or implement a method from a supertype
+```
+
+### 완성 후 추가 도전
+
+Bird[] 배열에 세 자식을 섞어 담고 for-each로 fly()를 호출하면 무슨 일이 일어날지 예측해보세요 (다음 시간 다형성 예고).
+
+```java
+public class BirdMain {
+    public static void main(String[] args) {
+        Eagle e = new Eagle();
+        Sparrow s = new Sparrow();
+        Penguin p = new Penguin();
+
+        Bird[] birds = {e, s, p};
+        for (Bird bird : birds) {
+            bird.fly();
+        }
+    }
+}
+```
+
+```
+독수리: 하늘 높이 활공한다
+참새: 짹짹 날아간다
+펭귄: 헤엄친다 (못 난다)
+```
+
+---
+
+# Period 03 다형성 • 업캐스팅 • 다운캐스팅 • instanceof
+
+1. 업캐스팅(자동)과 다운캐스팅(명시)의 차이를 그림으로 설명할 수 있다
+2. `Person[]`에 자식들을 담고 같은 메서드 호출로 각자 다른 결과를 얻는다
+3. “그릇 타입이 보여주는 메서드만 보인다”는 원리로 컴파일 오류를 설명할 수 있다
+4. `instanceof` 패턴 매칭으로 ClassCastException 없이 안전 캐스팅을 할 수 있다
+
+---
+
+## 업캐스팅(자동) vs 다운캐스팅(명시)
+
+- **🏗️ 업캐스팅(Upcasting): 안전한 일반화**
+    - 자식 클래스 타입의 객체를 부모 클래스 타입으로 형변환하는 것입니다. 부모는 자식의 모든 기능을 포함하고 있으므로, 별도의 연산자 없이 자동으로 처리되며 항상 안전합니다.
+    - 부모 타입으로 변환하면 자식만의 고유한 필드나 메서드에는 접근할 수 없게 되지만, 다형성을 활용하여 여러 종류의 자식 객체를 부모 타입의 그릇 하나에 통합하여 관리할 수 있게 됩니다.
+- **🧱 다운캐스팅(Downcasting): 명시적 구체화**
+    - 부모 타입으로 변환되었던 객체를 다시 자식 클래스 타입으로 되돌리는 것입니다. 부모 그릇 속에 담긴 객체가 실제로는 자식 객체임을 프로그래머가 보장해야 하므로, `(자식클래스명)변수명`과 같이 명시적으로 형변환을 표기해야 합니다.
+    - 만약 부모 그릇에 실제로 담긴 객체가 대상 자식 타입이 아닐 경우(예: `Person` 그릇에 `Teacher`가 있는데 `Student`로 다운캐스팅 시도), 런타임에 `ClassCastException`이라는 심각한 에러가 발생합니다.
+
+```java
+// 1. 업캐스팅 — 자동, 키워드 없음
+Person p1 = new Student();   ✓ OK
+Person p2 = new Teacher();   ✓ OK
+
+// 2. 다운캐스팅 — 명시적 (Type)
+Person p  = new Student();
+Student s = (Student) p;     ✓ OK (실제로 Student)
+
+// 3. 거짓말 다운캐스팅 — 컴파일은 OK
+Person  q = new Teacher();
+Student x = (Student) q;     ✗ CCE 런타임
+```
+
+---
+
+## 실습 1 Person[]에 학생 • 교사 섞어 담기
+
+```java
+public class SchoolMain {
   public static void main(String[] args) {
-    Student s1 = new Student();
-    s1.name="홍길동"; s1.score=92;
-    Student s2 = new Student();
-    s2.name="김철수"; s2.score=45;
+    Person[] school = new Person[4];
 
-    s1.introduce();
-    s2.introduce();
-  }
-}
-```
+    // 자식 객체를 부모 그릇에 (업캐스팅 자동)
+    school[0] = new Student("홍길동", 20);
+    school[1] = new Teacher("김선생", 40);
+    school[2] = new Student("이서연", 22);
+    school[3] = new Teacher("박교수", 55);
 
----
-
-## 실습 2 — 변환값 있는 메서드 bonus()
-
-```java
-public class Student {
-  String name;
-  int    score;
-
-  int bonus() {
-    if (score >= 90) {
-      return 10;       // 10점 보너스
-    } else {
-      return 0;        // 없음
+    // 단 한 줄의 루프, 4명 모두 인사
+    for (Person p : school) {
+      p.greet();
     }
   }
 }
 ```
 
-```java
-// BonusApp.java
-Student s1 = new Student();
-s1.name="홍길동"; s1.score=92;
-Student s2 = new Student();
-s2.name="김철수"; s2.score=45;
-
-int total1 = s1.score + s1.bonus();
-int total2 = s2.score + s2.bonus();
-System.out.println(s1.name+" 최종:"+total1);
-System.out.println(s2.name+" 최종:"+total2);
 ```
-
-> bonus()의 반환 타입을 void로 바꾸면 어떻게 될까요?
-→ 직접 IDE에서 시도해보고 어떤 빨간 줄이 뜨는지 적어 오세요.
-> 
-
-`Cannot return a value from a method with void result type` 라는 에러가 뜬다. 이는 반환 타입과 함수 반환 타입 정의가 다르기 때문이다.
+공부 중인 홍길동입니다 # Student 버전
+가르치는 김선생입니다 # Teacher 버전
+공부 중인 이서연입니다 # Student 버전
+가르치는 박교수입니다 # Teacher 버전
+```
 
 ---
 
-## "보기엔 같은데" 실험 — 참조 비교의 본질
+## 실습 2 instanceof — 학생일 때만 study() 호출하기
 
 ```java
-Student s1 = new Student();
-s1.name="홍길동"; s1.score=92;
+for (Person p : school) {
+  p.greet();                // 다 같이
 
-Student s2 = new Student();
-s2.name="홍길동"; s2.score=92;
-
-System.out.println(s1 == s2);       // ?
-System.out.println(
-  s1.name.equals(s2.name));         // ?
+  if (p instanceof Student) {
+    Student s = (Student) p;   // 다운캐스팅
+    s.study();
+  }
+  else if (p instanceof Teacher) {
+    Teacher t = (Teacher) p;
+    t.teach();
+  }
+}
 ```
 
-```bash
-$ java EqDemo
-false # s1 == s2
-true # name.equals(name)
+```java
+for (Person p : school) {
+  p.greet();
+
+  if (p instanceof Student s) {  // 한 줄에 캐스팅까지
+    s.study();
+  }
+  else if (p instanceof Teacher t) {
+    t.teach();
+  }
+}
 ```
 
-- **🏗️ 실험의 조건과 코드 설계**
-    - `Student s1 = new Student("홍길동", 90);`와 `Student s2 = new Student("홍길동", 90);`를 각각 독립적으로 생성한다.
-    - 두 객체 내부의 이름과 점수 데이터는 인간의 눈으로 보기에 완전히 일치하는 상태이다.
-- **🧱 동등성 비교 연산(==)의 반전 결과**
-    - 콘솔창에 `System.out.println(s1 == s2);`를 실행하면 두 객체의 데이터가 같음에도 불구하고 결과는 `false`가 출력된다.
-- **⚡ 물리적 주소 비교 메커니즘**
-    - 참조 타입에서 `==` 연산자는 객체 내부의 실제 필드 값을 비교하지 않는다.
-    - `new` 연산자에 의해 힙(Heap) 영역의 서로 다른 주소(예: `0x100`과 `0x200`)에 각각 독립적으로 자리 잡은 두 인스턴스의 '참조값(메모리 주소)' 자체를 비교하기 때문이다.
+```java
+공부 중인 홍길동입니다
+→ 홍길동이(가) 공부합니다
+가르치는 김선생입니다
+→ 김선생이(가) 가르칩니다
+공부 중인 이서연입니다
+→ 이서연이(가) 공부합니다
+```
 
 <aside>
-⚠️
+❓
 
-==는 참조(주소)를 비교한다.
-new를 두 번 했으므로 주소가 다르다. 따라서 false.
+**그런데 왜 다운캐스팅이 필요할까?**
+
+`Person p` 는 부모 그릇입니다. 자바 컴파일러는 **그릇 라벨에 적힌 메서드**(greet) 만 보장합니다.
+`p.study()`는 거절 — Person에 그런 메서드가 없으니까
 
 </aside>
 
 ---
 
-## 실습 3 — “값 동일성”을 직접 만들기 sameAs()
+## 잠깐 — 객체는 Student인데 study()를 못 부른다고?
+
+- **🏗️ 참조 변수 타입에 따른 접근 권한**
+    - 업캐스팅(Upcasting)을 통해 `Student` 객체를 `Person` 타입의 변수에 담으면, 컴파일러는 해당 객체를 오직 `Person`으로만 인식합니다.
+    - 비록 힙(Heap) 영역에 생성된 실제 객체는 `Student`라 하더라도, 참조 변수가 `Person` 타입이라면 `Student` 고유의 메서드인 `study()`는 물리적으로 존재하지 않는 것처럼 간주되어 호출할 수 없습니다.
+- **🧱 컴파일러의 시선 vs 런타임 객체**
+    - 자바 컴파일러는 '참조 변수의 타입'을 기준으로 메서드 호출 가능 여부를 검사합니다.
+    - 따라서 `Person` 타입 참조 변수로는 부모 클래스에 정의된 멤버만 접근이 허용됩니다. 실제 객체의 능력이 더 뛰어나더라도(즉, `study()` 기능이 있더라도), 컴파일러가 해당 타입을 인지하지 못하면 문법 에러가 발생하여 코드가 실행되지 않습니다.
+- **⚡ 기능 확장을 위한 캐스팅(Casting)의 필요성**
+    - 실제 객체의 고유 기능을 모두 사용하려면, `Person` 타입의 참조 변수를 다시 `Student` 타입으로 다운캐스팅(Downcasting)해야 합니다.
+    - 명시적인 형변환을 통해 변수의 타입을 객체의 실제 타입으로 맞춰주어야만, 비로소 자식 클래스에서 정의한 `study()` 메서드를 정상적으로 호출할 수 있게 됩니다.
 
 ```java
-public class Student {
-  String name;
-  int    score;
+Person p = new Student("홍길동", 20);
 
-  boolean sameAs(Student other) {
-    if (other == null) return false;
-    return this.name.equals(other.name)
-        && this.score == other.score;
-  }
-}
-```
-
-```java
-Student a = new Student();
-a.name="홍길동"; a.score=92;
-
-Student b = new Student();
-b.name="홍길동"; b.score=92;
-
-Student c = new Student();
-c.name="홍길동"; c.score=88;
-
-System.out.println(a == b);          // false
-System.out.println(a.sameAs(b));    // true
-System.out.println(a.sameAs(c));    // false
-```
-
-### 1) `a.sameAs(a)` — 자기 자신과 비교하면?
-
-```java
-System.out.println(a.sameAs(a));    // true
-```
-
-### 2) `a.sameAs(null)` — null 넣으면?
-
-```java
-System.out.println(a.sameAs(null)); // false
-```
-
-### 3) name만 다르고 score는 같으면? 점수만 다르면?
-
-```java
-// Student c = new Student();
-// c.name="홍길동"; c.score=88;
-// Student d = new Student();
-// d.name="김철수"; d.score=88;
-
-System.out.println(c.sameAs(d));    // false
-```
-
----
-
-## 도전 문제 — Book의 isExpensive() + sameAs()
-
-> 
-> 
-> 
-> **// 문제**
-> 
-> **Book** 클래스에 두 메서드를 추가. main에서 책 3권 비교 출력.
-> 
-> **// 클래스 요구사항**
-> 
-> - 필드: **String** title, **int** price
-> - **boolean isExpensive()** — price≥15000
-> - **boolean sameAs(Book other)** — title·price 모두 일치, null 안전
-> 
-> **// 검증 시나리오**
-> 
-> 1. b1(자바,30000) · b2(자바,30000) · b3(자바,25000)
-> 2. 각 책의 isExpensive 결과 출력
-> 3. b1==b2, b1.sameAs(b2), b1.sameAs(b3) 출력
-
-```java
-public class Book {
-    String title;
-    int price;
-
-    boolean isExpensive() {
-        return price >= 15000;
-    }
-
-    boolean sameAs(Book other) {
-        if (other == null) return false;
-        return title.equals(other.title) && price == other.price;
-    }
-}
-```
-
-```java
-public class BookApp {
-    public static void main(String[] args) {
-        Book b1 = new Book();
-        b1.title = "자바";
-        b1.price = 30000;
-
-        Book b2 = new Book();
-        b2.title = "자바";
-        b2.price = 30000;
-
-        Book b3 = new Book();
-        b3.title = "자바";
-        b3.price = 25000;
-
-        System.out.printf("%s (%d) 비쌈? %b%n", b1.title, b1.price, b1.isExpensive());
-        System.out.printf("%s (%d) 비쌈? %b%n", b2.title, b2.price, b2.isExpensive());
-        System.out.printf("%s (%d) 비쌈? %b%n", b3.title, b3.price, b3.isExpensive());
-
-        System.out.println("b1==b2 ? "+(b1==b2));
-        System.out.println("b1 sameAs b2 ? "+b1.sameAs(b2));
-        System.out.println("b1 sameAs b3 ? "+b1.sameAs(b3));
-    }
-}
+p.greet();   // ✓ OK — Person에 있음
+p.study();   // ✗ 컴파일 오류!
 ```
 
 ```
-자바 (30000) 비쌈? true
-자바 (30000) 비쌈? true
-자바 (25000) 비쌈? true
-b1==b2 ? false
-b1 sameAs b2 ? true
-b1 sameAs b3 ? false
+error: cannot find symbol
+symbol: method study()
+location: variable p of type Person
 ```
-
-### **완성 후 추가 도전.** Book 객체 4권을 **Book[4]**에 담아 for로 돌면서 비싼 책만 골라 제목을 출력하세요.
-
-```java
-Book b4 = new Book();
-b4.title = "자바";
-b4.price = 35000;
-        // . . .
-Book[] books = {b1, b2, b3, b4};
-int maxIdx = 0;
-for(int i=1; i < books.length; i++) {
-    if (books[i].price > books[maxIdx].price) maxIdx = i;
-}
-
-System.out.printf("가장 비싼 책은 %s (%d원)입니다.%n", books[maxIdx].title, books[maxIdx].price);
-```
-
-```
-가장 비싼 책은 자바 (35000원)이다.
-```
-
----
-
-# Period 04 — 객체는 어떻게 태어나는가
-
-1. 매개변수 있는 생성자를 작성하고 `new Student("홍길동", 92)` 로 객체를 한 줄에 만들 수 있다
-2. `this.name = name;` 에서 두 name의 의미를 구분해 설명할 수 있다
-3. 매개변수 생성자를 추가하면 기본 생성자가 사라진다는 사실과 이유를 설명할 수 있다.
-4. 생성자 오버로딩으로 여러 가지 초기화 방식을 만들 수 있다
-
----
-
-## 생성자 문법 + this의 정체
-
-- **🏗️ 생성자(Constructor)의 핵심 문법 규격**
-    - 생성자는 객체가 `new` 연산자에 의해 Heap 영역에 태어날 때 **생애 단 한 번만 실행**되는 아주 특별한 메서드입니다.
-    - 일반 메서드와 달리 **반환 타입(Return Type)을 아예 적지 않으며**, 이름은 반드시 **클래스명과 대소문자까지 완전히 일치**해야 합니다.
-- **🧱 생성자의 매개변수와 필드 충돌**
-    - 생성자 내부에서 멤버 변수(필드)의 값을 초기화할 때, 가독성을 위해 매개변수 이름을 필드 이름과 똑같이 짓는 경우가 많습니다 (예: `this.name = name;`).
-    - 이때 이름이 완전히 같으면 자바는 '가장 가까운 곳에 선언된 변수(매개변수)'를 우선 인식하므로, 필드 앞에 식별자를 붙여주지 않으면 멤버 변수에 접근할 수 없는 이름 가림 현상(Shadowing)이 발생합니다.
-- **⚡ `this` 키워드의 실제 정체**
-    - `this`는 메모리상에서 '지금 이 생성자 코드를 실행하고 있는 객체 바로 자신'의 Heap 영역 메모리 주소를 가리키는 내장 참조 변수입니다.
-    - 즉, `this.name`이라고 명시하는 것은 "매개변수로 넘어온 지역변수 `name` 말고, **이 객체 힙 공간에 방금 만들어진 멤버 변수 `name` 칸**에 값을 채워 넣어라"고 컴퓨터에게 명확한 주소를 짚어주는 역할을 합니다.
-
----
-
-## 실습 1 — 매개변수 있는 생성자 (한 줄로 객체 만들기)
-
-```java
-public class Student {
-  String name;
-  int    score;
-
-  public Student(String name, int score) {
-    this.name  = name;
-    this.score = score;
-  }
-
-  void introduce() {
-    System.out.println(name+" "+score+"점");
-  }
-}
-```
-
-```java
-// CtorApp.java
-Student s1 = new Student("홍길동", 92);
-Student s2 = new Student("김철수", 45);
-
-s1.introduce();
-s2.introduce();
-```
-
----
-
-## 실습 2 — 생성자 오버로딩 (같은 이름, 다른 시그니처)
-
-```java
-public class Student {
-  String name;
-  int    score;
-
-  // ① 이름만 받기
-  public Student(String name) {
-    this.name  = name;
-    this.score = 0;       // 기본 0점
-  }
-
-  // ② 이름 + 점수
-  public Student(String name, int score) {
-    this.name  = name;
-    this.score = score;
-  }
-}
-```
-
-```java
-// 사용
-Student a = new Student("홍길동");          // → ①
-Student b = new Student("김철수", 45);      // → ②
-System.out.println(a.name+" "+a.score);
-System.out.println(b.name+" "+b.score);
-```
-
-> 
-> 
-> 
-> **// 규칙**
-> 
-> - 이름은 같아도 됨 (당연 — 클래스명과 동일)
-> - **매개변수 개수/타입/순서**가 달라야 함
-> - 반환 타입만 다른 건 **오버로딩 아님** (생성자엔 반환 타입이 없음)
-
----
-
-## 사라진 기본 생성자 — 컴파일러의 배신
-
-```java
-public class Student {
-  String name; int score;
-
-  public Student(String name, int score) {
-    this.name=name; this.score=score;
-  }
-}
-
-// main
-Student s = new Student();    // 어쩌면 잘 될 것 같지만…
-```
-
-```
-$ javac Demo.java
-Demo.java:3: error: constructor Student in class Student
-cannot be applied to given types;
-required: String,int
-found: no arguments
-reason: actual and formal argument lists differ in length
-```
-
-- **🏗️ 기본 생성자(Default Constructor) 자동 제공 조건**
-    - 클래스 내부에 개발자가 정의한 생성자가 **단 하나도 존재하지 않을 때만**, 자바 컴파일러가 매개변수와 바디가 비어 있는 기본 생성자(`public ClassName() {}`)를 자동으로 삽입해 준다.
-- **🧱 사용자 정의 생성자 추가 시 자동 소멸**
-    - 개발자가 매개변수가 있는 생성자를 단 하나라도 명시적으로 작성하는 순간, 컴파일러가 무료로 제공하던 기본 생성자는 **그 즉시 자동 소멸하여 완전히 사라진다**.
-- **⚡ 컴파일 에러 발생 상황과 해결책**
-    - 기본 생성자가 소멸한 상태에서 외부에서 인자 없이 `new Student()`를 호출하면, 일치하는 생성자가 물리적으로 존재하지 않으므로 컴파일 에러가 발생한다.
-    - 이를 해결하려면 매개변수가 있는 생성자 외에, 클래스 내부에 빈 기본 생성자를 명시적으로 직접 선언해 주어야 한다.
-
-```java
-// 처방 1 - 기본 생성자도 직접 추가
-
-public Student() {     // ← 다시 만들어줘야 함
-  // 비워둬도 OK, 기본값 채워도 OK
-}
-public Student(String name, int score) {
-  this.name=name; this.score=score;
-}
-```
-
-```java
-// 처방 2 - 항상 인자 넣어 호출
-
-// 생성자가 매개변수 받는 형태뿐이라면
-Student s = new Student("", 0);
-```
-
----
-
-## 실습 3 — 실험 (this를 빼면 어떻게 될까?)
-
-```java
-// ❌ this 없이 작성
-public Student(String name, int score) {
-  name  = name;    // 무엇이 무엇에 대입?
-  score = score;
-}
-
-// main
-Student s = new Student("홍길동", 92);
-System.out.println(s.name + " " + s.score);
-```
-
-```java
-$ java NoThisDemo
-null 0 # 값이 안 들어갔다!
-```
-
-`name = name;`은 자바에게 “**매개변수 name에 매개변수 name을 대입**”으로 읽힙니다.
-**필드는 손도 대지 않았다**는 뜻. 그래서 null/0이 그대로.
 
 <aside>
-💡
+👁️
 
-**지역변수 우선 규칙**
-
-자바는 같은 이름이 있을 때 **가까운 것(=지역변수, 매개변수)**을 먼저 봅니다.
-필드를 명확히 가리키려면 `this.`가 필요.
+"내가 보는 건 **그릇 라벨(Person)**입니다. Person 클래스엔 study()가 없으므로 거절. **안에 든 객체가 진짜 뭔지는 따지지 않는다** (그건 런타임의 일)."
 
 </aside>
 
-```java
-// 처방 - this 또는 이름 바꾸기
-
-// 방법 A — this 사용
-this.name  = name;
-
-// 방법 B — 매개변수 이름 다르게
-public Student(String n, int s) {
-  name  = n;
-  score = s;
-}
-```
-
 ---
 
-## 도전 문제 — Car 클래스 (생성자 3종 오버로딩)
+## 위험한 캐스팅 vs 안전한 캐스팅
 
-> 
-> 
-> 
-> **// 문제**
-> 
-> **Car**에 **3종 생성자**를 만들고, main에서 3가지 방식으로 객체 생성·출력
-> 
-> **// 필드**
-> 
-> **String** model · **int** year · **int** mileage
-> 
-> **// 생성자 3종**
-> 
-> 1. **없음** → "Unknown", 0, 0
-> 2. **model**만 → 나머지 0
-> 3. **셋 다** 받음
-> 
-> **// 마지막 미션**
-> 
-> ①번 삭제 후 new Car() 호출 시 **컴파일 오류 메시지**를 그대로 적어 오기
-> 
+### 위험 — CCE 시연
 
 ```java
-public class Car {
-    String model;
-    int year;
-    int mileage;
+Person p = new Teacher("김선생", 40);
 
-    public Car() {
-        this("Unknown", 0, 0);
-    }
-    public Car(String model) {
-        this(model, 0, 0);
-    }
-    public Car(String model, int year, int mileage) {
-        this.model = model;
-        this.year = year;
-        this.mileage = mileage;
-    }
+// 컴파일은 통과 — 그릇은 Person
+Student s = (Student) p;
 
-    void show() {
-        System.out.println("Car{model="+model+"', year="+year+", mileage="+mileage+"}");
-    }
-}
+// 런타임에 폭발
+s.study();
 ```
 
-```java
-public class CarApp {
-    public static void main(String[] args) {
-        Car c1 = new Car();
-        Car c2 = new Car("Sonata");
-        Car c3 = new Car("Avante", 2024, 15000);
-
-        c1.show();
-        c2.show();
-        c3.show();
-    }
-}
+```
+Exception in thread "main"
+java.lang.ClassCastException:
+class Teacher cannot be cast
+to class Student
 ```
 
----
-
-# Period 05 — 외부와 내부, 그 사이의 벽
-
-1. 필드가 public일 때 어떤 위험이 있는지 코드 예시로 설명할 수 있다
-2. 필드를 `private` 로 바꾸고 getter/setter를 생성해 통제할 수 있다
-3. setter에 검증 로직을 넣어 잘못된 값(예: 음수 정수)을 거부할 수 있다
-4. “캡슐화 = 통제권”의 진짜 의미를 설명하고 read-only 필드를 만들 수 있다
-
----
-
-## 접근 제어자 + Getter / Setter 패턴
-
-- **🏗️ private을 통한 데이터 은닉 (Encapsulation)**
-    - 클래스의 필드를 `private`으로 선언하여 외부에서 점(`.`) 연산자로 직접 값을 읽거나 수정하지 못하도록 원천 차단한다.
-    - 이는 객체의 내부 상태를 부적절한 외부 간섭으로부터 안전하게 보호하는 캡슐화의 핵심 기반이 된다.
-- **🧱 Getter와 Setter 메서드의 역할**
-    - `private` 필드에 안전하게 접근할 수 있도록 통로를 열어주는 역할을 하는 `public` 제한자의 메서드이다.
-    - `Getter`는 내부 필드의 값을 안전하게 읽어와 반환하고, `Setter`는 외부에서 전달된 값을 받아 필드에 대입하는 기능을 수행한다.
-- **⚡ Setter를 통한 데이터 검증 기능**
-    - `Setter` 메서드 내부에 조건문(`if`) 등의 로직을 삽입하면, 음수 데이터나 비정상적인 범위의 값이 필드에 그대로 주입되는 현상을 사전에 필터링할 수 있다.
-    - 직접적인 필드 수정을 막고 코드를 거치게 만듦으로써 데이터의 정확성과 무결성을 유지하는 강력한 방어선 역할을 한다.
+### 안전 — instanceof 안전벨트
 
 ```java
-public class Student {
-  private String name;
-  private int    score;
+Person[] arr = {
+  new Student("홍길동", 20),
+  new Teacher("김선생", 40)
+};
 
-  // getter — 읽기
-  public String getName() {
-    return name;
+for (Person p : arr) {
+  if (p instanceof Student s) {
+    s.study();   // 안전
+  } else if (p instanceof Teacher t) {
+    t.teach();
   }
-  // setter — 쓰기
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public int  getScore()         { return score; }
-  public void setScore(int score) { this.score = score; }
-}
-```
-
-> 
-> 
-> 
-> **// 이름 규칙**
-> 
-> - getter: get + 필드명(첫 글자 대문자)
-> - setter: set + 필드명(첫 글자 대문자)
-> - boolean 필드는 isXxx도 흔함
-
----
-
-## 실습 1 — 필드 private + getter/setter (컴파일러가 막아준다)
-
-```java
-public class Student {
-  private String name;
-  private int    score;
-
-  public Student(String name, int score) {
-    this.name=name; this.score=score;
-  }
-
-  public String getName()  { return name; }
-  public int getScore() { return score; }
-
-  public void setName(String name)   { this.name=name; }
-  public void setScore(int score) { this.score=score; }
-}
 ```
 
 ```java
-Student s = new Student("홍길동", 92);
-
-s.score = -1000;        // 💥 컴파일 오류
-s.setScore(85);         // OK
-System.out.println(s.getScore());
+홍길동이(가) 공부합니다
+김선생이(가) 가르칩니다
+# 예외 없이 끝까지 실행
 ```
-
-```
-error: score has private access in Student
-s.score = -1000;
-^
-```
-
----
-
-## setter에 문지기 — 검증 로직 넣기
-
-```java
-public void setScore(int score) {
-  if (score < 0 || score > 100) {
-    System.out.println(
-      "[경고] 점수는 0~100 사이여야 합니다. 변경 거부: " + score);
-    return;          // 필드 안 바꾸고 종료
-  }
-  this.score = score;  // 통과한 값만 반영
-}
-```
-
-```java
-// GuardedApp.java
-Student s = new Student("홍길동", 92);
-
-s.setScore(-1000);      // 거부
-s.setScore(200);        // 거부
-s.setScore(85);         // OK
-System.out.println("현재 점수: "+s.getScore());
-```
-
-```
-$ java GuardedApp
-[경고] 점수는 0~100 사이여야 합니다. 변경 거부: -1000
-[경고] 점수는 0~100 사이여야 합니다. 변경 거부: 200
-현재 점수: 85
-```
-
----
-
-## 잠깐 — getter/setter 다 만들면 private의 의미가 없잖아?
-
-- **🏗️ 합리적인 의문과 겉보기상의 모순**
-    - 필드를 `private`으로 감싸놓고 모든 필드에 대해 기계적으로 `public getter/setter`를 제공한다면, 결국 외부에서 값을 마음대로 읽고 쓰는 모양새가 된다.
-    - 이 때문에 처음에는 데이터 은닉과 캡슐화의 취지가 완전히 퇴색되는 것처럼 보일 수 있다.
-- **🧱 결정적 차이: 제어권(Control)의 주체**
-    - 필드를 직접 노출하면 외부에 통제되지 않는 접근 권한을 주게 되지만, 메서드를 통하면 **제어권이 완전히 객체 자신에게** 귀속된다.
-    - 추후 데이터 검증 로직이 추가되거나 필드의 데이터 타입·구조가 변경되더라도, 외부 호출처의 코드를 단 한 줄도 수정하지 않고 객체 내부의 메서드 바디만 수정하여 안전하게 대응할 수 있는 강력한 유지보수성을 얻는다.
-- **⚡ 조건부 제공과 설계의 유연성**
-    - 모든 필드에 무조건 `setter`를 개설할 필요는 없다.
-    - 외부에 변경을 허용하지 않고 읽기만 가능해야 하는 필드는 `getter`만 제공함으로써, 자연스럽게 해당 필드나 객체 전체를 '읽기 전용(Read-Only)'으로 안전하게 설계할 수 있다.
 
 <aside>
 🔑
 
-**캡슐화의 본질**
-
-**“숨기는 것”**이 아니다 — **통제권을 갖는 것**이다.
-같은 정보를 노출하더라도, **어떤 조건에서 어떻게** 변할 수 있는지 클래스가 결정한다.
-setScore는 단순 대입이 아니라 **검증/로깅/계산**의 자리다.
+**규칙:** 다운캐스팅 전엔 **반드시 instanceof**로 확인. Java 16+ 패턴 매칭은 확인 + 캐스팅 + 변수 선언을 **한 줄**에. 추천 패턴.
 
 </aside>
 
 ---
 
-## 실습 3 — read-only (한 번 정해지면 못 바꾸는 필드)
-
-```java
-public class Student {
-  private final int id;        // ← final + setter 없음
-  private String    name;
-  private int       score;
-
-  public Student(int id, String name, int score) {
-    this.id    = id;       // 생성자에서 한 번만 가능
-    this.name  = name;
-    this.score = score;
-  }
-
-  public int    getId()    { return id; }
-  public String getName()  { return name; }
-  public int    getScore() { return score; }
-  // setId 없음! setter 안 만든다 = 외부 read-only
-
-  public void setName(String name)   { this.name=name; }
-  public void setScore(int score) { this.score=score; }
-}
-```
-
-```
-$ 외부에서 변경 시도
-s.setId(9999); → error: cannot find symbol
-s.id = 9999; → error: id has private access
-s.getId() → 1001 (읽기는 OK)
-```
-
-> // 어디에 쓰나
-**고유 식별자**: id, 주민번호, 사원번호
-**변하지 않는 사실**: 생년월일, 가입일
-**한번 정한 옵션**: 통화(KRW/USD), 단위
-> 
-
----
-
-## 도전 문제 — Account 클래스 (deposit / withdraw로만 잔액을 바꾼다)
+## 도전 문제 — 도서관 자료실
 
 > 
 > 
 > 
 > **// 문제**
-> balance를 **private**으로, **deposit/withdraw**를 통해서만 변경 통제
 > 
-> **// 필드
-> final String** owner (read-only)
-> **private int** balance
+> 공통 부모 **Item(String title)**과 자식 세 종류 **Book(저자)**, **Dvd(러닝타임)**, **Magazine(호수)**를 만들어라. Item[]에 자료 5개를 섞어 담고 **한 번의 for문**으로 종류별 다른 정보를 출력하라.
 > 
-> **// 메서드
-> deposit(amount)**: amount≤0 거부
-> **withdraw(amount)**: amount≤0 / 잔액부족 거부
-> **getBalance()**: 잔액 조회
+> **// 조건**
 > 
-> **// 4가지 시나리오 출력**
-> 10000원 정상 입금
-> 0원 입금 → 거부
-> 3000원 정상 출금
-> 잔액 초과 출금 → 거부
-> 
+> - 모든 자식의 자기만의 메서드는 다운캐스팅으로 호출
+> - **instanceof를 안 쓰고** 무작정 다운캐스팅하는 잘못된 코드도 한 번 작성해 CCE를 띄워보고 메시지 캡처
+> - 그 다음 Java 16+ 패턴 매칭으로 고친 코드 작성
 
 ```java
-public class Account {
-    final String owner;
-    private int balance;
-
-    public Account(String owner) {
-        this(owner, 0);
-    }
-    public Account(String owner, int balance) {
-        this.owner = owner;
-        this.balance = balance;
-    }
-
-    public int getBalance() {
-        return this.balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    public void deposit(int amount) {
-        if (amount <= 0) {
-            System.out.println("[거부] 입금액은 0보다 커야 합니다: "+amount);
-            return;
-        }
-        setBalance(getBalance() + amount);
-        System.out.printf("입금 %d - 잔액: %d%n", amount, getBalance());
-    }
-
-    public void withdraw(int amount) {
-        if (amount <= 0) {
-            System.out.println("[거부] 출금액은 0보다 커야 합니다: "+amount);
-            return;
-        } else if (amount > getBalance()) {
-            System.out.printf("[거부] 잔액 부족 (요청 %d, 잔액 %d)%n", amount, getBalance());
-            return;
-        }
-        setBalance(getBalance() - amount);
-        System.out.printf("출금 %d - 잔액: %d%n", amount, getBalance());
-    }
-}
-```
-
-### transfer(Account other, int amount)
-
-```java
-public void transfer(Account other, int amount) {
-		if (other == null) {
-		    System.out.println("입금계좌가 Null입니다. 계좌를 재확인하세요.");
-		    return;
-		} else if (amount > getBalance()) {
-		    System.out.printf(
-		        "[거부] 잔액 부족 (요청 %d, 잔액 %d)%n", amount, getBalance());
-		    return;
-		}
-		setBalance(getBalance() - amount);
-		other.setBalance(other.getBalance() + amount);
-		System.out.printf("출금 %d - 잔액: %d%n", amount, getBalance());
-		System.out.println("출금 성공 !!!");
-}
-```
-
----
-
-# Period 06 — 객체에 속하는가 클래스에 속하는가
-
-1. “객체에 속한다 vs 클래스에 속한다”의 차이를 설명할 수 있다
-2. `static int totalCount`를 추가하고 생성자에서 ++로 인원수를 셀 수 있다
-3. static 메서드를 만들어 `Student.getTotalCount()`로 호출할 수 있다
-4. static 변수를 객체 통해 변경하면 모든 객체에 반영되는 이유를 그림으로 설명할 수 있다
-
----
-
-## 메모리 — 세 번째 영역 등장 (Static / Method 영역)
-
-- **🏗️ 자바 메모리 구조의 완성**
-    - 참조 변수가 할당되는 **Stack 영역**과 인스턴스 본체가 생성되는 **Heap 영역**에 이어, 세 번째 물리 공간인 **Static(또는 Method) 영역**이 등장하며 자바의 핵심 메모리 구조가 완성된다.
-    - 이 공간은 프로그램 실행의 전체 설계도와 공통 데이터가 집중 관리되는 곳이다.
-- **🧱 Static 영역의 보관 대상과 특징**
-    - 클래스의 구조 정보(바이트코드), 메서드들의 실제 실행 코드 엔진, 그리고 `static` 키워드가 붙은 정적 멤버(필드 및 메서드)가 이 영역에 보관된다.
-    - `new` 연산자를 통한 객체 생성 여부와 관계없이 **프로그램이 시작되어 클래스가 로드될 때 메모리에 단 하나만 할당**되는 전역 공유 공간이다.
-- **⚡ 생명 주기: 프로그램의 시작과 끝을 함께함**
-    - 가비지 컬렉터(GC)에 의해 수시로 수거되고 관리되는 Heap 영역의 인스턴스들과 달리, Static 영역에 로드된 데이터는 **프로그램이 완전히 종료되어 JVM이 내려갈 때까지 메모리에 영구히 상주**한다.
-
----
-
-## 실습 1 — 학생 인원 세기 (static int totalCount)
-
-```java
-public class Student {
-  private String name;
-  private static int totalCount;
-
-  public Student(String name) {
-    this.name = name;
-    totalCount++;       // 클래스 한 곳을 +1
-  }
-
-  public static int getTotalCount() {
-    return totalCount;
-  }
-}
-```
-
-```java
-// CountApp.java
-Student a = new Student("홍길동");
-Student b = new Student("김철수");
-Student c = new Student("이민호");
-
-// 인스턴스 없이도 접근 가능
-System.out.println("총 인원: " + Student.getTotalCount());
-```
-
-```
-$ java CountApp
-총 인원: 3
-```
-
----
-
-## 실습 2 — 유틸리티 메서드 (객체와 무관한 일)
-
-```java
-public class ScoreUtil {
-  // 객체가 필요 없음 — 입력만 받으면 됨
-  public static String grade(int score) {
-    if (score >= 90) return "A";
-    if (score >= 80) return "B";
-    if (score >= 70) return "C";
-    return "F";
-  }
-
-  public static double average(int[] arr) {
-    int sum = 0;
-    for (int x : arr) sum += x;
-    return (double)sum / arr.length;
-  }
-}
-```
-
-```java
-// UtilApp.java
-System.out.println(ScoreUtil.grade(92));     // A
-System.out.println(ScoreUtil.grade(65));     // F
-System.out.println(ScoreUtil.average(new int[]{92,85,78})); // 85.0
-```
-
-### 언제 static 메서드?
-
-#### 적합한 경우
-
-- 입력만 받아서 결과만 반환 (필드 안 씀)
-- 유틸리티: Math.max, Integer.parseInt
-- 특정 객체에 묶을 필요가 없는 일반 로직
-
-#### 부적합한 경우
-
-- 객체의 필드를 읽거나 써야 한다면 → instance 메서드
-- 객체마다 다르게 동작해야 한다면 → instance 메서드
-- 객체의 상태와 동작이 함께 가야 한다면 (예: introduce) → instance 메서드
-
----
-
-## "모두 함께 바뀐다" 실험 — static 변수의 공유성
-
-- **🏗️ 실험 환경: 독립된 두 인스턴스 생성**
-    - `Student s1 = new Student();`와 `Student s2 = new Student();`를 각각 독립적으로 생성한다.
-    - 클래스 내부에는 전체 학생 수를 추적하기 위한 `static int totalStudents;`라는 정적 변수가 선언되어 있다.
-- **🧱 특정 객체를 통한 값 변경의 파장**
-    - 참조 변수 `s1`을 이용하여 `s1.totalStudents = 100;`과 같이 정적 변수의 값을 100으로 변경한다.
-    - 그 후, 직접 값을 변경하지 않은 다른 객체 `s2`를 통해 `s2.totalStudents` 값을 콘솔에 출력하여 상태를 확인해 본다.
-- **⚡ 실험 결과와 원인: 단 하나의 저장소 공유**
-    - 출력 결과, 값을 건드리지 않은 `s2.totalStudents` 역시 `100`으로 똑같이 변경되어 출력되는 동기화 현상이 발생한다.
-    - `static` 변수는 Heap 영역의 개별 객체 내부에 각각 생성되는 것이 아니라, Static 영역에 단 하나만 생성되어 모든 인스턴스가 하나의 메모리 주소를 공유하기 때문이다. (따라서 혼선을 방지하기 위해 객체명 대신 `Student.totalStudents`와 같이 클래스명으로 접근하는 것이 올바른 문법이다.)
-
-```java
-Student s1 = new Student("A");
-Student s2 = new Student("B");
-Student s3 = new Student("C");
-
-System.out.println(s1.totalCount);  // 3
-System.out.println(s2.totalCount);  // 3
-System.out.println(s3.totalCount);  // 3
-
-// s1을 통해 0으로 바꾼다 — s1만 바뀔까?
-s1.totalCount = 0;
-
-System.out.println(s1.totalCount);  // 0
-System.out.println(s2.totalCount);  // ??
-System.out.println(s3.totalCount);  // ??
-```
-
-```
-$ java SharedDemo
-3 3 3
-0 0 0 # 모두 같이 바뀜!
-```
-
----
-
-## 실습 3 — static 안에서 instance 필드를 쓰면?
-
-```java
-public class Student {
-  private String name;
-  private static int totalCount;
-
-  // ❌ static 메서드 안에서 name(instance) 접근
-  public static void printName() {
-    System.out.println(name);
-  }
-}
-```
-
-```
-error: non-static variable name cannot be referenced
-from a static context
-System.out.println(name);
-^
-```
-
-```java
-// ✅ instance 메서드로 만들거나, 매개변수로 받기
-public void printName() {        // static 제거
-  System.out.println(name);
-}
-
-// 또는
-public static void printName(Student s) {
-  System.out.println(s.name);
-}
-```
-
-<aside>
-⚠️
-
-static 메서드는 특정 객체에 속하지 않는다.
-`Student.printName()`이라고 호출했을 때 — 자바는 “어느 학생의 name을 보여줄까?”를 모른다.
-그래서 컴파일 단계에서 미리 막아주는 것.
-
-</aside>
-
----
-
-## 도전 문제 — Counter(instance 버전 vs static 버전, 출력으로 차이 증명)
-
-> 
-> 
-> 
-> **// 문제**
-> 두 클래스를 만드세요:
-> (A) **InstanceCounter** — instance count + increment()
-> (B) **StaticCounter** — static count + increment()
-> 
-> **// 시나리오**
-> 각 클래스로 **객체 3개**씩 생성
-> 각 객체가 **모두** increment() 호출
-> 마지막에 각 객체의 count를 출력
-> 
-> **// 관찰**
-> (A)는 **1,1,1**이지만 (B)는 **3,3,3**. 왜? 메모리 그림으로 한 줄 설명을 함께.
-> 
-
-```java
-class InstanceCounter {
-    int count;
-
-    void increment() {
-        count++;
-    }
-}
-
-class StaticCounter {
-    static int count;
-
-    void increment() {
-        count++;
-    }
-}
-
-public class CounterApp {
-    public static void main(String[] args) {
-        InstanceCounter a1 = new InstanceCounter();
-        InstanceCounter a2 = new InstanceCounter();
-        InstanceCounter a3 = new InstanceCounter();
-
-        StaticCounter b1 = new StaticCounter();
-        StaticCounter b2 = new StaticCounter();
-        StaticCounter b3 = new StaticCounter();
-
-        a1.increment(); a2.increment(); a3.increment();
-        System.out.println(
-                "a1.count="+a1.count+" "+
-                "a2.count="+a2.count+" "+
-                "a3.count="+a3.count);
-
-        b1.increment(); b2.increment(); b3.increment();
-        System.out.println(
-                "b1.count="+StaticCounter.count+" "+
-                "b2.count="+StaticCounter.count+" "+
-                "b3.count="+StaticCounter.count);
-    }
-}
-```
-
----
-
-# Period 07 — v0를 객체로 다시 짓다
-
-1. private 필드 + 생성자 + getter + toString + static totalCount를 모두 갖춘 Student 클래스를 작성할 수 있다
-2. `Student[]`로 평균/최고점/이름순 정렬 등 기본 연산을 처리할 수 있다
-3. while + switch 메뉴 루프로 모든 기능을 하나의 콘솔 앱에 통합할 수 있다
-4. v0 대비 v1의 코드 길이와 확장성을 비교하고, 5장으로 미루는 한계를 설명할 수 있다
-
-### Student  완성
-
-```java
-public class Student {
-    private final int id;
-    private String name;
-    private int score;
-    private static int totalCount;
-
-    public Student(int id, String name, int score) {
-        this.id = id;
-        this.name = name;
-        setScore(score);
-        totalCount++;
-    }
-
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public int getScore() {
-        return score;
-    }
-    public static int getTotalCount() {
-        return totalCount;
-    }
-
-    public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            System.out.println("[경고] 이름은 문자열이여야 합니다. 변경 거부: "+ name);
-            return;
-        }
-        this.name = name;
-    }
-    public void setScore(int score) {
-        if (score < 0 || score > 100) {
-            System.out.println("[경고] 점수는 0~100 사이여야 합니다. 변경 거부: " + score);
-            return;
-        }
-        this.score = score;
-    }
-
-    static double average(Student[] arr) {
-        int sum = 0;
-        for (Student s : arr) sum += s.getScore();
-        return (double)sum / arr.length;
-    }
-
-    static Student top(Student[] arr) {
-        Student best = arr[0];
-        for (int i=1; i < arr.length; i++)
-            if (arr[i].getScore() > best.getScore())
-                best = arr[i];
-        return best;
-    }
-
-    static void sortDesc(Student[] arr) {
-        for (int i=0; i < arr.length; i++) {
-            int maxIdx = i;
-            for (int j=i+1; j<arr.length; j++)
-                if (arr[j].getScore() > arr[maxIdx].getScore())
-                    maxIdx = j;
-            Student tmp = arr[i];   // 참조 교환!
-            arr[i] = arr[maxIdx];
-            arr[maxIdx] = tmp;
-        }
-    }
-
-    void introduce() {
-        System.out.println("안녕하세요! 저는 " +name+"이고 "+score+"점입니다.");
-    }
-
-    void shout() {
-        System.out.println(name+"!!!");
-    }
-
-    int bonus() {
-        if (score >= 90) return 10;
-        else return 0;
-    }
-
-    boolean sameAs(Student other) {
-        if (other == null) return false;
-        return this.name.equals(other.name)
-                && this.score == other.score;
+public class Item {
+    protected String title;
+
+    public Item(String t) {
+        title = t;
     }
 
     public String toString() {
-        return id+" "+name+" "+score;
+        return title;
     }
 }
-```
 
-### GradeAppV1
+public class Book extends Item {
+    private String author;
 
-```java
-import java.util.Scanner;
+    public Book(String title, String a) {
+        super(title); author = a;
+    }
 
-public class GradeAppV1 {
+    public void read() {
+        System.out.println(
+                "[Book] " + super.toString() + " - 저자: " + author);
+    }
+}
+
+public class Dvd extends Item {
+    private int rtime;
+
+    public Dvd(String t, int r) {
+        super(t); rtime = r;
+    }
+
+    public void watch() {
+        System.out.println(
+                "[Dvd] " + super.toString() + " - " + rtime + "분");
+    }
+}
+
+public class Magazine extends Item {
+    private String hosu;
+
+    public Magazine(String t, String h) {
+        super(t); hosu = h;
+    }
+
+    public void read() {
+        System.out.println("[Magazine] " + super.toString() + " - " + hosu + "호");
+    }
+}
+
+public class LibraryMain {
     public static void main(String[] args) {
-        Student[] arr = new Student[5];
-        arr[0] = new Student(1001,"홍길동",92);
-        arr[1] = new Student(1002,"김철수",78);
-        arr[2] = new Student(1003,"이민호",88);
-        arr[3] = new Student(1004,"박영희",71);
-        arr[4] = new Student(1005,"최지우",95);
+        Book b1 = new Book("코끼리는 생각하지 마", "레이코프");
+        Dvd d1 = new Dvd("인터스텔라", 169);
+        Magazine m1 = new Magazine("월간 자바", "2026/05");
+        Book b2 = new Book("객체지향의 사실과 오해", "조영호");
 
-        Scanner sc = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("\n=== 학생 성적 관리 v1 ===");
-            System.out.println("[1] 전체  [2] 평균  [3] 최고점  [4] 정렬  [0] 종료");
-            System.out.print("선택 ▷ ");
-            int m = sc.nextInt();
-
-            switch (m) {
-                case 1 -> {
-                    for (Student s : arr) System.out.println(s);
-                    System.out.println("(총원: "+Student.getTotalCount()+"명)");
-                }
-                case 2 -> System.out.println("평균: "+Student.average(arr));
-                case 3 -> System.out.println("최고: "+Student.top(arr));
-                case 4 -> {
-                    Student.sortDesc(arr);
-                    for (Student s : arr) System.out.println(s);
-                }
-                case 0 -> {
-                    System.out.println("종료합니다.");
-                    return;
-                }
-                default -> System.out.println("올바른 번호를 입력하세요");
+        Item[] arr = {b1, d1, m1, b2};
+        for (Item it : arr) {
+            if (it instanceof Book b) {
+                b.read();
+            } else if (it instanceof Dvd d) {
+                d.watch();
+            } else if (it instanceof Magazine m) {
+                m.read();
+            } else {
+                System.out.println("Book / Dvd / Magazine의 인스턴스가 아닙니다");
             }
         }
     }
@@ -1571,32 +988,702 @@ public class GradeAppV1 {
 
 ---
 
-## 메뉴 [5] 학번 검색 + 메뉴 [6] 학생 추가 — 한계까지 가보기
+# Period 04 추상 클래스 abstract — 자식에게 강제하는 약속
 
-> 
-> 
-> 
-> **// 미션 1 — 학번 검색**
-> 
-> - 메뉴 [5] "학번으로 학생 찾기"
-> - 학번 입력받아 일치 Student 출력
-> - 없으면 "찾을 수 없습니다"
-> - **static Student findById(Student[] arr, int id)**
+1. `abstract class` 와 `abstract method`를 작성할 수 있다
+2. 자식 클래스에서 모든 abstract 메서드를 구현해 컴파일을 통과시킨다
+3. “추상 클래스는 왜 인스턴스화가 안 되는가”를 컴파일 오류 메시지로 설명한다
+4. 일반 메서드(공통 구현)와 abstract 메서드(강제)를 한 클래스에서 적절히 섞을 수 있다
+
+---
+
+## abstract 문법 + UML 표기
+
+- **🏗️ abstract 키워드를 통한 추상 클래스 선언**
+    - 클래스 앞에 `abstract` 키워드를 붙이면 해당 클래스는 '추상 클래스'가 되며, 인스턴스(객체)를 직접 생성할 수 없게 된다.
+    - 이는 그 자체로 완전한 설계도가 아니라 자식 클래스들이 공통적으로 가져야 할 필드와 메서드의 틀을 정의하고, 일부 동작(메서드)은 자식에게 구체적인 구현을 강제하기 위해 사용한다.
+- **🧱 abstract 메서드와 구현 강제**
+    - 클래스 내부에서 `public abstract void method();`와 같이 선언부만 있고 바디(`{ }`)가 없는 메서드를 '추상 메서드'라고 한다.
+    - 추상 클래스를 상속받는 자식 클래스는 반드시 이 추상 메서드들을 오버라이딩하여 자신만의 구체적인 로직으로 구현해야 하며, 하나라도 구현하지 않으면 자식 클래스 역시 추상 클래스가 되어야 한다.
+- **⚡ UML 클래스 다이어그램의 추상화 표현**
+    - UML에서 추상 클래스 이름과 추상 메서드 이름은 이탤릭체(기울임꼴)로 표기하는 것이 표준이다.
+    - 추상 클래스 박스는 일반 클래스와 동일하게 그리되, 이름과 추상 메서드 영역에 이탤릭체를 적용하여 해당 요소가 추상적임을 설계 단계에서부터 명확히 구분한다.
 
 ```java
-static String findById(Student[] arr, int id) {
-    if (arr == null) return "학생이 없습니다.";
-    for (Student s : arr) {
-        if (s.getId() == id) return s.toString();
-    }
-    return "찾을 수 없습니다.";
+public abstract class Person {     // ① 클래스에
+  protected String name;
+  protected int age;
+
+  public Person(String n, int a) {  // 생성자 OK
+    this.name = n;  this.age = a;
+  }
+
+  public String info() {                   // 일반 메서드 OK
+    return name + "(" + age + ")";
+  }
+
+  public abstract void work();        // ② 메서드에 (몸체 없음)
+}
+```
+
+---
+
+## 실습 1 abstract Person → Student / Teacher
+
+```java
+public abstract class Person {
+  protected String name;
+  public Person(String n) { name = n; }
+
+  public abstract void work();
+}
+
+public class Student extends Person {
+  public Student(String n) { super(n); }
+
+  @Override
+  public void work() {
+    System.out.println(name + "이(가) 공부한다");
+  }
+}
+
+public class Teacher extends Person {
+  public Teacher(String n) { super(n); }
+
+  @Override
+  public void work() {
+	  System.out.println(name + "이(가) 가르친다);
+	}
 }
 ```
 
 ```java
-case 5 -> {
-    System.out.print("학번 ▷ ");
-    int id = sc.nextInt();
-    System.out.println(Student.findById(arr, id));
+public class SchoolMain {
+  public static void main(String[] args) {
+    Person[] arr = {
+      new Student("홍길동"),
+      new Teacher("김선생")
+    };
+    for (Person p : arr) p.work();
+  }
+}
+```
+
+> **관찰:** Person은 abstract이지만 Person[] 그릇은 만들 수 있습니다. 인스턴스를 못 만들 뿐, 부모 **타입**으로 다형성 그릇 역할은 그대로 가능합니다.
+> 
+
+---
+
+## 실습 2 Staff 추가 — Person 코드는 한 줄도 안 바뀜
+
+```java
+public class Staff extends Person {
+  private String department;
+
+  public Staff(String n, String dept) {
+    super(n);
+    this.department = dept;
+  }
+
+  @Override
+  public void work() {
+    System.out.println(name + "이(가) "
+        + department + "에서 일한다");
+  }
+}
+```
+
+```java
+Person[] people = {
+  new Student("홍길동"),
+  new Teacher("김선생"),
+  new Staff("이주임", "행정실")
+};
+
+System.out.println("=== 모두의 일과 ===");
+for (Person p : people) {
+  p.work();
+}
+```
+
+```
+=== 모두의 일과 ===
+홍길동이(가) 공부한다
+김선생이(가) 가르친다
+이주임이(가) 행정실에서 일한다
+```
+
+---
+
+## 잠깐 — abstract는 두 가지를 거절한다
+
+- **🏗️ 첫 번째 거절: 인스턴스(객체) 생성을 거부**
+    - `abstract` 클래스는 설계도 그 자체로 불완전하므로, `new` 연산자를 사용하여 객체를 직접 생성하는 행위를 컴파일러가 강력하게 차단한다.
+    - 이는 객체화가 되면 안 되는 추상적인 개념(예: 일반적인 '동물' 클래스)이 실제로 메모리에 올라와 오동작하는 논리적 오류를 미연에 방지하기 위한 안전장치이다.
+- **🧱 두 번째 거절: 불완전한 구현을 거부**
+    - `abstract` 메서드가 하나라도 포함된 클래스는, 그 자식 클래스가 추상 메서드들을 모두 오버라이딩하여 구체적인 로직을 완성하지 않으면 자식 클래스 자체의 인스턴스 생성도 거부한다.
+    - 즉, 구현되지 않은 '빈 껍데기' 메서드가 남은 상태로는 프로그램을 실행할 수 없게 만들어, 개발자가 강제로 상세 기능을 구현하도록 유도하는 역할을 한다.
+- **⚡ 목적: 강제성과 안전한 다형성**
+    - 이러한 두 가지 거절을 통해 자바는 '상속받는 모든 자식은 반드시 특정 기능을 구현해야 한다'는 엄격한 설계 규칙을 강제한다.
+    - 결과적으로 부모 타입으로 자식 객체를 다룰 때(다형성), 자식이 어떤 타입이든 항상 해당 메서드가 안전하게 실행될 것임을 100% 보장할 수 있게 된다.
+
+<aside>
+❓
+
+**그러면 — abstract 메서드가 0개인 추상 클래스도 의미가 있을까?**
+
+**있다.** "공통 필드·생성자·일반 메서드는 자식들이 다 같이 쓰지만, **나 자체로는 만들 수 없게** 막고 싶을 때" 사용한다. 예: Shape는 도형이라는 개념일 뿐 구체적 형태 없음 → 자식 Circle/Rectangle만 만들 수 있도록 강제. "직접 new 금지"만으로도 abstract는 충분히 유용하다.
+
+</aside>
+
+---
+
+## 실습 3 — 일반 메서드 + 추상 메서드의 공존
+
+```java
+public abstract class Person {
+  protected String name;
+  protected int age;
+  public Person(String n, int a) {
+    name = n; age = a;
+  }
+
+  public String info() {            // 일반 — 자식 공통
+      return name + "(" + age + ")";
+  }
+
+  public abstract void work();    // 추상 — 강제
+}
+
+public class Student extends Person {
+  // info()는 상속 그대로 — 다시 안 적어도 됨
+
+  public Student(String n, int a) { super(n, a); }
+
+  @Override
+  public void work() {                  // 구현 의무
+    System.out.println(info() + " 공부 중");
+  }
+}
+```
+
+```java
+Person[] people = {
+  new Student("홍길동", 20),
+  new Teacher("김선생", 40)
+};
+for (Person p : people) p.work();
+```
+
+```
+홍길동(20) 공부 중
+김선생(40) 가르치는 중
+# info()는 부모 거 그대로 활용
+```
+
+<aside>
+⚖️
+
+**황금률**
+
+- **공통 동작 = 부모에 일반 메서드** (코드 재사용)
+- **종류별 동작 = 부모에 추상 메서드** (강제력).
+- 이 두 가지를 한 클래스에 섞으면 코드 중복 0 + 누락 위험 0이 된다.
+</aside>
+
+---
+
+## 도전 문제 Employee 추상 계층
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> 추상 **Employee(name)**를 만들고 abstract int salary()를 두자. 자식 세 종류 **FullTime(연봉/12)**, **PartTime(시급×시간)**, **Contract(고정금액)**를 작성하고 Employee[]에 섞어 담아 **월급 총합**을 출력하라.
+> 
+> **// 조건**
+> 
+> - 각 자식 생성자에서 super(name) 호출
+> - 일부러 한 자식에서 salary()를 누락시킨 뒤 컴파일 오류 메시지를 적어 오기
+> - 월급 총합은 일반 메서드(static)로 작성
+
+```java
+public abstract class Employee {
+    protected String name;
+
+    public Employee(String n) {
+        name = n;
+    }
+
+    public abstract int salary();
+
+    public static int totalPay(Employee[] arr) {
+        int sum = 0;
+        for (Employee e : arr) {
+            if (e instanceof FullTime f) {
+                sum += f.salary();
+            } else if (e instanceof PartTime p) {
+                sum += p.salary();
+            } else if (e instanceof Contract c) {
+                sum += c.salary();
+            } else {
+                System.out.println("잘못된 양식");
+            }
+        }
+        return sum;
+    }
+}
+
+public class FullTime extends Employee {
+    private int annual;
+
+    public FullTime(String n, int a) {
+        super(n);
+        annual = a;
+    }
+
+    @Override
+    public int salary() {
+        return annual / 12;
+    }
+}
+
+public class PartTime extends Employee {
+    private int hrate;
+    private int hour;
+
+    public PartTime(String n, int r, int h) {
+        super(n);
+        hrate = r;
+        hour = h;
+    }
+
+    @Override
+    public int salary() {
+        return hrate * hour;
+    }
+}
+
+public class Contract extends Employee {
+    private int fix;
+
+    public Contract(String n,  int f) {
+        super(n);
+        fix = f;
+    }
+
+    @Override
+    public int salary() {
+        return fix;
+    }
+}
+```
+
+```java
+public class PayrollMain {
+    public static void main(String[] args) {
+        Employee[] arr = {
+                new FullTime("김정규", 54_000_000),
+                new PartTime("이단기", 10_000, 80),
+                new Contract("박계약", 3_000_000)
+        };
+
+        for (Employee e : arr) {
+            if (e instanceof FullTime f) {
+                System.out.printf(
+                        "[FullTime] %s: %,d원%n", f.name, f.salary());
+            } else if (e instanceof PartTime p) {
+                System.out.printf(
+                        "[PartTime] %s: %,d원%n", p.name, p.salary());
+            } else if (e instanceof Contract c) {
+                System.out.printf(
+                        "[Contract] %s: %,d원%n", c.name, c.salary());
+            } else {
+                System.out.println("잘못된 양식");
+            }
+        }
+        System.out.printf(
+                "--- 총 지급액: %,d원 ---%n",
+                Employee.totalPay(arr));
+    }
+}
+```
+
+```
+[FullTime] 김정규: 4,500,000원
+[PartTime] 이단기: 800,000원
+[Contract] 박계약: 3,000,000원
+--- 총 지급액: 8,300,000원 ---
+```
+
+---
+
+# Period 05 인터페이스 — 능력 약속 + 다중 구현
+
+1. `interface`를 정의하고 클래스가 `implements`로 구현할 수 있다
+2. 한 클래스가 **여러 인터페이스**를 동시에 구현해 다중 능력을 가질 수 있다
+3. `default` 메서드 충돌(다이아몬드)을 인식하고 명시 호출로 해결한다
+4. 상황에 따라 **추상 클래스 vs 인터페이스** 중 적절한 것을 선택할 수 있다
+
+---
+
+## interface 문법 + default 메서드
+
+- **🏗️ 인터페이스(interface)의 핵심 정의와 문법**
+    - 인터페이스는 클래스가 구현해야 할 '기능 명세서'로, `class` 대신 `interface` 키워드를 사용하여 선언합니다.
+    - 내부의 모든 메서드는 기본적으로 `public abstract`로 간주되어 바디(`{ }`) 없이 시그니처만 정의하며, 클래스가 이를 `implements`하여 구체적인 로직을 완성합니다.
+- **🧱 default 메서드의 등장 배경**
+    - 기존 인터페이스는 모든 자식 클래스에서 메서드 구현을 강제하므로, 인터페이스에 새로운 기능을 추가하면 이를 상속받은 모든 클래스에서 컴파일 에러가 발생하여 유지보수가 매우 어려웠습니다.
+    - 자바 8부터 도입된 `default` 메서드는 인터페이스 내부에 구현부(`{ }`)를 직접 작성할 수 있게 하여, 모든 구현 클래스가 공통된 기본 동작을 상속받으면서도 필요시 재정의할 수 있도록 유연성을 제공합니다.
+- **⚡ 다중 구현과 메서드 충돌 방지**
+    - 인터페이스는 다중 구현이 가능하므로, 서로 다른 인터페이스에서 동일한 시그니처를 가진 `default` 메서드를 상속받을 경우 충돌이 발생합니다.
+    - 자바는 이를 해결하기 위해 구현 클래스에서 해당 메서드를 반드시 명시적으로 오버라이딩하여 어떤 인터페이스의 기능을 사용할지(또는 재정의할지) 결정하도록 강제합니다.
+
+```java
+public interface Printable {
+  // public abstract 생략됨 — 모든 메서드 자동
+  void print();
+
+  // Java 8+ default 메서드 — 기본 구현 제공
+  default void display() {
+    System.out.println("[기본 출력] ");
+    print();
+  }
+
+  // 상수만 가능 (public static final 생략)
+  String VERSION = "1.0";
+}
+```
+
+```java
+public class Student extends Person
+       implements Printable {
+
+  @Override
+  public void print() {                // abstract 메서드 구현 의무
+    System.out.println("Student: " + name);
+  }
+  // display()는 default로 그대로 사용
+}
+```
+
+<aside>
+💡
+
+**실무 팁:** 인터페이스 이름은 흔히 -able(가능)로 끝납니다. Printable, Runnable, Comparable, Iterable...
+
+</aside>
+
+---
+
+## 실습 1 Printable 인터페이스 + 다형성 그릇
+
+```java
+// Printable.java
+public interface Printable {
+  void print();
+}
+
+// Student.java
+public class Student extends Person
+       implements Printable {
+
+  public Student(String n) { super(n); }
+
+  @Override
+  public void print() {
+    System.out.println("[Student] " + name);
+  }
+}
+
+// Teacher.java
+public class Teacher extends Person
+       implements Printable {
+
+  public Teacher(String n) { super(n); }
+
+  @Override
+  public void print() {
+    System.out.println("[Teacher] " + name);
+  }
+}
+```
+
+```java
+// PrintMain.java
+public class PrintMain {
+  public static void main(String[] args) {
+
+    // Printable 그릇에 자식 객체 담기 (다중 타입)
+    Printable[] items = {
+      new Student("홍길동"),
+      new Teacher("김선생"),
+      new Student("이서연")
+    };
+
+    for (Printable item : items) {
+      item.print();
+    }
+  }
+}
+```
+
+```
+[Student] 홍길동
+[Teacher] 김선생
+[Student] 이서연
+```
+
+---
+
+## 실습 2 Loggable 추가 — Student는 두 능력을 가진다
+
+```java
+// Loggable.java
+public interface Loggable {
+  void log(String message);
+
+  default void logInfo(String msg) {
+    log("[INFO] " + msg);
+  }
+}
+
+// Student.java
+public class Student extends Person
+       implements Printable, Loggable {
+
+  public Student(String n) { super(n); }
+
+  @Override
+  public void print() {
+    System.out.println("학생: " + name);
+  }
+
+  @Override
+  public void log(String msg) {
+    System.out.println(name + " → " + msg);
+  }
+}
+```
+
+```java
+// MultiMain.java
+Student s = new Student("홍길동");
+
+// Printable 능력
+s.print();
+
+// Loggable 능력 (default 메서드 포함)
+s.log("수업 시작");
+s.logInfo("오늘 컨디션 최상");
+
+// 둘 다 부모 타입으로도 다룰 수 있음
+Printable p = s;   p.print();
+Loggable  l = s;   l.log("end");
+```
+
+```java
+학생: 홍길동
+홍길동 → 수업 시작
+홍길동 → [INFO] 오늘 컨디션 최상
+학생: 홍길동
+홍길동 → end
+```
+
+---
+
+## 📌 47페이지: 잠깐 — 두 default가 같은 이름이면 다이아몬드
+
+```java
+// 충돌 시연
+interface Printable {
+  default void display() {
+    System.out.println("[화면 출력]");
+  }
+}
+interface Loggable {
+  default void display() {
+    System.out.println("[로그 기록]");
+  }
+}
+
+public class Student
+    implements Printable, Loggable { }
+```
+
+```
+error: class Student inherits
+unrelated defaults for
+display() from types
+Printable and Loggable
+```
+
+- **🏗️ 다이아몬드 문제의 발생 원인**
+    - 하나의 클래스가 동일한 시그니처(이름, 매개변수)를 가진 `default` 메서드를 제공하는 두 개 이상의 인터페이스를 동시에 구현할 때 발생합니다.
+    - 자바 컴파일러는 두 인터페이스 중 어느 쪽의 `default` 메서드를 우선시해야 할지 판단할 수 없으므로, 이를 '다이아몬드 모양의 상속 구조'에 의한 모호성 문제로 간주합니다.
+- **🧱 컴파일러의 엄격한 거부**
+    - 모호한 상태를 그대로 두면 프로그램의 실행 결과가 예측 불가능해지기 때문에, 자바는 이를 묵인하지 않고 즉시 **컴파일 에러**를 발생시켜 개발자가 해결하도록 강제합니다.
+    - 이는 다중 상속(다중 구현)을 허용하면서도, 부모 간의 충돌을 명확하게 해결하게 하여 언어의 신뢰성과 안전성을 높이는 설계상의 선택입니다.
+- **⚡ 해결 방법: 개발자의 명시적 오버라이딩**
+    - 충돌이 발생한 클래스에서 해당 메서드를 반드시 **오버라이딩**하여 재정의해야 합니다.
+    - 이때 `인터페이스명.super.메서드명();` 구문을 사용하여 어떤 인터페이스의 기능을 사용할지 명시하거나, 아예 새로운 로직을 작성함으로써 모호성을 제거하고 개발자의 의도를 명확히 전달해야 합니다.
+
+```java
+public class Student
+    implements Printable, Loggable {
+
+  @Override
+  public void display() {
+    // 방법 1: 한 쪽 명시 호출
+    Printable.super.display();
+
+    // 방법 2: 둘 다 호출도 가능
+    Loggable.super.display();
+
+    // 방법 3: 완전히 새 동작도 가능
+    System.out.println("[Student] 학생 표시");
+  }
+}
+```
+
+<aside>
+🔑
+
+ **규칙:** 두 인터페이스의 default가 충돌하면 **구현 클래스가 직접 오버라이딩**해야 합니다. 그 안에서 [인터페이스명].super.메서드()로 어느 쪽을 쓸지 명시할 수 있습니다.
+
+</aside>
+
+> **이름:** 두 부모(인터페이스)에서 내려오는 같은 메서드 → 자식이 정점 → **다이아몬드(◇) 모양**. C++에선 진짜 다중 상속의 골칫거리. 자바는 인터페이스로만 허용하고 컴파일러가 강제로 해결을 요구합니다.
+> 
+
+---
+
+## 실습 3 언제 abstract, 언제 interface?
+
+```java
+// 추상 클래스 — 공통 상태 (name, age)
+public abstract class Person {
+  protected String name;
+  protected int age;
+  public abstract void work();
+}
+
+// 인터페이스 — 능력 약속
+public interface Printable {
+  void print();
+}
+
+// 자식: 부모(상태) + 인터페이스(능력)
+public class Student extends Person
+       implements Printable {
+  public Student(String n, int a) { super(n); age = a; }
+
+  @Override public void work()  { ... }
+  @Override public void print() { ... }
+}
+```
+
+> **관찰:** Person으로 상태와 work()를 받고, Printable로 능력을 추가했습니다. 한 클래스가 **둘 다**의 장점을 가집니다.
+> 
+
+### abstract class vs interface 비교 요약
+
+| **비교 항목** | **추상 클래스 (abstract class)** | **인터페이스 (interface)** |
+| --- | --- | --- |
+| **관계** | "is-a" (상속/확장 관계) | "has-a" (기능 구현 관계) |
+| **상속 개수** | 단일 상속만 가능 | 다중 구현 가능 |
+| **필드(변수)** | 일반 필드 및 정적/상수 모두 가능 | `public static final` 상수만 가능 |
+| **생성자** | 생성자 존재 (자식 객체 초기화용) | 생성자 없음 |
+| **일반 메서드** | 일반 메서드 구현 가능 | `default` 메서드만 구현 가능 |
+| **추상 메서드** | 추상 메서드와 일반 메서드 혼합 가능 | 모든 메서드가 추상 메서드(기본) |
+- **🏗️ 추상 클래스의 핵심: 공통 상태 공유**
+    - 상태(필드)를 가지거나, 자식 클래스 간의 공통적인 기반 로직을 공유하고 싶을 때 주로 사용합니다. 상속을 통해 부모의 속성을 물려받아 객체의 계층 구조를 명확히 할 때 유리합니다.
+- **🧱 인터페이스의 핵심: 기능 명세 및 다형성**
+    - 클래스가 무엇을 할 수 있는지(Capability)를 정의합니다. 다중 구현이 가능하므로, 서로 다른 계층의 클래스들이 동일한 기능을 수행하도록 강제하여 다형성을 극대화할 때 강력한 도구가 됩니다.
+- **⚡ 설계 선택 가이드**
+    - 부모-자식 간의 긴밀한 계층 구조를 형성해야 한다면 `abstract class`를, 서로 관계없는 클래스들에게 특정 동작을 수행하도록 계약을 맺고 싶다면 `interface`를 선택하는 것이 표준 설계 원칙입니다.
+
+---
+
+## 도전 문제 — Rankbale로 정렬
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> **interface Rankable { int rank(); }**를 만들고 Student(점수 기준)와 Product(가격 기준) 두 클래스가 모두 implements 하라. Rankable[]에 둘을 섞어 담고 rank **내림차순** 정렬해 출력하라.
+> 
+> **// 조건**
+> 
+> - 정렬 알고리즘은 3장의 선택정렬을 직접 작성 (Arrays.sort 금지)
+> - 출력은 toString을 활용 (각 클래스에서 다르게)
+> - Rankable[]에 들어간 Student와 Product를 instanceof로 구분해 표시
+
+```java
+// Student.java
+public class Student implements Rankable {
+    private String name;
+    private int score;
+
+    public Student(String n, int s) {
+        this.name = n;
+        this.score = s;
+    }
+
+    public int rank() { return score; }
+
+    public String toString() {
+        return "[Student] " + name + "(" + score + "점)";
+    }
+}
+
+// Product.java
+public class Product implements Rankable {
+    private String name;
+    private int price;
+
+    public Product(String n, int p) {
+        this.name = n;
+        this.price = p;
+    }
+
+    @Override
+    public int rank() { return price; }
+
+    public String toString() {
+        return "[Product] " + name + "(" + price + "만원)";
+    }
+}
+```
+
+```java
+public class RankMain {
+    public static void main(String[] args) {
+        Rankable[] arr = {
+                new Student("홍길동", 95),
+                new Product("마우스", 3),
+                new Product("노트북", 250)
+        };
+
+        for (int i=0; i < arr.length; i++) {
+            int maxIdx = i;
+            for (int j=i+1; j < arr.length; j++) {
+                if (arr[j].rank() > arr[maxIdx].rank()) {
+                    maxIdx = j;
+                }
+            }
+            if (maxIdx != i) {
+                Rankable temp = arr[i];
+                arr[i] = arr[maxIdx];
+                arr[maxIdx] = temp;
+            }
+        }
+
+        for (Rankable r : arr) {
+            System.out.println(r);
+        }
+    }
 }
 ```
