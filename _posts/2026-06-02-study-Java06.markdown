@@ -1,0 +1,1665 @@
+---
+layout: post
+title: '[Java] Java 06 Exception'
+subtitle: 'Exception'
+categories: study
+tags: Java
+comments: true
+---
+
+![Java](/assets/img/study/java.jpeg)
+
+- [Period 01 예외(Exception) 기초 — try / catch / finally](#period-01-예외exception-기초--try--catch--finally)
+  - [try/catch/finally 흐름 + 예외 계층](#trycatchfinally-흐름--예외-계층)
+  - [실습 1 자주 만나는 두 예외 — NPE와 IOOBE](#실습-1-자주-만나는-두-예외--npe와-ioobe)
+    - [NPE — null 참조 호출](#npe--null-참조-호출)
+    - [IOOBE — 배열 범위 초과](#ioobe--배열-범위-초과)
+  - [실습 2 다중 catch — 종류별로 다르게 처리](#실습-2-다중-catch--종류별로-다르게-처리)
+  - [잠깐 — `try` 에서 `return`해도 `finally`는 실행됩니다](#잠깐--try-에서-return해도-finally는-실행됩니다)
+    - [함정 1 — return 후 finally](#함정-1--return-후-finally)
+    - [함정 2 — finally에서 return하면 예외 삼킴](#함정-2--finally에서-return하면-예외-삼킴)
+  - [실습 3 try-with-resources — 자동 close](#실습-3-try-with-resources--자동-close)
+    - [옛 방식 — finally에서 close](#옛-방식--finally에서-close)
+    - [Java 7+ try-with-resources](#java-7-try-with-resources)
+  - [도전 문제 — 절대 죽지 않는 계산기](#도전-문제--절대-죽지-않는-계산기)
+- [Period 02 사용자 정의 예외 + throws + Checked / Unchecked](#period-02-사용자-정의-예외--throws--checked--unchecked)
+  - [문법 + Checked vs Unchecked 선택](#문법--checked-vs-unchecked-선택)
+  - [실습 1 Account.withdraw + InsufficientBalanceException](#실습-1-accountwithdraw--insufficientbalanceexception)
+    - [예외 정의 + Account](#예외-정의--account)
+    - [Main에서 try/catch](#main에서-trycatch)
+  - [실습 2 throws 호출 사슬 — 예외는 위로 전파된다](#실습-2-throws-호출-사슬--예외는-위로-전파된다)
+    - [3단계 호출 사슬](#3단계-호출-사슬)
+  - [잠깐 — RuntimeException이 “편한” 게 함정](#잠깐--runtimeexception이-편한-게-함정)
+    - [Checked — 컴파일러가 강제](#checked--컴파일러가-강제)
+    - [Unchecked — 자유롭지만 위험](#unchecked--자유롭지만-위험)
+  - [다중 throws + 다중 catch — Account 확장](#다중-throws--다중-catch--account-확장)
+    - [Account — 두 예외](#account--두-예외)
+    - [Main — 각각 다른 처리](#main--각각-다른-처리)
+  - [도전 문제 — 도서관 대여 시스템](#도전-문제--도서관-대여-시스템)
+- [Period 03 ArrayList](#period-03-arraylist)
+  - [문법 + 주요 API + 자동 확장 원리 (ArrayList)](#문법--주요-api--자동-확장-원리-arraylist)
+    - [자동 확장 원리](#자동-확장-원리)
+  - [실습 1 학생 리스트 — 동적 추가/조회](#실습-1-학생-리스트--동적-추가조회)
+    - [학생 리스트 동적 운용](#학생-리스트-동적-운용)
+  - [실습 2 for-each 순회 + 인덱스 remove](#실습-2-for-each-순회--인덱스-remove)
+    - [3가지 순회 방법](#3가지-순회-방법)
+    - [인덱스로 삭제](#인덱스로-삭제)
+  - [같은 1인데 결과가 다릅니다 (ArrayList `remove`의 함정)](#같은-1인데-결과가-다릅니다-arraylist-remove의-함정)
+    - [함정 1 — remove(1) vs remove(Integer.valueOf(1))](#함정-1--remove1-vs-removeintegervalueof1)
+    - [함정 2  — for-each 중 remove → CME](#함정-2---for-each-중-remove--cme)
+  - [실습 3 안전한 조건부 삭제 — removeIf](#실습-3-안전한-조건부-삭제--removeif)
+    - [Java 8+ removeIf (권장)](#java-8-removeif-권장)
+    - [옛 방식 — Iterator.remove](#옛-방식--iteratorremove)
+    - [Student 필터링 예시](#student-필터링-예시)
+  - [도전 문제 — 쇼핑 카트](#도전-문제--쇼핑-카트)
+- [Period 04 HashMap • HashSet • equals \& hashCode 계약](#period-04-hashmap--hashset--equals--hashcode-계약)
+  - [해시 동작 + 주요 API (HashSet)](#해시-동작--주요-api-hashset)
+  - [실습 1 HashMap — 학번으로 즉시 조회](#실습-1-hashmap--학번으로-즉시-조회)
+  - [실습 2 HashSet — 중복 자동 제거](#실습-2-hashset--중복-자동-제거)
+    - [중복 학번 거르기](#중복-학번-거르기)
+    - [빠른 contains](#빠른-contains)
+  - [잠깐 — 분명 넣었는데 못 찾습니다](#잠깐--분명-넣었는데-못-찾습니다)
+    - [함정 — equals만 오버라이딩](#함정--equals만-오버라이딩)
+    - [진실](#진실)
+    - [해결 — 둘을 함께](#해결--둘을-함께)
+  - [실습 3 IntelliJ Generate — 두 메서드 한 번에](#실습-3-intellij-generate--두-메서드-한-번에)
+  - [도전 문제 — 출석부 시스템](#도전-문제--출석부-시스템)
+- [Period 05 파일 IO — Path • Files.writeString • readAllLines](#period-05-파일-io--path--fileswritestring--readalllines)
+  - [Path + Files — 두 클래스로 거의 다 된다](#path--files--두-클래스로-거의-다-된다)
+- [Period 06 싱글톤 + 전략 — 자바의 두 핵심 패턴](#period-06-싱글톤--전략--자바의-두-핵심-패턴)
+  - [왜 디자인 패턴 — 자주 마주치는 두 문제](#왜-디자인-패턴--자주-마주치는-두-문제)
+    - [싱글톤 + 전략 패턴의 골격 구조](#싱글톤--전략-패턴의-골격-구조)
+
+
+# Period 01 예외(Exception) 기초 — try / catch / finally
+
+1. `try / catch / finally` 구문으로 예외를 받아 프로그램이 죽지 않게 한다
+2. 자주 보는 예외(NPE, IOOBE, ArithmeticExcpetion)의 원인을 설명한다
+3. 다중 catch로 여러 종류 예외를 다르게 처리한다 (자식 → 부모 순서)
+4. `try-with-resources`로 자원을 자동 close한다
+
+<aside>
+💡
+
+ **예외 처리의 본질:** "프로그램이 죽지 않게 받쳐주기" + "사용자가 이해할 수 있는 메시지로 안내". stacktrace는 개발자용, 메시지는 사용자용.
+
+</aside>
+
+---
+
+## try/catch/finally 흐름 + 예외 계층
+
+```java
+// 흐름 -- 정상 vs 예외
+try {
+  // ① 시도 코드
+  위험한_작업();
+  // 예외 없으면 catch 건너뜀
+} catch (SomeException e) {
+  // ② 예외 발생 시 진입
+  로그(e);
+} finally {
+  // ③ 항상 실행 (예외든 정상이든)
+  자원_정리();
+}
+```
+
+- **🏗️ 예외 처리의 3단계 흐름 (`try-catch-finally`)**
+    - **`try`**: 예외가 발생할 가능성이 있는 코드를 감싸며, 예외가 발생하면 즉시 실행을 멈추고 `catch` 블록으로 제어를 넘깁니다.
+    - **`catch`**: 발생한 예외 객체를 받아 적절한 대응 로직을 수행합니다. 예외 종류별로 다중 `catch`를 사용하여 세밀하게 처리할 수 있습니다.
+    - **`finally`**: 예외 발생 여부와 상관없이 **항상 마지막에 실행**됩니다. 주로 파일 닫기나 네트워크 연결 해제 등 자원 정리(Resource Cleanup)를 수행하는 데 필수적입니다.
+- **🧱 자바의 예외 계층 구조**
+    - 모든 예외의 조상은 `Throwable` 클래스입니다. 크게 `Error`와 `Exception`으로 나뉩니다.
+    - **`Error`**: JVM 자체에서 발생하는 치명적인 오류(예: `OutOfMemoryError`)로, 개발자가 코드 수준에서 복구하거나 처리할 수 없습니다.
+    - **`Exception`**: 코드의 논리적 오류나 외부 환경 문제로 발생하며 처리가 가능합니다. 다시 `IOException`처럼 컴파일 시점에 체크를 강제하는 **Checked 예외**와, 그렇지 않은 **Unchecked 예외**로 구분됩니다.
+- **⚡ 흐름 제어의 핵심: 순서와 안전성**
+    - `catch` 블록은 자식 타입에서 부모 타입 순으로 작성해야 합니다. 부모를 먼저 작성하면 자식 예외가 부모 `catch`에 걸려버려 상세한 처리가 불가능해지기 때문입니다.
+    - `finally` 블록 안에서 `return`을 사용하는 것은 위험합니다. 예외 발생 정보를 덮어쓰거나 무시하게 만들어 디버깅을 불가능하게 만들 수 있으므로 주의해야 합니다.
+
+```
+Throwable
+├─ Error (JVM 자체 오류 — 잡지 마세요)
+└─ Exception
+   ├─ IOException (Checked)
+   │  # throws 필수
+   └─ RuntimeException
+      ├─ NullPointerException (NPE)
+      ├─ ArrayIndexOutOfBounds (IOOBE)
+      ├─ ArithmeticException
+      └─ ClassCastException
+        # throws 불필요
+```
+
+> 
+> 
+> 
+> **두 종류:
+> Checked** = 컴파일러가 throws 강제 (IOException 등)
+> **Unchecked(RuntimeException)**= throws 자유 (NPE, IOOBE 등)
+> 
+
+<aside>
+⛔
+
+**주의:** **Error는 절대 catch하지 마세요.** OutOfMemoryError 같은 JVM 자체 오류는 회복 불가.
+
+</aside>
+
+---
+
+## 실습 1 자주 만나는 두 예외 — NPE와 IOOBE
+
+### NPE — null 참조 호출
+
+```java
+// NpeDemo.java
+public class NpeDemo {
+  public static void main(String[] args) {
+    String s = null;
+    try {
+      System.out.println(s.length());
+    } catch (NullPointerException e) {
+      System.out.println("null이라 길이 못 구함");
+    }
+    System.out.println("계속 실행됨!");
+  }
+}
+```
+
+```
+null이라 길이 못 구함
+계속 실행됨!
+```
+
+### IOOBE — 배열 범위 초과
+
+```java
+// IoobeDemo.java
+public class IoobeDemo {
+  public static void main(String[] args) {
+    int[] arr = {10, 20, 30};
+    try {
+      System.out.println(arr[10]);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.out.println("인덱스 범위 초과: " + e.getMessage());
+    }
+    System.out.println("계속 실행됨!");
+  }
+}
+```
+
+```
+인덱스 범위 초과: Index 10 out of bounds for length 3
+계속 실행됨!
+```
+
+> **팁:** e.getMessage()로 예외의 상세 메시지를 얻을 수 있습니다.
+> 
+
+---
+
+## 실습 2 다중 catch — 종류별로 다르게 처리
+
+```java
+import java.util.Scanner;
+import java.util.InputMismatchException;
+
+public class SafeDivide {
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    try {
+      System.out.print("두 정수: ");
+      int a = sc.nextInt();
+      int b = sc.nextInt();
+      System.out.println(a + " / " + b + " = " + (a / b));
+    }
+    catch (InputMismatchException e) {
+      System.out.println("⚠ 정수만 입력하세요");
+    }
+    catch (ArithmeticException e) {
+      System.out.println("⚠ 0으로 나눌 수 없습니다");
+    }
+    catch (Exception e) {        // 마지막 안전망
+      System.out.println("⚠ 알 수 없는 오류");
+    }
+  }
+}
+```
+
+```
+$ java SafeDivide
+두 정수: 10 2
+10 / 2 = 5
+
+$ java SafeDivide
+두 정수: 10 0
+⚠ 0으로 나눌 수 없습니다
+
+$ java SafeDivide
+두 정수: abc
+⚠ 정수만 입력하세요
+```
+
+> **순서가 중요!** 자식 → 부모 순으로 catch. catch (Exception)을 맨 위에 두면 다른 catch가 절대 실행되지 않음 (컴파일 오류)
+> 
+
+> **Java 7+:** catch (IOException | SQLException e) { ... }로 두 종류를 한 블록에 묶을 수도 있습니다.
+> 
+
+---
+
+## 잠깐 — `try` 에서 `return`해도 `finally`는 실행됩니다
+
+- **🏗️ `finally` 블록의 절대적 보장**
+    - `try` 블록 안에서 `return` 문을 만나 메서드가 종료되려 하더라도, 자바는 `finally` 블록에 작성된 코드를 **반드시 먼저 실행**한 뒤에 메서드를 최종 종료합니다.
+    - 이는 예외 발생 여부나 정상 종료 여부와 상관없이, 시스템이 어떤 경로로 빠져나가든 자원 정리(Resource Cleanup)가 반드시 수행되어야 한다는 설계를 보장하기 위함입니다.
+- **🧱 실무에서의 활용 (자원 정리)**
+    - 파일 스트림, 네트워크 소켓, DB 연결 등은 프로그램이 종료되거나 예외가 발생할 때 반드시 닫아주어야(close) 자원 누수가 발생하지 않습니다.
+    - `finally`는 이러한 자원을 확실하게 해제할 수 있는 유일한 '최후의 보루' 역할을 하므로, 안전한 프로그래밍을 위한 필수 구조입니다.
+- **⚡ 주의 사항: `finally` 내의 `return` 금지**
+    - `finally` 블록 내부에서 `return`을 사용하면 `try`나 `catch` 블록에서 발생했던 원래의 예외 정보를 덮어쓰거나 무시하게 됩니다.
+    - 이로 인해 디버깅이 매우 어려워지므로, `finally`는 오직 자원 해제나 정리 작업만을 위해 사용하고 메서드 흐름을 제어하는 `return`은 절대 작성하지 않아야 합니다.
+
+### 함정 1 — return 후 finally
+
+```java
+static String test() {
+  try {
+    System.out.println("try 진입");
+    return "try 반환";       // 여기서 끝일까?
+  } finally {
+    System.out.println("finally 실행");
+  }
+}
+
+// main에서 호출
+System.out.println(test());
+```
+
+```
+try 진입
+finally 실행 # return 직전에 실행됨!
+try 반환
+```
+
+> **진실:** try에서 return하면 **finally가 먼저 실행된 뒤** return이 완료됩니다. "finally는 항상"이라는 약속 때문.
+> 
+
+### 함정 2 — finally에서 return하면 예외 삼킴
+
+```java
+static int danger() {
+  try {
+    throw new RuntimeException("치명적!");
+  } finally {
+    return 0;       // ← 예외가 사라짐
+  }
+}
+
+// main에서
+try {
+  System.out.println(danger());
+} catch (Exception e) {
+  System.out.println("잡힘: " + e);
+}
+```
+
+```
+0 # 예외가 없었던 것처럼…
+```
+
+<aside>
+❗
+
+**절대 finally에서 return하지 마세요**
+
+예외가 조용히 사라져 디버깅이 매우 어려워집니다. finally는 **자원 정리만**. return·throw는 try/catch에서.
+
+</aside>
+
+---
+
+## 실습 3 try-with-resources — 자동 close
+
+### 옛 방식 — finally에서 close
+
+```java
+Scanner sc = null;
+try {
+  sc = new Scanner(System.in);
+  int n = sc.nextInt();
+  System.out.println(n * 2);
+} catch (Exception e) {
+  System.out.println("오류");
+} finally {
+  if (sc != null) sc.close();   // 직접
+}
+```
+
+<aside>
+👎
+
+ null 체크, close, 11줄. 한 줄만 빼먹어도 자원 누수.
+
+</aside>
+
+### Java 7+ try-with-resources
+
+```java
+try (Scanner sc = new Scanner(System.in)) {
+  int n = sc.nextInt();
+  System.out.println(n * 2);
+} catch (Exception e) {
+  System.out.println("오류");
+}
+// finally 없어도 sc.close() 자동 호출!
+```
+
+<aside>
+👍
+
+ 7줄. 누수 위험 0. **AutoCloseable을 구현한 클래스**만 가능 (Scanner, Reader, OutputStream 등).
+
+</aside>
+
+<aside>
+🔑
+
+**황금률**
+
+**자원(파일/네트워크/DB)을 다룰 땐 무조건 try-with-resources.**
+
+</aside>
+
+> **팁:** 여러 자원도 한 번에 — try (Scanner sc = ...; FileReader fr = ...) { } (역순으로 close됨)
+> 
+
+---
+
+## 도전 문제 — 절대 죽지 않는 계산기
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> Scanner로 정수 두 개를 받아 **나누기**를 계속 반복하는 프로그램. **어떤 입력**(정수 아님, 0 나누기 등)이 와도 **stacktrace 없이** 안내 후 다음 입력으로.
+> 
+> **// 조건**
+> 
+> - InputMismatchException, ArithmeticException 모두 catch
+> - 0을 두 번 연속 입력하면 종료
+> - try-with-resources로 Scanner 자동 close
+> - try에서 return하고 finally에서도 return 두 가지 코드도 따로 작성해 결과 비교 (반전 페이지 복습)
+
+```java
+public class SafeCalc {
+    public static void main(String[] args) {
+        try (Scanner sc = new Scanner(System.in)) {
+            while (true) {
+                try {
+                    System.out.print("a b: ");
+                    int a = sc.nextInt();
+                    int b = sc.nextInt();
+                    if (a == 0 && b == 0) {
+                        System.out.println("종료");
+                        break;
+                    }
+                    System.out.println("결과: " + (a / b));
+                } catch (InputMismatchException e) {
+                    System.out.println("⚠ 정수만");
+                    sc.next();
+                } catch (ArithmeticException e) {
+                    System.out.println("⚠ 0으로 나누기 금지");
+                }
+            }
+        }
+    }
+}
+```
+
+---
+
+# Period 02 사용자 정의 예외 + throws + Checked / Unchecked
+
+1. `extends Exception` 또는 `RuntimeException`으로 사용자 정의 예외를 만든다
+2. `throw`로 예외를 던지고 `throws`로 시그니처에 명시한다
+3. Checked와 Unchecked의 차이(컴파일러 강제 여부)를 코드로 시연한다
+4. 도메인 상황에 맞게 Checked / Unchecked를 적절히 선택할 수 있다
+
+<aside>
+💡
+
+ **사용자 정의 예외의 가치:** 클래스 이름 자체가 문서. 호출자는 catch 종류만 봐도 무슨 일이 일어나는지 압니다. **도메인 = 코드의 단어**가 됩니다.
+
+</aside>
+
+---
+
+## 문법 + Checked vs Unchecked 선택
+
+- **🏗️ Checked 예외 (컴파일 타임)**
+    - 예외 처리가 **강제**되는 예외입니다 (`Exception`의 자식 중 `RuntimeException`이 아닌 것들).
+    - `try-catch`로 직접 처리하거나, 호출한 곳으로 `throws`를 통해 책임을 넘겨야만 컴파일이 가능합니다. 파일 IO나 네트워크 연결처럼 외부 환경에 의해 발생할 가능성이 높은 비즈니스 상황에서 주로 사용합니다.
+- **🧱 Unchecked 예외 (런타임)**
+    - 예외 처리가 **강제되지 않는** 예외입니다 (`RuntimeException` 계열).
+    - 프로그래머의 실수(예: `NullPointerException`, `IndexOutOfBoundsException`)로 발생하는 경우가 많으며, 코드를 수정하여 예방하는 것이 원칙이기에 불필요한 `try-catch` 문법 오염을 막기 위해 처리를 강제하지 않습니다.
+- **⚡ 선택 가이드: 무엇을 쓸 것인가?**
+    - 호출자가 예외를 반드시 복구하여 프로그램을 정상화할 수 있다면 **Checked 예외**를 사용합니다.
+    - 호출자가 해결할 방법이 없거나(예: 프로그램이 죽어야 할 심각한 상황), 프로그래머의 실수로 인해 발생하는 예외라면 **Unchecked 예외**를 선택하여 비즈니스 로직을 깔끔하게 유지합니다.
+
+|  | **Checked 예외** | **Unchecked 예외** |
+| --- | --- | --- |
+| **부모** | `Exception` | `RuntimeException` |
+| **throws** | 필수 (없으면 컴파일 오류) | 선택 |
+| **호출자** | try/catch 강제 | 자유 (생략 가능) |
+| **예시** | `IOException`, `SQLException` | NPE, IOOBE, IllegalArg |
+| **의도** | 회복 가능한 외부 오류 | 프로그래머의 실수, 코드 버그 |
+
+<aside>
+⚖️
+
+**선택 가이드**
+
+- **Checked:** 호출자가 **반드시** 알아야 + 회복 가능 (파일 없음, DB 연결 끊김)
+- **Unchecked:** 프로그래머가 잘 짜면 안 나야 함 (잘못된 인자, null 참조)
+</aside>
+
+---
+
+## 실습 1 Account.withdraw + InsufficientBalanceException
+
+### 예외 정의 + Account
+
+```java
+// InsufficientBalanceException.java
+public class InsufficientBalanceException
+       extends Exception {
+
+  public InsufficientBalanceException(int bal, int req) {
+    super("잔액(" + bal + ") < 요청(" + req + ")");
+  }
+}
+
+// Account.java
+public class Account {
+  private int balance;
+
+  public Account(int b) { balance = b; }
+
+  public void withdraw(int amount)
+      throws InsufficientBalanceException {
+    if (amount > balance) {
+      throw new InsufficientBalanceException(balance, amount);
+    }
+    balance -= amount;
+    System.out.println("출금 OK, 잔액: " + balance);
+  }
+}
+```
+
+### Main에서 try/catch
+
+```java
+public class BankMain {
+  public static void main(String[] args) {
+    Account acc = new Account(10000);
+
+    try {
+      acc.withdraw(3000);
+      acc.withdraw(50000);  // 폭발
+    } catch (InsufficientBalanceException e) {
+      System.out.println("⚠ " + e.getMessage());
+    }
+  }
+}
+```
+
+```
+출금 OK, 잔액: 7000
+⚠ 잔액(7000) < 요청(50000)
+```
+
+> **관찰:** withdraw 시그니처에 throws InsufficientBalanceException이 있고, 호출자는 **반드시** try/catch로 처리(또는 자기도 throws). Checked의 강제력.
+> 
+
+---
+
+## 실습 2 throws 호출 사슬 — 예외는 위로 전파된다
+
+### 3단계 호출 사슬
+
+```java
+class BankService {
+  private Account acc = new Account(10000);
+
+  // 사슬 중간 — 자기도 throws 선언
+  public void pay(int amount)
+      throws InsufficientBalanceException {
+    acc.withdraw(amount);   // 던질 수 있음
+  }
+}
+
+public class App {
+  public static void main(String[] args) {
+    BankService bs = new BankService();
+    // 최상위에서 try/catch
+    try {
+      bs.pay(50000);
+    } catch (InsufficientBalanceException e) {
+      System.out.println("⚠ 결제 실패: " + e.getMessage());
+    }
+  }
+}
+```
+
+> **관찰:** 사슬 중간 메서드는 **catch 안 해도** 됩니다 — **throws로 위로 미루기**만 하면 OK. 실제 처리는 가장 위(보통 main 또는 UI 계층)에서.
+> 
+
+> **실무:** 비즈니스 로직(서비스 계층)은 throws만, 표현 계층(컨트롤러/UI)이 catch.
+> 
+
+---
+
+## 잠깐 — RuntimeException이 “편한” 게 함정
+
+### Checked — 컴파일러가 강제
+
+```java
+// Exception 상속
+public class MyEx extends Exception {}
+
+// withdraw에 throws 없이
+public void withdraw(int amt) {
+  throw new MyEx();   // ✗ 컴파일 오류
+}
+```
+
+```
+error: unreported exception MyEx;
+must be caught or declared to be thrown
+```
+
+> 
+> 
+> 
+> **장점:** 컴파일러가 처리를 강제 →**까먹을 수 없음**
+> 
+> **단점:** throws 사슬이 모든 호출자에 전파 → 코드가 장황
+> 
+
+### Unchecked — 자유롭지만 위험
+
+```java
+// RuntimeException 상속
+public class MyEx extends RuntimeException {}
+
+// throws 없이도 OK
+public void withdraw(int amt) {
+  throw new MyEx();   // ✓ 컴파일 OK
+}
+
+// main에서 처리 안 해도 OK
+public static void main(String[] args) {
+  new Account().withdraw(5000);   // ✓
+}
+```
+
+```
+Exception in thread "main" MyEx
+at Account.withdraw...
+# 운영 중 stacktrace로 폭발
+```
+
+> 
+> 
+> 
+> **함정:** "편한" 게 위험. 호출자가 처리를 **까먹기 쉬움** → 운영 환경에서 노출.
+> 
+> **권장:** 회복 가능 = Checked, 프로그래머 실수 = Unchecked.
+> 
+- **🏗️ "편리함" 뒤에 숨겨진 위험**
+    - `RuntimeException`은 `try-catch`를 강제하지 않으므로 코드 작성이 매우 편리합니다. 하지만 이 편리함 때문에 예외 처리를 아예 생략하게 되기 쉽습니다.
+    - 개발자가 예외 발생 가능성을 인지하지 못하고 방치하게 되면, 실제 프로그램 운영 중에 예기치 못한 시점에 앱이 중단되는 런타임 오류가 발생할 위험이 커집니다.
+- **🧱 안전성 확보를 위한 철학**
+    - 자바가 Checked 예외를 통해 강제하는 것은 '귀찮음'이 아니라 '안전 장치'입니다. 컴파일 타임에 예외를 확인하게 함으로써 최소한의 안전성을 확보하려는 설계 의도가 담겨 있습니다.
+    - `RuntimeException`을 사용할 때는 호출자에게 예외 상황을 충분히 인지시킬 수 있는 문서화(Javadoc)나 명확한 코드 주석이 뒷받침되어야 합니다.
+- **⚡ 실무적 균형점**
+    - 예외를 통해 프로그램 흐름을 복구해야 한다면 반드시 Checked 예외를 사용하고, 프로그래머의 실수로 인해 예외가 발생한다면 Unchecked 예외를 사용하여 로직을 단순하게 유지하는 균형 감각이 중요합니다.
+    - 편리함만을 쫓아 예외를 모두 `RuntimeException`으로 감싸버리면(Wrapping), 정작 문제가 발생했을 때 근본 원인을 파악하기 매우 어려워질 수 있습니다.
+
+---
+
+## 다중 throws + 다중 catch — Account 확장
+
+### Account — 두 예외
+
+```java
+// 두 예외 — 하나는 Unchecked, 하나는 Checked
+public class InvalidAmountException
+       extends RuntimeException {
+  public InvalidAmountException(int a) {
+    super("잘못된 금액: " + a);
+  }
+}
+
+public class Account {
+  private int balance;
+
+  public void withdraw(int amount)
+      throws InsufficientBalanceException {
+
+    // Unchecked — throws 안 써도 됨
+    if (amount <= 0)
+      throw new InvalidAmountException(amount);
+
+    // Checked — throws 필수
+    if (amount > balance)
+      throw new InsufficientBalanceException(balance, amount);
+
+    balance -= amount;
+  }
+}
+```
+
+### Main — 각각 다른 처리
+
+```java
+public class BankApp {
+  public static void main(String[] args) {
+    Account acc = new Account(10000);
+
+    int[] tries = {3000, -100, 50000};
+    for (int amt : tries) {
+      try {
+        acc.withdraw(amt);
+        System.out.println("OK " + amt);
+      }
+      catch (InvalidAmountException e) {
+        System.out.println("입력 오류: " + e.getMessage());
+      }
+      catch (InsufficientBalanceException e) {
+        System.out.println("잔액 부족: " + e.getMessage());
+      }
+    }
+  }
+}
+```
+
+```
+OK 3000
+입력 오류: 잘못된 금액: -100
+잔액 부족: 잔액(7000) < 요청(50000)
+```
+
+> **관찰:** 두 예외를 각각 다른 catch로 처리 → 사용자에게 정확한 메시지. 코드 자체가 도메인 사고를 반영.
+> 
+
+---
+
+## 도전 문제 — 도서관 대여 시스템
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> Library.borrow(bookId, userId) 메서드를 만들고 3가지 사용자 정의 예외를 던지도록 설계하라. 그리고 4가지 시나리오를 main에서 모두 try/catch로 처리하라.
+> 
+> **// 3가지 예외**
+> 
+> - **BookNotFoundException** (Checked) — 책이 존재하지 않음
+> - **AlreadyBorrowedException** (Checked) — 이미 대여 중
+> - **UserBlockedException** (Unchecked) — 차단된 사용자
+> 
+> **설계 과제:** 각 예외를 Checked / Unchecked로 결정한 이유를 두 줄로 적어 오기.
+> 
+
+```java
+public class BookNotFoundException
+        extends Exception {
+    BookNotFoundException(String bookId) {
+        super("[없는 책] "+bookId+" -> 없는 책: "+bookId);
+    }
+}
+
+public class AlreadyBorrowedException
+        extends Exception {
+    AlreadyBorrowedException(String bookId) {
+        super("[이미 대여] "+bookId+" -> 이미 대여중");
+    }
+}
+
+public class UserBlockedException
+        extends RuntimeException {
+    UserBlockedException(String userId) {
+        super("[차단된 사용자] "+userId+" -> 차단됨");
+    }
+}
+
+public class Library {
+    private String[] borrowed = new String[10];
+
+    public void borrow(String bookId, String userId)
+        throws BookNotFoundException, AlreadyBorrowedException {
+        if (bookId.equals("B999")) {
+            throw new BookNotFoundException(bookId);
+        } else if (userId.equals("U900")) {
+            throw new UserBlockedException("U900");
+        }
+        for (String book : borrowed) {
+            if (bookId.equals(book)) {
+                throw new AlreadyBorrowedException(bookId);
+            }
+        }
+        for (int i=0; i < borrowed.length; i++) {
+            if (borrowed[i] == null) {
+                borrowed[i] = bookId;
+                System.out.println("[정상] "+bookId+" -> "+userId+" 대여 OK");
+                break;
+            }
+        }
+
+    }
+}
+
+```
+
+```java
+public class LibraryApp {
+    public static void main(String[] args) {
+        Library lib = new Library();
+
+        try {
+            lib.borrow("B101", "U200");
+        } catch (BookNotFoundException | AlreadyBorrowedException | UserBlockedException e) {
+            System.out.println("!!! " + e.getMessage());
+        }
+
+        try {
+            lib.borrow("B999", "U200");
+        } catch (BookNotFoundException | AlreadyBorrowedException | UserBlockedException e) {
+            System.out.println("!!! " + e.getMessage());
+        }
+
+        try {
+            lib.borrow("B101", "U200");
+        } catch (BookNotFoundException | AlreadyBorrowedException | UserBlockedException e) {
+            System.out.println("!!! " + e.getMessage());
+        }
+
+        try {
+            lib.borrow("B101", "U900");
+        } catch (BookNotFoundException | AlreadyBorrowedException | UserBlockedException e) {
+            System.out.println("!!! " + e.getMessage());
+        }
+    }
+}
+```
+
+```
+[정상] B101 -> U200 대여 OK
+!!! [없는 책] B999 -> 없는 책: B999
+!!! [이미 대여] B101 -> 이미 대여중
+!!! [차단된 사용자] U900 -> 차단됨
+```
+
+> **완성 후 추가 도전.** 모든 예외에 공통 부모 LibraryException을 만들고 자식들이 상속받으면 catch 한 줄로 묶을 수 있습니다.
+> 
+
+---
+
+# Period 03 ArrayList
+
+1. `ArrayList`의 add / get / remove / size를 자유롭게 사용
+2. 배열 대비 자동 확장의 동작 원리를 설명한다
+3. `remove(int)`와 `remove(Object`의 차이를 구분한다
+4. for-each 중 remove로 인한 ConcurrentModificationException을 `removeIf`로 해결
+
+---
+
+## 문법 + 주요 API + 자동 확장 원리 (ArrayList)
+
+```java
+import java.util.List;
+import java.util.ArrayList;
+
+// 권장 — 인터페이스 타입 선언
+List<String> names = new ArrayList<>();
+
+// 초기값과 함께
+List<Integer> nums = new ArrayList<>(
+    List.of(1, 2, 3));
+```
+
+- **🏗️ ArrayList 문법 및 활용**
+    - 배열의 크기를 고정해야 했던 불편함을 해결하기 위해 `ArrayList<T>`를 사용합니다.
+    - `List<Student> list = new ArrayList<>();`와 같이 선언하며, `add()`, `get()`, `remove()`, `size()` 등 직관적인 메서드를 통해 데이터를 자유롭게 관리할 수 있습니다.
+- **🧱 내부 동작 원리: 자동 확장 (Auto-Expansion)**
+    - `ArrayList`는 내부에 고정 크기의 배열을 유지합니다.
+    - 데이터가 가득 차면, 자바는 기존 배열보다 약 1.5배 큰 새로운 배열을 자동으로 생성한 뒤 기존 데이터를 모두 복사하여 옮깁니다.
+    - 개발자는 `add()` 메서드만 호출하면 되며, 내부적인 배열 크기(`capacity`) 관리나 복사 과정은 자바가 자동으로 처리하므로 신경 쓸 필요가 없습니다.
+- **⚡ 주의 사항: size vs capacity**
+    - **size**는 현재 저장된 데이터의 실제 개수이며, **capacity**는 현재 할당된 내부 배열의 전체 수용 크기입니다.
+    - `remove(1)`과 `remove(Integer.valueOf(1))` 호출 시 결과가 다를 수 있는 점 등, 인덱스 기반 삭제와 객체 값 기반 삭제의 차이를 명확히 이해하고 사용해야 합니다.
+
+### 자동 확장 원리
+
+```java
+// 초기: capacity 10 (기본값)
+capacity = 10  size = 0
+
+// add 10번 후
+capacity = 10  size = 10 ← 가득
+
+// 11번째 add 시점
+capacity 부족!
+↓
+capacity = 15  (1.5배)
+기존 10개 복사
+size = 11
+```
+
+<aside>
+🔑
+
+**핵심**
+
+**size = 실제 개수**, **capacity = 내부 배열 크기** (사용자는 신경 X). 가득 차면 자바가 알아서 1.5배로 키우고 복사. 우리는 add만.
+
+</aside>
+
+> **참고:** 배열은 .length (필드), ArrayList는 .size() (메서드). 헷갈리지 마세요.
+> 
+
+---
+
+## 실습 1 학생 리스트 — 동적 추가/조회
+
+### 학생 리스트 동적 운용
+
+```java
+import java.util.*;
+
+public class StudentListDemo {
+  public static void main(String[] args) {
+    List<Student> list = new ArrayList<>();
+
+    // 처음엔 5명만 — 가변이라 부담 없음
+    list.add(new Student("홍길동", 92));
+    list.add(new Student("김철수", 85));
+    list.add(new Student("이서연", 78));
+
+    System.out.println("현재 " + list.size() + "명");
+
+    // 6번째 학생 추가 — 배열이라면 큰 일
+    list.add(new Student("신입생", 100));
+    System.out.println("추가 후: " + list.size() + "명");
+
+    // 0번째 조회
+    Student first = list.get(0);
+    System.out.println("첫 번째: " + first);
+  }
+}
+```
+
+```
+현재 3명
+추가 후: 4명
+첫 번째: Student[홍길동, 92]
+```
+
+---
+
+## 실습 2 for-each 순회 + 인덱스 remove
+
+### 3가지 순회 방법
+
+```java
+List<String> names = new ArrayList<>(
+    List.of("홍", "김", "이", "박"));
+
+// ① 전통적 for + 인덱스
+for (int i=0; i<names.size(); i++) {
+  System.out.println(i + ":" + names.get(i));
+}
+
+// ② for-each (권장)
+for (String s : names) {
+  System.out.println(s);
+}
+
+// ③ forEach 메서드 (람다)
+names.forEach(s -> System.out.println(s));`
+```
+
+### 인덱스로 삭제
+
+```java
+List<String> list = new ArrayList<>(
+    List.of("홍", "김", "이", "박"));
+
+// 1번 인덱스 삭제 → "김" 제거
+list.remove(1);
+System.out.println(list);
+
+// 결과: [홍, 이, 박]
+// "이"의 인덱스가 2→1로 당겨짐!
+```
+
+```java
+[홍, 이, 박]
+```
+
+---
+
+## 같은 1인데 결과가 다릅니다 (ArrayList `remove`의 함정)
+
+- **🏗️ 인덱스 기반 삭제 vs 객체 값 기반 삭제**
+    - `ArrayList`의 `remove()` 메서드는 인자로 전달되는 값이 `int` 타입(인덱스)인지 `Integer` 객체(실제 요소 값)인지에 따라 완전히 다른 동작을 수행합니다.
+    - `list.remove(1)`을 호출하면 인덱스 `1` 위치에 있는 요소를 삭제하지만, `list.remove(Integer.valueOf(1))`을 호출하면 리스트 내부에 존재하는 값 `1`을 찾아서 삭제합니다.
+- **🧱 타입 구분의 중요성**
+    - 자바 컴파일러는 메서드 오버로딩 규칙에 따라 전달되는 데이터의 타입으로 호출할 메서드를 결정합니다.
+    - 숫자 `1`을 단순히 전달하면 인덱스로 처리되지만, `Integer.valueOf(1)`과 같이 객체로 명시하면 값(value)으로 처리되므로, 개발자가 의도한 삭제 대상이 무엇인지 명확히 구분하여 호출해야 합니다.
+- **⚡ 주의 사항: 혼란을 방지하는 방법**
+    - 리스트를 다룰 때 인덱스를 지울 것인지 값을 지울 것인지 혼동이 생기지 않도록, `remove` 연산 시 타입 캐스팅이나 `valueOf`를 적절히 사용하여 의도를 명확하게 표현하는 습관이 필요합니다.
+    - 이러한 '같은 1이지만 결과가 다른' 미스터리는 리스트의 데이터 타입과 `remove` 오버로딩 메서드의 동작 방식을 정확히 이해하지 못하면 발생하기 쉬운 전형적인 실무 버그입니다.
+
+### 함정 1 — remove(1) vs remove(Integer.valueOf(1))
+
+```java
+List<Integer> nums = new ArrayList<>();
+nums.add(10);  nums.add(1);
+nums.add(20);  nums.add(30);
+// 시작: [10, 1, 20, 30]
+
+// A) int → remove(int index) 호출
+nums.remove(1);
+System.out.println(nums);
+
+// B) Integer → remove(Object o) 호출
+nums.remove(Integer.valueOf(1));
+System.out.println(nums);
+```
+
+```
+[10, 20, 30] # A: 인덱스 1 (값 1) 제거
+[10, 20, 30] # 우연히 같은데…
+// nums가 [1,2,3]이었으면?
+remove(1) → [1, 3] 인덱스 1 (값 2) 제거
+remove(Integer.valueOf(1)) → [2, 3] 값 1 제거
+```
+
+### 함정 2  — for-each 중 remove → CME
+
+```java
+List<Integer> nums = new ArrayList<>(
+    List.of(1, 2, 3, 4));
+
+for (Integer n : nums) {
+  if (n % 2 == 0) {
+    nums.remove(n);   // 폭발!
+  }
+}
+```
+
+```
+Exception in thread "main"
+java.util.ConcurrentModificationException
+```
+
+---
+
+## 실습 3 안전한 조건부 삭제 — removeIf
+
+### Java 8+ removeIf (권장)
+
+```java
+List<Integer> nums = new ArrayList<>(
+    List.of(1, 2, 3, 4, 5, 6));
+
+// 한 줄로 짝수 모두 제거
+nums.removeIf(n -> n % 2 == 0);
+
+System.out.println(nums);
+// 결과: [1, 3, 5]
+```
+
+### 옛 방식 — Iterator.remove
+
+```java
+Iterator<Integer> it = nums.iterator();
+while (it.hasNext()) {
+  Integer n = it.next();
+  if (n % 2 == 0) {
+    it.remove();   // Iterator의 remove — 안전
+  }
+}
+```
+
+### Student 필터링 예시
+
+```java
+List<Student> list = new ArrayList<>(...);
+
+// 점수 60점 미만 학생 모두 제거
+list.removeIf(s -> s.getScore() < 60);
+
+// 특정 이름 제거
+list.removeIf(s -> s.getName().equals("홍길동"));
+```
+
+<aside>
+🔑
+
+**규칙**
+
+- **한 개 삭제**: list.remove(...) for 루프 밖에서
+- **조건부 다수 삭제**: list.removeIf(...)
+- **for-each 안에서 list 수정 금지** — CME
+</aside>
+
+---
+
+## 도전 문제 — 쇼핑 카트
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> List<Product>로 쇼핑 카트를 만들고 메뉴 루프로 다음을 처리:
+> 
+> - **1=상품 추가** (이름, 가격)
+> - **2=5000원 이하 모두 삭제** — for-each 안 remove로 한 번 폭발시킨 뒤 removeIf로 고치기
+> - **3=총액 출력** — for-each 또는 stream
+> - **0=종료**
+> 
+> **설계 과제:** CME 메시지를 캡처해 적고, removeIf 한 줄로 어떻게 바뀌었는지 한 줄 메모.
+> 
+
+```java
+public class Product {
+    private String name;
+    private int price;
+
+    public Product() {}
+    public Product(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() { return name; }
+    public int getPrice() { return price; }
+}
+```
+
+```java
+public class CartApp {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<Product> cart = new ArrayList<>();
+
+        while (true) {
+            System.out.print("1=추가 2=싼것삭제 3=총액 0=종료: ");
+            int cmd = sc.nextInt();
+
+            switch (cmd) {
+                case 1 -> {
+                    System.out.print("이름 가격: ");
+                    String name = sc.next();
+                    int price = sc.nextInt();
+                    cart.add(new Product(name, price));
+                    System.out.println("담음, 현재 " + cart.size() + "개");
+                }
+                case 2 -> {
+                    int before = cart.size();
+                    cart.removeIf(p -> p.getPrice() <= 5000);
+                    int after = cart.size();
+                    int diff = before - after;
+                    System.out.println(diff + "개 삭제됨. 남음: "+ after);
+                }
+                case 3 -> {
+                    int sum = 0;
+                    for (Product p : cart) sum += p.getPrice();
+                    System.out.println("총액: " + sum);
+                }
+                case 0 -> { return; }
+            }
+        }
+    }
+}
+```
+
+---
+
+# Period 04 HashMap • HashSet • equals & hashCode 계약
+
+1. `HashMap`으로 키-값 쌍을 저장하고 O(1) 조회
+2. `HashSet`으로 중복 자동 제거 + 빠른 contains 검사
+3. equals와 hashCode가 한 몸 계약임을 코드로 시연한다
+4. IntelliJ의 Generate equals/hashCode로 안전하게 둘을 한 번에 작성한다
+
+---
+
+## 해시 동작 + 주요 API (HashSet)
+
+- **🏗️ HashSet의 개념과 특징**
+    - 중복을 허용하지 않고 순서를 보장하지 않는 대표적인 집합(Set) 자료구조입니다.
+    - 내부적으로 해시 테이블(Hash Table)을 사용하여 데이터의 추가, 삭제, 검색 연산을 O(1)에 가까운 고속으로 처리하며, 데이터 양이 많아져도 일정한 성능을 유지하는 강력한 자료구조입니다.
+- **🧱 해시 메커니즘: 중복을 걸러내는 원리**
+    - **1단계 (해시값 계산):** 객체가 추가될 때 `hashCode()` 메서드를 호출하여 고유한 해시값을 얻고, 이를 기반으로 저장될 버킷(바구니) 위치를 결정합니다.
+    - **2단계 (동일성 비교):** 만약 해당 위치에 이미 다른 데이터가 있다면, `equals()` 메서드를 호출하여 두 객체가 논리적으로 완전히 동일한지 최종 비교합니다. 이 과정을 통해 중복 저장을 완벽하게 차단합니다.
+- **⚡ 주요 API의 활용**
+    - **`add(E e)`**: 요소를 추가합니다. 이미 존재하는 값이라면 `false`를 반환하여 중복 저장을 방지합니다.
+    - **`contains(Object o)`**: 특정 요소가 집합 내에 있는지 확인합니다. 리스트와 달리 데이터 규모가 아무리 커져도 해시 알고리즘을 통해 즉각적인 검색이 가능합니다.
+    - **`remove(Object o)`**: 지정된 요소를 제거합니다. 이 과정 역시 해시 계산을 통해 수행되므로 매우 효율적입니다.
+
+---
+
+## 실습 1 HashMap — 학번으로 즉시 조회
+
+```java
+import java.util.*;
+
+public class MapDemo {
+  public static void main(String[] args) {
+    Map<String, Student> db = new HashMap<>();
+
+    // 저장
+    db.put("20240001", new Student("홍길동", 92));
+    db.put("20240002", new Student("김철수", 85));
+    db.put("20240003", new Student("이서연", 78));
+
+    // 조회 — O(1)
+    Student s = db.get("20240002");
+    System.out.println(s);
+
+    // 존재 확인
+    if (db.containsKey("20240999")) {
+      System.out.println("있음");
+    } else {
+      System.out.println("없는 학번");
+    }
+
+    // 순회 — entrySet
+    for (Map.Entry<String,Student> e : db.entrySet()) {
+      System.out.println(e.getKey() + " → " + e.getValue());
+    }
+  }
+}
+```
+
+```
+Student[김철수, 85]
+없는 학번
+20240001 → Student[홍길동, 92]
+20240002 → Student[김철수, 85]
+20240003 → Student[이서연, 78]
+```
+
+<aside>
+⚡
+
+**핵심 관찰**
+
+**get("20240002") 한 번의 호출**로 즉시 학생 찾음. 1만명이든 100만명이든 시간 거의 동일 → O(1).
+
+</aside>
+
+> **팁:** 순서가 중요하면 LinkedHashMap, 정렬이 필요하면 TreeMap. 보통은 HashMap.
+> 
+
+---
+
+## 실습 2 HashSet — 중복 자동 제거
+
+### 중복 학번 거르기
+
+```java
+List<String> raw = List.of(
+    "20240001", "20240002",
+    "20240001",   // 중복
+    "20240003",
+    "20240002"    // 중복
+);
+System.out.println("입력: " + raw.size());
+
+// List → Set 한 줄
+Set<String> unique = new HashSet<>(raw);
+System.out.println("중복 제거: " + unique.size());
+System.out.println(unique);
+```
+
+```
+입력: 5
+중복 제거: 3
+[20240001, 20240002, 20240003]
+# 순서는 보장 X (HashSet)
+```
+
+### 빠른 contains
+
+```java
+// 출석 체크 — Set이면 O(1)
+Set<String> attended = new HashSet<>();
+attended.add("20240001");
+attended.add("20240003");
+
+if (attended.contains("20240001")) {
+  System.out.println("홍길동: 출석");
+}
+if (!attended.contains("20240002")) {
+  System.out.println("김철수: 결석");
+}
+
+// add — 이미 있으면 false 반환
+boolean added = attended.add("20240001");
+System.out.println("두 번째 add: " + added);
+// false — 중복 시 무시
+```
+
+<aside>
+🔑
+
+**Set의 황금 사용처**
+
+- 중복 제거 (학번/이메일 유일성)
+- 빠른 contains 검사 (즐겨찾기, 관심사)
+- 집합 연산 (교집합/합집합)
+</aside>
+
+---
+
+## 잠깐 — 분명 넣었는데 못 찾습니다
+
+### 함정 — equals만 오버라이딩
+
+```java
+public class Student {
+  private String id;
+  private String name;
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Student s)) return false;
+    return id.equals(s.id);
+  }
+  // hashCode 안 만듦!
+}
+
+// main:
+Set<Student> set = new HashSet<>();
+set.add(new Student("001", "홍길동"));
+set.add(new Student("001", "홍길동"));
+System.out.println("size: " + set.size());
+
+Map<Student,String> m = new HashMap<>();
+m.put(new Student("001", "홍길동"), "출석");
+String v = m.get(new Student("001", "홍길동"));
+System.out.println("get: " + v);
+```
+
+```
+size: 2 # 중복 안 걸러짐!
+get: null # 분명 넣었는데?
+```
+
+### 진실
+
+<aside>
+🔍
+
+**해시 동작 순서**
+
+1. **hashCode()**로 버킷 위치 결정
+2. 같은 버킷 안에서 **equals()**로 비교
+
+**hashCode를 안 만들면** Object의 기본 — **객체마다 다른 해시값**.
+같은 학번이어도 새 객체면 다른 버킷에 들어감 → 영원히 못 만남.
+
+</aside>
+
+### 해결 — 둘을 함께
+
+```java
+@Override
+public boolean equals(Object o) {
+  if (!(o instanceof Student s)) return false;
+  return id.equals(s.id);
+}
+
+@Override
+public int hashCode() {
+  return Objects.hash(id);  // 같은 필드 기반
+}
+```
+
+> **계약:** equals가 같으면 hashCode도 반드시 같아야. 한쪽만 만들면 위반.
+> 
+
+---
+
+## 실습 3 IntelliJ Generate — 두 메서드 한 번에
+
+```java
+import java.util.Objects;
+
+public class Student {
+  private String id;
+  private String name;
+  private int score;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Student s)) return false;
+    return Objects.equals(id, s.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+}
+```
+
+```
+size: 1 # 중복 제거됨!
+get: 출석 # 찾을 수 있음
+```
+
+<aside>
+🔑
+
+**핵심 원칙**
+
+**같은 필드**를 equals와 hashCode 모두에 사용. 한쪽만 만들거나 다른 필드를 쓰면 계약 위반. IntelliJ 자동 생성을 쓰면 실수 0.
+
+</aside>
+
+> **팁:** Java 14+ record 키워드면 equals/hashCode/toString 모두 자동 (학습용은 클래스로 직접).
+> 
+
+---
+
+## 도전 문제 — 출석부 시스템
+
+> 
+> 
+> 
+> **// 문제**
+> 
+> 학생 출석부를 두 자료구조로 동시에 관리하라.
+> 
+> - Map<String, Boolean> attendance — 학번 → 출석여부
+> - Set<String> lateStudents — 지각자 학번 (중복 자동 제거)
+> 
+> **// 시나리오**
+> 
+> - 5명 출석 등록
+> - 그 중 1명을 일부러 **두 번** 출석 등록
+> - 2명을 지각자 Set에 추가 (한 명은 두 번)
+> - Map.size()와 Set.size()를 출력 후 예측과 비교
+
+```java
+import java.util.*;
+
+public class Attendance {
+    public static void main(String[] args) {
+        Map<String, Boolean> attendance = new HashMap<>();
+        Set<String> lateStudents = new HashSet<>();
+
+        attendance.put("0001", true);
+        attendance.put("0002", true);
+        attendance.put("0003", true);
+        attendance.put("0004", true);
+        attendance.put("0005", true);
+        attendance.put("0001", false);
+
+        lateStudents.add("0001");
+        lateStudents.add("0003");
+        lateStudents.add("0001");
+
+        System.out.println("Map: " + attendance.size());
+        System.out.println("Set: " + lateStudents.size());
+    }
+}
+```
+
+---
+
+# Period 05 파일 IO — Path • Files.writeString • readAllLines
+
+1. `Files.writeString(path, text)`로 파일에 쓴다
+2. `Files.readAllLines(path)`로 줄 단위 읽기 후 객체 복원
+3. 기본 덮어쓰기 → `StandardOpenOption.APPEND`로 누적 저장
+4. `try-with-resources`로 BufferedReader 자동 close
+
+---
+
+## Path + Files — 두 클래스로 거의 다 된다
+
+- **🏗️ `Path`: 경로 관리의 표준**
+    - 기존의 `File` 클래스에서 경로 처리 기능만을 분리하고 강화한 객체입니다. 파일의 **위치(경로)** 정보만을 다루며, 파일 존재 여부와 무관하게 경로 문자열을 조작하거나 상위/하위 경로를 가져오는 등 유연한 경로 연산을 수행할 수 있습니다.
+- **🧱 `Files`: 실제 기능의 집합체**
+    - 파일 시스템과 상호작용하는 **정적(Static) 메서드**들을 모아놓은 유틸리티 클래스입니다. `Files.copy()`, `Files.move()`, `Files.delete()`, `Files.readAllLines()` 등 실제 파일을 다루는 거의 모든 작업을 `Files` 클래스를 통해 수행합니다.
+    - 데이터를 직접 쓰거나 읽는 동작은 `Files`가 전담하여 코드가 훨씬 간결해졌습니다.
+- **⚡ `Path`와 `Files`의 협업 구조**
+    - **`Path`가 어디(Where)를 가리킬지 결정하면, `Files`가 무엇을(What) 할지 결정하는 방식**으로 작동합니다.
+    - 예: `Path path = Paths.get("data.txt");` (어디) → `Files.readAllLines(path);` (무엇)
+    - 이 조합은 기존 `File` 클래스의 설계 미흡했던 부분들을 보완하며, 예외 처리도 더 상세하게 제공하여 안정적인 파일 시스템 프로그래밍을 가능하게 합니다.
+
+```java
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public static void main(String[] args)
+    throws IOException {   // Checked!
+
+  Path path = Path.of("students.txt");
+
+  // 쓰기 — 한 줄
+  Files.writeString(path, "홍길동,92\n김철수,85\n");
+
+  // 읽기 — 줄 단위 List
+  List<String> lines = Files.readAllLines(path);
+  for (String line : lines) {
+    System.out.println(line);
+  }
+}
+```
+
+---
+
+---
+
+# Period 06 싱글톤 + 전략 — 자바의 두 핵심 패턴
+
+1. `private 생성자 + static getInstance`로 싱글톤을 구현한다
+2. 인터페이스 위임으로 전략 패턴을 구현하고 갈아 끼운다
+3. “private 생성자 누락”이 어떻게 싱글톤을 깨뜨리는지 시연한다
+4. if-else 분기 vs 전략 패턴의 OCP 차이를 새 결제수단 추가로 증명한다
+
+---
+
+## 왜 디자인 패턴 — 자주 마주치는 두 문제
+
+- **🏗️ 자주 마주치는 두 문제 (The Two Common Problems)**
+    - **1. 자원 관리 문제 (예: Logger)**: 여러 곳에서 객체를 생성하여 자원을 낭비하거나 상태를 관리하기 까다로운 상황 (예: "Logger를 `new`해서 여러 개 생성하는 것이 옳은가?").
+    - **2. 조건문 지옥 (예: 결제 로직)**: 새로운 정책이 추가될 때마다 `if-else` 블록이 무한히 늘어나 코드의 유지보수성을 떨어뜨리는 상황 (예: "결제 `if-else` 지옥?").
+- **🧱 핵심 해법: 디자인 패턴의 도입**
+    - 디자인 패턴은 위와 같은 전형적인 문제들에 대해 입증된 해결책을 제공합니다.
+    - 자원 관리 문제는 싱글톤 패턴(Singleton Pattern)을 통해 객체의 유일성을 보장함으로써 해결합니다.
+    - 조건문 지옥 문제는 전략 패턴(Strategy Pattern)을 통해 알고리즘(정책)을 객체화하여 확장성을 높이고 결합도를 낮춤으로써 해결합니다.
+- **⚡ 디자인 패턴의 실무 가치**
+    - 단순히 코드를 수정하는 것이 아니라, 구조를 개선하여 향후 요구사항 변경에 유연하게 대응할 수 있는 코드를 만드는 것이 목적입니다.
+    - "스프링(Spring)은 이러한 패턴들을 자동화하여 더 효율적인 개발 환경을 제공합니다".
+
+---
+
+### 싱글톤 + 전략 패턴의 골격 구조
+
+- **🏗️ 1. 싱글톤 패턴 (Singleton Pattern): 유일한 자원 관리**
+    - **구조:** 생성자를 `private`으로 선언하여 외부에서 `new`를 통한 객체 생성을 원천 차단합니다. 클래스 내부에 `private static`으로 단 하나의 인스턴스를 미리 생성해두고, 이를 외부에 제공하는 `getInstance()` 메서드를 제공합니다.
+    - **핵심:** 프로그램 전체에서 해당 객체가 오직 하나만 존재하도록 보장하여, Logger와 같이 중복 생성이 불필요한 자원을 효율적으로 관리합니다.
+
+```java
+public class Logger {
+
+  // ① 자기 자신을 static으로 보관
+  private static Logger instance;
+
+  // ② private 생성자 — 외부 new 차단
+  private Logger() { /* 초기화 */ }
+
+  // ③ 유일한 진입점
+  public static Logger getInstance() {
+    if (instance == null) {
+      instance = new Logger();
+    }
+    return instance;
+  }
+
+  public void log(String msg) {
+    System.out.println("[LOG] " + msg);
+  }
+}
+
+// 사용: Logger.getInstance().log("...")
+```
+
+- **🧱 2. 전략 패턴 (Strategy Pattern): 알고리즘의 캡슐화**
+    - **구조:** 다양한 알고리즘(예: 결제 방식 등)을 공통 인터페이스로 정의합니다. 각 구체적인 알고리즘은 해당 인터페이스를 구현한 클래스로 각각 작성합니다.
+    - **핵심:** '실행하는 놈(Context)'과 '알고리즘(Strategy)'을 분리합니다. Context는 인터페이스를 참조하여 실행하며, 새로운 정책이 추가되어도 Context의 코드를 수정하지 않고 새로운 구현체만 갈아 끼우면 되므로 확장성이 극대화됩니다.
+
+```java
+// ① 전략 인터페이스
+public interface PaymentStrategy {
+  void pay(int amount);
+}
+
+// ② 구체 전략들
+class CardPayment implements PaymentStrategy {
+  public void pay(int a) {
+    System.out.println("카드 " + a);
+  }
+}
+class CashPayment implements PaymentStrategy {
+  public void pay(int a) {
+    System.out.println("현금 " + a);
+  }
+}
+
+// ③ 사용자 — 인터페이스 그릇
+class PaymentService {
+  private PaymentStrategy strategy;
+  public void setStrategy(PaymentStrategy s) {
+    this.strategy = s;
+  }
+  public void checkout(int a) { strategy.pay(a); }
+}
+```
+
+- **⚡ 결합 시너지: 더 깔끔한 설계**
+    - 싱글톤으로 관리되는 Context 객체 내부에서 전략 패턴으로 구현된 알고리즘들을 사용함으로써, 자원 관리의 효율성과 로직의 유연성을 동시에 잡을 수 있습니다.
+    - 이러한 구조는 복잡한 `if-else` 조건을 제거하고, 객체 지향적인 다형성을 통해 유지보수가 용이한 코드를 작성하게 해줍니다.
+
+```java
+public interface DiscountStrategy {
+    int apply(int price);
+}
+
+public class NoDiscount implements DiscountStrategy {
+    @Override
+    public int apply(int price) {
+        System.out.print("[NoDiscount] ");
+
+        Logger l = Logger.getInstance();
+        l.log("결제 " + price);
+
+        return price;
+    }
+}
+
+public class PercentDiscount implements DiscountStrategy {
+    @Override
+    public int apply(int price) {
+        System.out.print("[Percent10] ");
+        double rate = 0.9;
+        double final_price = rate * price;
+
+        Logger l = Logger.getInstance();
+        l.log("결제 " + (int) final_price);
+
+        return (int) final_price;
+    }
+}
+
+public class FixedDiscount implements DiscountStrategy {
+    @Override
+    public int apply(int price) {
+        System.out.print("[Fixed100] ");
+
+        Logger l = Logger.getInstance();
+        l.log("결제 " + (price - 1000));
+
+        return price - 1000;
+    }
+}
+
+public class DiscountService {
+    private DiscountStrategy strategy;
+    public void setStrategy(DiscountStrategy s) {
+        this.strategy = s;
+    }
+    public void discount(int price) {
+        int after = strategy.apply(price);
+        System.out.println(price + "원 -> " + after + "원");
+    }
+}
+```
+
+```java
+public class Logger {
+    private static Logger instance;
+    private final Path file = Path.of("app.log");
+
+    private Logger() {}
+
+    public static Logger getInstance() {
+        if (instance == null) return new Logger();
+        return instance;
+    }
+
+    public void log(String msg) {
+        try {
+            Files.writeString(file,
+                    msg + "\n",
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            System.err.println("log fail");
+        }
+    }
+}
+```
+
+```java
+public class ShopMain {
+    public static void main(String[] args) {
+        DiscountService svc = new DiscountService();
+        Logger l = Logger.getInstance();
+
+        svc.setStrategy(new NoDiscount());
+        svc.discount(10000);
+
+        svc.setStrategy(new PercentDiscount());
+        svc.discount(10000);
+
+        svc.setStrategy(new FixedDiscount());
+        svc.discount(10000);
+    }
+}
+```
