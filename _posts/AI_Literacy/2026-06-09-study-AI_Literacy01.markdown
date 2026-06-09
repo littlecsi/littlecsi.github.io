@@ -1,7 +1,7 @@
 ---
 layout: post
-title: '[AI] AI Literacy'
-subtitle: 'AI & Generative AI'
+title: '[AI] AI Literacy 01'
+subtitle: 'AI Prompting Basics'
 categories: study
 tags: AI_Literacy
 comments: true
