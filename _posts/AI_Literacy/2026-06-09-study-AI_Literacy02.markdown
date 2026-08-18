@@ -3,7 +3,7 @@ layout: post
 title: '[AI] AI Literacy 02'
 subtitle: 'Advanced AI Prompting'
 categories: study
-tags: AI_Literacy
+tags: AI
 comments: true
 ---
 
