@@ -1,7 +1,7 @@
 ---
 layout: tag-blog
 title: Certificate
-slug: Certificate
+slug: certificate
 category: study
 menu: false
 order: 1

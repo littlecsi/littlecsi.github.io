@@ -43,3 +43,6 @@ node_modules
 .sass-cache
 .jekyll-metadata
 *.gem
+
+# 이전 소유자(isme2n) 저장소의 .git 백업 - 추적 대상 아님
+.git_backup

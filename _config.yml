@@ -45,15 +45,16 @@ google_fonts:        Lato
 # If you do not use a Google Fonts, uncomment the line below
 # no_google_fonts:     true
 
-# Set your Google Analytics id to receive `pageview` events.
-# To remove Google Anaylics from your page, remove the line below.
-google_analytics:    UA-154857674-1
+# Google Analytics 측정 ID.
+# 기존 UA-154857674-1 은 Universal Analytics 로, 2023년 7월 서비스가 종료되어 더 이상 수집되지 않음.
+# 계속 사용하려면 GA4 측정 ID(`G-` 로 시작)를 발급받아 아래 줄의 주석을 해제하고 교체할 것.
+# google_analytics:    G-XXXXXXXXXX
 
 # Setting a disqus shortname will enable the comment section on pages with `comments: true` in the front matter
 disqus_shortname:    littlecsi
 
 # This text will appear in the footer of every page. Markdown enabled.
-copyright:           '&copy; 2017. by isme2n'
+copyright:           '&copy; 2026. by Lian Choi'
 
 # Format of the permalinks
 permalink:           pretty
@@ -99,7 +100,8 @@ collections:
 #  Advanced configuration
 # -----------------------------------------------------------------------------
 
-gems:
+# `gems` 는 Jekyll 3.5 에서 `plugins` 로 이름이 바뀐 폐기 키 (Jekyll 4 에서는 무시됨)
+plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-paginate
