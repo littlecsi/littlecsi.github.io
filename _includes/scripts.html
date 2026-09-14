@@ -34,6 +34,32 @@
   <script>loadJSDeferred('{{ js_url | relative_url }}');</script>
 
   {% comment %}
+    수식 렌더링.
+    GitHub Pages 의 kramdown 은 수식을 \( \) / \[ \] 텍스트로 내보내는데,
+    hydejack.js 에 번들된 KaTeX 0.7.1 코드는 <script type="math/tex"> 태그만 처리해서
+    수식이 LaTeX 원문 그대로 보였다. KaTeX auto-render 로 본문(#_main)을 직접 렌더링한다.
+    hydejack 의 push-state 는 새로고침 없이 #_main 만 교체하므로 y-push-state-after 에서도 다시 실행한다.
+    compress 레이아웃이 줄바꿈을 없애므로 아래 인라인 JS 에는 // 주석을 쓰면 안 된다.
+  {% endcomment %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+  <script>
+    window.renderMath = function () {
+      var main = document.getElementById('_main');
+      if (!main || !window.renderMathInElement) return;
+      window.renderMathInElement(main, {
+        delimiters: [
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    };
+    document.getElementById('_yPushState').addEventListener('y-push-state-after', window.renderMath);
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="window.renderMath()"></script>
+
+  {% comment %}
     {% include my-scripts.html %}
   {% endcomment %}
   <!--<![endif]-->
